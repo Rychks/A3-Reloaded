@@ -1,0 +1,86 @@
+﻿
+@{
+    ViewBag.Title = "AjusteTemplate";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    A3_Reloaded.Models.TemplateModel template = new A3_Reloaded.Models.TemplateModel();
+}
+
+<div class="section-body">
+    <h2 class="section-title">Ajustes de Template A3</h2>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card card-primary">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-lg-2">
+                            <label for="txtTemplates_Folio">Folio</label>
+                            <input type="text" class="form-control" value="@template.Folio" id="txtTemplatesM_Folio">
+                            <input type="text" id="txtTemplatesM_ID" hidden disabled>
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="slcTemplatesM_TipoA3">Tipo de A3</label>
+                            <select class="form-control" id="slcTemplatesM_TipoA3">
+                                <option value="-1" selected disabled>Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-2" style="margin-top:30px">
+                            <button type="button" class="btn btn-icon btn-success btn-left" id="btnTemplatesM_Guardar" data-toggle="modal" data-target="#mdlTemplates_Agregar">
+                                <i class="fa fa-plus" aria-hidden="true"></i> Agregar
+                            </button>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Estatus:</label>
+                            <div class="form-check">
+                                <label class="switch">
+                                    <input type="checkbox" for="cbxTemplatesM_Activo" id="cbxTemplatesM_Activo">
+                                    <span class="slider"></span>
+                                </label>
+                                <label for="cbxTemplatesM_Activo">Desactivado</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="mdlTemplates_Agregar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info" data-type="warning">
+                    <h4 class="modal-title">Agregar Nuevo Template</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-lg-4">
+                            <label for="txtTemplatesN_Folio">Folio:</label>
+                            <input type="text" class="form-control" id="txtTemplatesN_Folio" placeholder="Ingrese un Folio">
+                            <input type="text" id="txtTemplatesN_ID" hidden disabled>
+                            <textarea></textarea>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="slcTemplatesN_TipoA3">TipoA3:</label>
+                            <select class="form-control" id="slcTemplatesN_TipoA3">
+                                <option selected disabled value="-1">Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Estatus:</label>
+                            <div class="form-check">
+                                <label class="switch">
+                                    <input type="checkbox" for="cbxTemplatesN_Activo" id="cbxTemplatesN_Activo">
+                                    <span class="slider"></span>
+                                </label>
+                                <label for="cbxTemplatesN_Activo">Desactivado</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-danger" tabindex="4" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" tabindex="3" id="btnTemplatesN_Guardar">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

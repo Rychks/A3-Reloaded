@@ -1,0 +1,30 @@
+﻿@{
+    Layout = "~/Views/Login/_Login.cshtml";
+    ViewBag.Title = "Upsi!!";
+}
+<div class="row">
+    <div class="col-12 col-md-12 col-lg-12">
+        <div class="card card-hero" style="width: 480px;" data-type="danger">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <h4>¡Ups! tenemos un inconveniente</h4>
+                <div class="card-header-action">
+                    <a href="@Url.Action("Index","Login")" class="btn btn-success"><i class="fa fa-arrow-left"></i>  Regresar</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <p>Lamentamos que no pueda acceder al sistema.</p>
+                <p>Algunas de las posibles causas son:</p>
+                <ul>
+                    <li>Una lenta conexión de red.</li>
+                    <li>La cadena de conexión a la base de datos es incorrecta.</li>
+                    <li>Problemas con los permisos en la base de datos y/o servidor.</li>
+                    <li>No está configurado correctamente el servidor.</li>
+                </ul>
+                <p>Por favor compruebe lo anterior e intente de nuevo. <br />Si el problema persiste contacte al administrador del sistema.</p>
+            </div>
+        </div>
+    </div>
+</div>

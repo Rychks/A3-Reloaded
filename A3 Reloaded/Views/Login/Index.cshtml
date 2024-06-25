@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "~/Views/Login/_Login.cshtml";
+    ViewBag.Title= "Login";
+}
+<div class="login-brand">
+    <img src="~/Assets/Bayer_Brand/Bayer-Logo2.png" alt="logo" width="100" class="shadow-light rounded-circle">
+</div>
+<div class="card card-success">
+    <div class="card-header"><h4>Welcome!</h4></div>
+    <div class="card-body">
+        <form method="post" action="@Url.Action("IniciarSesion", "Login")" id="frmLogin_Login">
+            <div class="form-group">
+                <label for="btnLogin_BYTOST">CWID</label>
+                <input id="btnLogin_BYTOST" name="BYTOST" type="text" class="form-control text-center" value="EUENY" tabindex="1" autofocus placeholder="Enter CWID">
+            </div>
+            <div class="form-group">
+                <label for="txtLogin_ZNACKA" class="control-label">Password</label>
+                <input id="txtLogin_ZNACKA" name="ZNACKA" type="password" value="Oc3anEye$290797" class="form-control text-center" tabindex="2" placeholder="Enter Password">
+            </div>
+            <div class="form-group">
+                <label for="txtLogin_Idioma" class="control-label">Language</label>
+                <select id="slc_Idioma" name="ID_Language" style="padding: 5px" class="form-control">
+                    <option value="value">Ingles</option>
+                    <option value="value">Español</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success btn-lg btn-block" tabindex="3" id="btnLogin_Entrar">Login</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="simple-footer">Copyright &copy; @DateTime.Now.Year  All rights reserved. Bayer Lerma</div>

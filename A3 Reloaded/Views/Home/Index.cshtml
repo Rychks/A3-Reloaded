@@ -1,0 +1,126 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    string CWID = HttpContext.Current.User.Identity.Name.ToUpper();
+}
+<script>require(['Home']);</script>
+<div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="section-title">Home</h1>
+        </div>
+    </div>
+    <div class="mt-4">
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">A3 History</a>
+                <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">A3 Task</a>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <!--HOME TAB-->
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                <div class="card-body">
+                    <div class="form-row" id="frm_home_filter_div">
+                        <div class="form-group col-lg-1">
+                            <label for="txtHome_Folio">Folio</label>
+                            <input type="text" class="form-control txt_Idioma_Ingrese_Folio" id="txtHome_Folio" placeholder="Ingrese un Folio">
+                        </div>
+                        <div class="form-group col-lg-1">
+                            <label for="txtHome_Contact" class="txt_Idioma_Responsable">User</label>
+                            <input type="text" class="form-control" value="@CWID" id="txtHome_Contact">
+                            <input type="text" class="form-control" value="@CWID" id="txtHome_Contact_aux" disabled style="display:none">
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="txtHome_TipoA3" class="txt_Idioma_Tipo_de_A3">Tipo de A3</label>
+                            <select class="form-control" id="slcHome_TipoA3">
+                                <option value="-1" selected>Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="txtHome_KeyWord" class="txt_Idioma_palabra_clave">Key Word</label>
+                            <input type="text" class="form-control txt_Idioma_ingrese_palabra_clave" id="txtHome_KeyWord" placeholder="Ingrese una palabra clave">
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="" class="">Test</label>
+                            <select class="form-control" multiple="multiple" id="slcTestUsuarios">
+                                <option value="-1" selected>Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-1">
+                            <label for="slcHome_status" class="txt_Idioma_Estatus">Estatus</label>
+                            <select class="form-control" id="slcHome_status">
+                                <option class="txt_Idioma_Seleccione" value="-1" selected>Seleccione</option>
+                                <option class="txt_Idioma_Finalizado" value="1">Seleccione</option>
+                                <option class="txt_idioma_Ingrese_En_Revision" value="3">Seleccione</option>
+                                <option class="txt_idioma_Ingrese_En_Modificacion" value="2">Seleccione</option>
+                                <option class="txt_Idioma_En_Proceso" value="0">Seleccione</option>
+                            </select>
+                        </div>
+                        <a class="nav-link" style="display:none;" id="btn_redirect_test" href=""><i class="fa fa-user"></i> <span>Test</span></a>
+                        <div class="form-group col-lg-2" style="margin-top:2.2rem">
+                            <button type="button" class="btn btn-icon btn-info btn-sm" id="btnHome_Search"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                            <button type="button" class="btn btn-icon btn-outline-secondary btn-sm" id="btnHome_clearFilter"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center" align="center">
+                    <div class="col-lg-12">
+                        <label class="custom-switch" style="font-size: 16px !important; font-weight: bold" align="center">
+                            <input type="checkbox" checked="checked" id="cbxHome_Activities" name="custom-switch-checkbox" class="custom-switch-input">
+                            <span class="custom-switch-indicator"></span>
+                            <span class="custom-switch-description txt_Idioma_mis_actividades" id="cbxHome_Activities_text">My activities</span>
+                        </label>
+                    </div>                  
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="card card-primary">
+                            <div class="card-body">
+                                <div class="dimmer" id="tblHome_A3History">
+                                    <div class="dimmer-content">
+                                        <div class="table-responsive tabla-md encabezados-fixed">
+                                            <table class="table table-hover text-center">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="txt_Idioma_Folio" scope="col" width="10%">Folio A3</th>
+                                                        <th class="txt_Idioma_Version" scope="col">Version</th>
+                                                        <th class="txt_Idioma__Formato_de_A3" scope="col">Tipo de A3</th>
+                                                        <th class="txt_Idioma_Falla" scope="col">Failure</th>
+                                                        <th class="txt_Idioma_Responsable" scope="col">Responsable</th>
+                                                        @*<th class="txt_Idioma_Rol" scope="col">Rol</th>*@
+                                                        <th class="txt_Idioma_Estatus" scope="col">Estatus</th>
+                                                        <th class="txt_Idioma_Opciones" scope="col" colspan="2">Opciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div id="pgdHome_A3History" align="right">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                                        <div class="btn-group">
+                                            <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                                                <option selected disabled value="-1">Página</option>
+                                            </select>
+                                        </div>
+                                        <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--TASK TRAKING TAB-->
+            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
+        </div>
+    </div>
+    
+</div>

@@ -1,0 +1,203 @@
+/**
+ *
+ * You can write your CSS code here, DO NOT touch the default JavaScript file
+ * because it will make it harder for you to update.
+ * 
+ */
+
+/*# sourceMappingURL=custom.css.map */
+select, input {
+    padding: 5px !important;
+}
+.loader {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: url('/Assets/Bayer_Brand/Bayer_Loader2.gif') 50% 50% no-repeat #00324e;
+    background-size: 250px;
+}
+
+.tabla-md {
+    height: 20rem !important;
+    /*height: calc(100vh - 385px);*/
+    max-width: 100% !important;
+    max-height: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+}
+
+.texto-sm {
+    resize: none;
+    min-height: 150px !important;
+}
+
+.modal-sm {
+    max-width: 360px !important;
+}
+
+.encabezados-fixed tbody {
+    font-size: 12px;
+    font-family: Arial;
+    padding: 0px,0px,0,0px !important;
+}
+
+    .encabezados-fixed tbody tr {
+        border-bottom: solid 1px #CDD3D8;
+    }
+
+.encabezados-fixed thead tr th {
+    position: sticky;
+    top: 0;
+    z-index: 1 !important;
+}
+
+/*table {
+    border-collapse: collapse;
+    width: 100%;
+}*/
+
+tr, td {
+    padding: 3px !important;
+}
+
+th, td {
+    padding: 8px 16px;
+}
+
+.encabezados-fixed thead th {
+    box-shadow: 0px 1px 0px 0px #000;
+    background-color: #E3EAEF !important;
+}
+
+.modal-header[data-type=info] {
+    background-color: #3ABAF4;
+    color: #FFFFFF;
+}
+
+.modal-header[data-type=warning] {
+    background-color: #FFA426;
+    color: #FFFFFF;
+}
+
+.card.card-hero[data-type=danger] .card-header {
+    background-image: linear-gradient(to bottom, #FC544B, #ff6d65) !important;
+}
+
+    .card.card-hero[data-type=danger] .card-header .card-icon {
+        color: #f9766f;
+    }
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 25px;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 19px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+input + .slider {
+    background-color: #FC544B;
+}
+
+input:checked + .slider {
+    background-color: #63ED7A;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(18px);
+    -ms-transform: translateX(18px);
+    transform: translateX(18px);
+}
+
+.custom-file-input ~ .custom-file-label::after {
+    display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    color: #fff;
+    box-shadow: 0 2px 6px #acb5f6;
+    background-color: #6777ef;
+    border-color: #6777ef;
+    content: "Seleccione";
+}
+
+.file-area {
+    width: 100%;
+    position: relative;
+}
+
+    .file-area input[type=file] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-area .file-dummy {
+        color: #463E64;
+        width: 100%;
+        padding: 30px;
+        border: 2px dashed black;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        transition: background 0.3s ease-in-out;
+    }
+
+    .file-area:hover .file-dummy {
+        background: #E3EAEF;
+    }
+
+    .file-area input[type=file]:focus + .file-dummy {
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline: -webkit-focus-ring-color auto 5px;
+    }
+
+    .file-area input[type=file]:valid + .file-dummy {
+        border-color: rgba(0, 255, 0, 0.4);
+        background-color: rgba(0, 255, 0, 0.3);
+    }
+
+    select {
+        height: 3.5rem !important
+    }

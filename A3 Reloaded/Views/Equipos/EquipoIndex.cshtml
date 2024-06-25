@@ -1,0 +1,142 @@
+﻿
+@{
+    ViewBag.Title = "EquipoIndex";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="loader"></div>
+<div class="section-body">
+    <h2 class="section-title txt_Idioma_Administracion_Equipos">Administración de Equipos</h2>
+    <div class="section-lead">
+        <div class="form-row" id="frmEquipos">
+            <div class="form-group col-md-6">
+                <label for="txtEquipos_Nombre" class="txt_Idioma_Equipo">Sub-área</label>
+                <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Equipo" id="txtEquipos_Nombre" placeholder="Ingrese el Nombre de la Linea">
+            </div>
+            <div class="form-group col-md-2" style="margin-top:2rem">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="cbxEquipos_Activo">
+                    <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxEquipos_Activo">Solo ver activos</label>
+                </div>
+            </div>
+            <div class="form-group col-md-4" style="margin-top:2rem">
+                <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnEquipos_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left  ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnEquipos_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+                <button type="button" class="btn btn-sm btn-icon btn-success  btn-left  ml-3 mb-4 txt_Idioma_Agregar" id="btnEquipos_Agregar" data-toggle="modal" data-target="#mdlEquipos_Agregar">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-primary">
+                <div class="card-body">
+                    <div class="dimmer" id="tblEquipos">
+
+                        <div class="dimmer-content">
+                            <div class="table-responsive tabla-md encabezados-fixed">
+                                <table class="table table-hover text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width:15px;">#</th>
+                                            <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
+                                            <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
+                                            <th scope="col" class="txt_Idioma_Opciones">Opciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <div id="pgdEquipos">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                            <div class="btn-group">
+                                <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                                    <option selected disabled value="-1">Página</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="mdlEquipos_Agregar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info" data-type="warning">
+                    <h4 class="modal-title txt_Idioma_Registrar_Equipo">Agregar Nueva Sub-área</h4>
+                </div>
+                <div class="modal-body" id="frmEquiposN">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtEquiposN_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
+                            <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Equipo" id="txtEquiposN_Nombre" placeholder="Ingrese el Nombre del Departamento">
+
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label class="txt_Idioma_Estatus">Estatus:</label>
+                            <div class="form-check">
+                                <label class="switch">
+                                    <input type="checkbox" for="cbxEquiposN_Activo" id="cbxEquiposN_Activo">
+                                    <span class="slider"></span>
+                                </label>
+                                <label for="cbxEquiposN_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnEquiposN_Guardar">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="mdlEquipos_Modificar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info" data-type="warning">
+                    <h4 class="modal-title txt_Idioma_Modificar_Equipo">Modificar Sub-área</h4>
+                </div>
+                <div class="modal-body" id="frmEquiposM">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtEquiposM_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
+                            <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Subarea" id="txtEquiposM_Nombre" placeholder="Ingrese el Nombre">
+                            <input type="text" id="txtEquiposM_ID" hidden disabled>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label class="txt_Idioma_Estatus">Estatus:</label>
+                            <div class="form-check">
+                                <label class="switch">
+                                    <input type="checkbox" for="cbxEquiposM_Activo" id="cbxEquiposM_Activo">
+                                    <span class="slider"></span>
+                                </label>
+                                <label for="cbxEquiposM_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnEquiposM_Guardar">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>require(['Equipos']);</script>

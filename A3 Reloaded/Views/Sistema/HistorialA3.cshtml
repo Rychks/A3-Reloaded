@@ -1,0 +1,78 @@
+﻿<div class="section-body">
+    <h2 class="section-title">Historial de Investiaciones A3 Reloaded</h2>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4>Filtros de información</h4>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group col-lg-2">
+                            <label for="txtTemplatesRunning_History_Folio">Folio</label>
+                            <input type="text" class="form-control" id="txtTemplatesRunning_History_Folio" placeholder="Ingrese un Folio">
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="slcTemplatesRunning_History_TipoA3">Tipo de A3</label>
+                            <select class="form-control" id="slcTemplatesRunning_History_TipoA3">
+                                <option value="-1" selected disabled>Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3">
+                            <label for="txtTemplatesRunning_History_Contact">Responsable</label>
+                            <input type="text" class="form-control" id="txtTemplatesRunning_History_Contact" placeholder="Responsable">
+                        </div>
+                        <div class="form-group col-lg-2">
+                            <label for="slcTemplatesRunning_History_Estatus">Estatus</label>
+                            <select class="form-control" id="slcTemplatesRunning_History_Estatus">
+                                <option value="-1" selected disabled>Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-3" style="margin-top:30px">
+                            <button type="button" class="btn btn-icon btn-info btn-left" id="btnTemplatesRunning_History_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                            <button type="button" class="btn btn-icon btn-outline-secondary btn-left" id="btnTemplatesRunning_History_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card card-primary">
+                <div class="card-body">
+                    <div class="table-responsive tabla-md encabezados-fixed">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width:15px;">#</th>
+                                    <th scope="col" style="width:25px;">Folio</th>
+                                    <th scope="col">Tipo de A3</th>
+                                    <th scope="col">Responsable</th>
+                                    <th scope="col">Estatus</th>
+                                    <th scope="col" colspan="2">Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblTemplatesRunning_History">
+                                <tr><th colspan="7"><p class="text-center">No se encontraron registros</p></th></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <div id="pgdTemplatesRunning_History">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info pgd-Ant"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                            <div class="btn-group">
+                                <select id="pagTemplatesRunning_History" class="form-control text-center" style="width:80px !important">
+                                    <option selected="selected" disabled>Página</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-info pgd-Sig"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

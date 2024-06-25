@@ -1,0 +1,225 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <div class="loader"></div>
+    <div class="section-body">
+        <h2 class="section-title txt_Idioma_Administracion_Usuarios">Administración de Usuarios</h2>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-primary">
+                    <div class="card-body">
+                        <div id="frmUsuarios">
+                            <div class="form-row">
+                                <div class="form-group col-lg-2">
+                                    <label for="txtUsuarios_CWID" class="txt_Idioma_CWID">CWID</label>
+                                    <input type="text" class="form-control txt_Idioma_Ingese_un_CWID" id="txtUsuarios_CWID" placeholder="Ingrese un CWID">
+                                </div>
+                                <div class="form-group col-lg-3">
+                                    <label for="txtUsuarios_Nombre" class="txt_Idioma_Nombre">Nombre</label>
+                                    <input type="text" class="form-control txt_Idioma_Ingrese_un_nombre" id="txtUsuarios_Nombre" placeholder="Ingrese un Nombre">
+                                </div>
+                                <div class="form-group col-lg-3">
+                                    <label for="txtUsuarios_Correo" class="txt_Idioma_Correo">Correo</label>
+                                    <input type="text" class="form-control txt_Idioma_Ingrese_correo" id="txtUsuarios_Correo" placeholder="">
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="slcUsuarios_Rol" class="txt_Idioma_Rol">Rol</label>
+                                    <select class="form-control" id="slcUsuarios_Rol">
+                                        <option value="-1" selected disabled>Seleccione</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="slcUsuarios_Rol" class="txt_Idioma_Departamento">Departamento</label>
+                                    <select class="form-control" id="slcUsuarios_Departamento">
+                                        <option value="-1" selected disabled>Seleccione</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-lg-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="cbxUsuarios_Activo">
+                                        <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxUsuarios_Activo">Solo ver activos</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-10 text-right">
+                                    <button type="button" class="btn btn-sm btn-icon btn-info btn-left txt_Idioma_Buscar" id="btnUsuarios_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left txt_Idioma_Limpiar_filtros" id="btnUsuarios_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-success btn-left txt_Idioma_Agregar" id="btnUsuarios_Agregar" data-toggle="modal" data-target="#mdlUsuarios_Agregar">
+                                        <i class="fa fa-plus" aria-hidden="true"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="card card-primary">
+                    <div class="card-body">
+                        <div class="dimmer" id="tblUsuarios">
+                            <div class="dimmer-content">
+                                <div class="table-responsive tabla-md encabezados-fixed">
+                                    <table class="table table-hover text-center">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width:15px;">#</th>
+                                                <th scope="col" class="txt_Idioma_CWID" style="width:25px;">CWID</th>
+                                                <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
+                                                <th scope="col" class="txt_Idioma_Correo">Correo</th>
+                                                <th scope="col" class="txt_Idioma_Rol">Rol</th>
+                                                <th scope="col" class="txt_Idioma_Departamento">Departamento</th>
+                                                <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
+                                                <th scope="col" class="txt_Idioma_Opciones">Opciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="pgdUsuarios">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                                <div class="btn-group">
+                                    <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                                        <option selected disabled value="-1">Página</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" tabindex="-1" role="dialog" id="mdlUsuarios_Agregar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info" data-type="warning">
+                        <h4 class="modal-title txt_Idioma_Registrar_Usuario">Agregar Nuevo Usuario</h4>
+                    </div>
+                    <div class="modal-body" id="frmUsuariosN">
+                        <div class="form-row">
+                            <div class="form-group col-lg-4">
+                                <label for="txtUsuariosN_CWID" class="txt_Idioma_CWID">CWID:</label>
+                                <input type="text" class="form-control txt_Idioma_Ingese_un_CWID" id="txtUsuariosN_CWID" placeholder="Ingrese el CWID">
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label for="txtUsuariosN_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
+                                <input type="text" class="form-control txt_Idioma_Ingrese_un_nombre" id="txtUsuariosN_Nombre" placeholder="Ingrese el Nombre">
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <label for="txtUsuariosN_App" class="txt_Idioma_Apellido_paterno">Apellido:</label>
+                                <input type="text" class="form-control txt_Idioma_Apellido_paterno" id="txtUsuariosN_App" placeholder="Ingrese el Apellido Paterno">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="txtUsuariosN_Correo" class="txt_Idioma_Correo">Correo:</label>
+                                <input type="email" class="form-control txt_Idioma_Ingrese_correo" id="txtUsuariosN_Correo" placeholder="Ingrese el Correo Electrónico">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="slcUsuariosN_Rol" class="txt_Idioma_Rol">Rol:</label>
+                                <select class="form-control" id="slcUsuariosN_Rol">
+                                    <option selected disabled value="-1">Seleccione</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="slcUsuariosN_Departamento" class="txt_Idioma_Departamento">Departamento:</label>
+                                <select class="form-control" id="slcUsuariosN_Departamento">
+                                    <option selected disabled value="-1">Seleccione</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label class="txt_Idioma_Estatus">Estatus:</label>
+                                <div class="form-check">
+                                    <label class="switch">
+                                        <input type="checkbox" for="cbxUsuariosN_Activo" id="cbxUsuariosN_Activo">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <label class="txt_Idioma_Desactivado" for="cbxUsuariosN_Activo">Desactivado</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnUsuariosN_Guardar">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" tabindex="-1" role="dialog" id="mdlUsuarios_Modificar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info" data-type="warning">
+                        <h4 class="modal-title txt_Idioma_Modificar_Usuario">Modificando Usuario</h4>
+                    </div>
+                    <div class="modal-body" id="frmUsuariosM">
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="txtUsuariosM_CWID" class="txt_Idioma_CWID">CWID:</label>
+                                <input type="text" class="form-control txt_Idioma_Ingese_un_CWID" id="txtUsuariosM_CWID">
+                                <input type="text" id="txtUsuariosM_ID" hidden disabled>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="txtUsuariosM_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
+                                <input type="text" class="form-control txt_Idioma_Ingrese_un_nombre" id="txtUsuariosM_Nombre" placeholder="Ingrese el Nombre">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="txtUsuariosM_App" class="txt_Idioma_Apellido_paterno">Apellido:</label>
+                                <input type="text" class="form-control txt_Idioma_Apellido_paterno" id="txtUsuariosM_App" placeholder="Ingrese">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="txtUsuariosM_Correo" class="txt_Idioma_Correo">Correo:</label>
+                                <input type="email" class="form-control txt_Idioma_Ingrese_correo" id="txtUsuariosM_Correo" placeholder="Ingrese el Correo Electrónico">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="slcUsuariosM_Rol" class="txt_Idioma_Rol">Rol:</label>
+                                <select class="form-control" id="slcUsuariosM_Rol">
+                                    <option selected disabled value="-1">Seleccione</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="slcUsuariosM_Departamento" class="txt_Idioma_Departamento">Departamento:</label>
+                                <select class="form-control" id="slcUsuariosM_Departamento">
+                                    <option selected disabled value="-1">Seleccione</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label class="txt_Idioma_Estatus">Estatus:</label>
+                                <div class="form-check">
+                                    <label class="switch">
+                                        <input type="checkbox" for="cbxUsuariosM_Activo" id="cbxUsuariosM_Activo">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <label class="txt_Idioma_Desactivado" for="cbxUsuariosM_Activo">Desactivado</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnUsuariosM_Guardar">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>require(['Usuario']);</script>

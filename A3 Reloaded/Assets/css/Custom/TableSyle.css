@@ -1,0 +1,37 @@
+﻿body {
+    font-size: 12px !important;
+    font-family: Arial !important;
+}
+
+input {
+    height: 2rem !important;
+}
+
+.form-control{
+    font-size:12px !important;
+    font-family: Arial;
+    height: 2rem !important;
+}
+
+.table {
+    font-size:12px !important;
+    font-family: Arial;
+}
+
+.table tbody td {
+    height: 2rem !important;
+}
+
+    .table thead th {
+        height: 2rem !important;
+        position: sticky;
+        top: 0;
+        z-index: 1 !important;
+        box-shadow: 0px 1px 0px 0px #000;
+        background-color: #E3EAEF !important;
+    }
+
+.badge {
+    font-family: Arial !important;
+    font-size: 10px !important
+}

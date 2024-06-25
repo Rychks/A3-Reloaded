@@ -1,0 +1,164 @@
+﻿@{
+    
+}
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+    <link rel="shortcut icon" href="~/Assets/Bayer_Brand/Bayer-Logo2.png" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Assets/modules/fontawesome-free-5.12.1-web/css/all.css" rel="stylesheet" />
+    <link href="~/Assets/css/style.css" rel="stylesheet" />
+    <link href="~/Assets/css/components.css" rel="stylesheet" />
+    <link href="~/Assets/modules/izitoast/css/iziToast.min.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Assets/css/custom.css" rel="stylesheet" />
+</head>
+<body style="background-color:#00324e;">
+    <div class="loader"></div>
+    <div id="app">
+        <section class="section">
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+        </section>
+        @if (ViewBag.Llave != null)
+        {
+            <input type="password" id="txtSistema_Grifo" hidden disabled value=@ViewBag.Llave />
+        }
+    </div>
+
+    <script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Assets/modules/popper.js"></script>
+    <script src="~/Assets/modules/tooltip.js"></script>
+    <script src="~/Assets/modules/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/Assets/modules/nicescroll/jquery.nicescroll.min.js"></script>
+    <script src="~/Assets/modules/moment.min.js"></script>
+    <script src="~/Assets/js/stisla.js"></script>
+    <script src="~/Assets/js/scripts.js"></script>
+    <script src="~/Assets/modules/izitoast/js/iziToast.min.js"></script>
+    <script src="~/Assets/js/page/modules-toastr.js"></script>
+    <script src="~/Assets/modules/sweetalert/sweetalert.min.js"></script>
+    <script src="~/Assets/Modulos/Lenguage.js"></script>
+    @Scripts.Render("~/Assets/RSA")
+    <script>
+        "use strict";
+        jQuery(window).on("load", function () {
+            $(".loader").fadeOut("slow");
+        });
+        function disableBack() { window.history.forward() }
+        window.onload = disableBack();
+        window.onpageshow = function (evt) { if (evt.persisted) disableBack() }
+        $(document).ready(function () {
+            if ("@ViewBag.Tipo" != "") {
+                fn_Notificaciones({ Mensaje: "@ViewBag.Mensaje", Tipo: "@ViewBag.Tipo" });
+                var uri = window.location.toString();
+                if (uri.indexOf("?") > 0) {
+                    var clean_uri = uri.substring(0, uri.indexOf("?"));
+                    window.history.replaceState({}, document.title, clean_uri);
+                }
+                $("#btnLogin_Entrar").removeClass("btn-progress");
+            } else {
+                var uri = window.location.toString();
+                if (uri.indexOf("?") > 0) {
+                    var clean_uri = uri.substring(0, uri.indexOf("?"));
+                    window.history.replaceState({}, document.title, clean_uri);
+                }
+            }
+            $("#frmLogin_Login").submit(function (event) {
+                event.preventDefault();
+                var bytost = $("#btnLogin_BYTOST").val();
+                var znacka = $("#txtLogin_ZNACKA").val();
+                var grifo = $("#txtSistema_Grifo").val();
+                if (bytost !== "" && znacka !== "") {
+                    //Encriptar aqui los datos
+                    var en = fn_encriptar("eee", grifo);
+                    //Cambiar los datos encriptados por los que se van a mandar
+                    $("#btnLogin_Entrar").addClass("btn-progress");
+                    //Reanuda el envio de los datos
+                    $(this).unbind('submit').submit();
+                } else {
+                    fn_Notificaciones({ Mensaje: "Campos vacios, por favor llene los campos", Tipo: "info" });
+                }
+            });
+        });
+        function fn_Notificaciones(param) {
+            var defaults = { Titulo: "Sistema", Mensaje: null, Tipo: null, Error: null };
+            var param = $.extend({}, defaults, param);
+            var parametros = { title: param.Titulo, message: param.Mensaje, position: "topRight", timeout: 3000, pauseOnHover: true, progressBar: false, closeOnClick: true, transition: "fadeInDown", layout: 2 };
+            if (param.Tipo === "info") {
+                iziToast.info(parametros);
+            } else if (param.Tipo === "success") {
+                iziToast.success(parametros);
+            } else if (param.Tipo === "warning") {
+                iziToast.warning(parametros);
+            } else if (param.Tipo === "danger" || param.Tipo === "error") {
+                iziToast.error(parametros);
+            } else {
+                iziToast.show(parametros);
+            }
+            if (param.Error > 0) {
+                console.log(param.Error);
+            }
+        }
+        //Tarabajar con la llave que manda el servidor y no con esta ya establecida
+        // RSA 512 bit key.
+		var xmlParamsDefault =
+			"<RSAKeyValue>" +
+			"<Modulus>pxtmFnrGI6Sb8ziyY+NRUDuQ4b/ETw5WabQ4daFQqzsCEr/6J/LLBU/2D5mO5/Wu5U/Rya1E55aYFZeaZMNqAw==</Modulus>" +
+			"<Exponent>AQAB</Exponent>" +
+			"<P>2TsVXWPEvDIJv/gd2rX9k0UOyXuaYgoAchIH6vUicis=</P>" +
+			"<Q>xO4+OYREQfqYRQK7y73+RaUG0IxobT0OQ0c+Ok2hc4k=</Q>" +
+			"<DP>K7/xgpiIU9rECeyfnp/OjS14V+3T3vDivBaTj6eFI3c=</DP>" +
+			"<DQ>K4N9ClZ4gp+tn6oP9t//XEIvtEsiE+kmyqTmUhmvMAk=</DQ>" +
+			"<InverseQ>p7o4BOlKZQZ693R1ViZ66y5gTjUkNNTd2za7/1YGBCs=</InverseQ>" +
+			"<D>XZqFVrYy4qhECruJgVZFp/GVuD5Y0gev88nVjl5r911QT+I8vgJSklTso7jTlpMtf2oe7UZ0WRWEtgPS3tZn4Q==</D>" +
+			"</RSAKeyValue>";
+
+		function GetNewRsaProvider(dwKeySize) {
+			// Create a new instance of RSACryptoServiceProvider.
+			if (!dwKeySize) dwKeySize = 512;
+			return new System.Security.Cryptography.RSACryptoServiceProvider(dwKeySize);
+		}
+		function GetRsaKey(includePrivateParameters) {
+			var keyParams = xmlParamsDefault;
+			// ------------------------------------------------
+			// RSA Keys
+			// ------------------------------------------------
+			var rsa = GetNewRsaProvider();
+			if (keyParams[0] === "<") {
+				// Import parameters from xml.
+				rsa.FromXmlString(keyParams);
+			} else {
+				var keyBlob = System.Convert.FromBase64String(keyParams);
+				rsa.ImportCspBlob(keyBlob);
+			}
+			return rsa.ExportParameters(includePrivateParameters);
+		}
+        function fn_encriptar(Texto, Grifo) {
+			var decryptedBytes = System.Text.Encoding.UTF8.GetBytes(Texto);
+			var doOaepPadding = false;
+			// ------------------------------------------------
+			// Encrypt
+			// ------------------------------------------------
+			var rsa = GetNewRsaProvider();
+			// Import the RSA Key information.
+			rsa.ImportParameters(GetRsaKey(false));
+			// Encrypt the passed byte array and specify OAEP padding.
+			var encryptedBytes = rsa.Encrypt(decryptedBytes, doOaepPadding);
+			var encryptedString = System.Convert.ToBase64String(encryptedBytes)
+			// ------------------------------------------------
+			// Display the encrypted data.
+			//var encryptedString = System.BitConverter.ToString(encryptedBytes, "");
+			return encryptedString;
+        }
+    </script>
+</body>
+</html>

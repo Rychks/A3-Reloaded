@@ -1,0 +1,140 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <div class="loader"></div>
+    <div class="section-body">
+        <h2 class="section-title txt_Idioma_Administracion_Departamentos">Administración de Departamentos</h2>
+        <div class="section-lead">
+            <div class="form-row" id="frmDepartamentos">
+                <div class="form-group col-md-6">
+                    <label for="txtDepartamento_Usuario" class="txt_Idioma_Departamento">Departamento</label>
+                    <input type="text" class="form-control txt_Idioma_Ingrese_el_nombre_del_departamento" id="txtDepartamentos_Nombre" placeholder="Ingrese el Nombre del Departamento">
+                </div>
+                <div class="form-group col-md-2" style="margin-top:2rem">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="cbxDepartamentos_Activo">
+                        <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxDepartamentos_Activo">Solo ver activos</label>
+                    </div>
+                </div>
+                <div class="form-group col-md-4" style="margin-top:2rem">
+                    <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnDepartamentos_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                    <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left  ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnDepartamentos_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+                    <button type="button" class="btn btn-sm btn-icon btn-success  btn-left  ml-3 mb-4 txt_Idioma_Agregar" id="btnDepartamentos_Agregar" data-toggle="modal" data-target="#mdlDepartamentos_Agregar">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Agregar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="card card-primary">
+                    <div class="card-body">
+                        <div class="dimmer" id="tblDepartamentos">
+                            <div class="dimmer-content">
+                                <div class="table-responsive tabla-md encabezados-fixed">
+                                    <table class="table table-hover text-center">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width:15px;">#</th>
+                                                <th scope="col" class="txt_Idioma_Departamento">Nombre</th>
+                                                <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
+                                                <th scope="col" class="txt_Idioma_Opciones">Opciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="pgdDepartamentos">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                                <div class="btn-group">
+                                    <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                                        <option selected disabled value="-1">Página</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" tabindex="-1" role="dialog" id="mdlDepartamentos_Agregar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info" data-type="warning">
+                        <h4 class="modal-title txt_Idioma_Registrar_Departamento">Agregar Nuevo Departamento</h4>
+                    </div>
+                    <div class="modal-body" id="frmDepartamentosN">
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="txtDepartamentosN_Nombre" class="txt_Idioma_Departamento">Nombre:</label>
+                                <input type="text" class="form-control txt_Idioma_Ingrese_el_nombre_del_departamento" id="txtDepartamentosN_Nombre" placeholder="Ingrese el Nombre del Departamento">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label class="txt_Idioma_Estatus">Estatus:</label>
+                                <div class="form-check">
+                                    <label class="switch">
+                                        <input type="checkbox" for="cbxDepartamentosN_Activo" id="cbxDepartamentosN_Activo">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <label for="cbxDepartamentosN_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnDepartamentosN_Guardar">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" tabindex="-1" role="dialog" id="mdlDepartamentos_Modificar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info" data-type="warning">
+                        <h4 class="modal-title txt_Idioma_Modificar_Departamento">Modificando Departamento</h4>
+                    </div>
+                    <div class="modal-body" id="frmDepartamentosM">
+                        <div class="form-row">
+                            <div class="form-group col-lg-12">
+                                <label for="txtDepartamentosM_Nombre" class="txt_Idioma_Departamento">Nombre:</label>
+                                <input type="text" class="form-control txt_Idioma_Ingrese_el_nombre_del_departamento" id="txtDepartamentosM_Nombre" placeholder="Ingrese el Nombre">
+                                <input type="text" id="txtDepartamentosM_ID" hidden disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label class="txt_Idioma_Estatus">Estatus:</label>
+                                <div class="form-check">
+                                    <label class="switch">
+                                        <input type="checkbox" for="cbxDepartamentosM_Activo" id="cbxDepartamentosM_Activo">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <label for="cbxDepartamentosM_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnDepartamentosM_Guardar">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>require(['Departamento']);</script>

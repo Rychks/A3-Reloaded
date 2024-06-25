@@ -1,0 +1,180 @@
+﻿
+@{
+    ViewBag.Title = "Rol_Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>require(['Rol']);</script>
+<div class="loader"></div>
+<div class="section-body">
+    <h2 class="section-title txt_Idioma_Administracion_Roles">Administración de Roles</h2>
+    <div class="section-lead">
+        <div class="form-row" id="frmRoles">
+            <div class="form-group col-md-6">
+                <label for="txtRoles_Nombre" class="txt_Idioma_Rol">Rol</label>
+                <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Rol" id="txtRoles_Nombre" placeholder="Ingrese el Nombre de la Linea">
+            </div>
+            <div class="form-group col-md-2" style="margin-top:2rem">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="cbxRoles_Activo">
+                    <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxRoles_Activo">Solo ver activos</label>
+                </div>
+            </div>
+            <div class="form-group col-md-4" style="margin-top:2rem">
+                <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnRoles_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+                <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left  ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnRoles_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+                <button type="button" class="btn btn-sm btn-icon btn-success  btn-left  ml-3 mb-4 txt_Idioma_Agregar" id="btnRoles_Agregar" data-toggle="modal" data-target="#mdlRoles_Agregar">
+                    <i class="fa fa-plus" aria-hidden="true"></i> Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-primary">
+                <div class="card-body">
+                    <div class="dimmer" id="tblRoles">
+
+                        <div class="dimmer-content">
+                            <div class="table-responsive tabla-md encabezados-fixed">
+                                <table class="table table-hover text-center">
+                                    <thead style="z-index: 1 !important;">
+                                        <tr>
+                                            <th scope="col" style="width:5%;">#</th>
+                                            <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
+                                            <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
+                                            <th scope="col" width="10%" class="txt_Idioma_Opciones">Opciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <div id="pgdRoles">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                            <div class="btn-group">
+                                <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                                    <option selected disabled value="-1">Página</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="mdlRoles_Agregar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info" data-type="warning">
+                    <h4 class="modal-title txt_Idioma_Registrar_Rol">Agregar nuevo rol</h4>
+                </div>
+                <div class="modal-body" id="frmRolesN">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtRolesN_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
+                            <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Rol" id="txtRolesN_Nombre" placeholder="Ingrese el nombre del rol">
+
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label class="txt_Idioma_Estatus">Estatus:</label>
+                            <div class="form-check">
+                                <label class="switch">
+                                    <input type="checkbox" for="cbxRolesN_Activo" id="cbxRolesN_Activo">
+                                    <span class="slider"></span>
+                                </label>
+                                <label for="cbxRolesN_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnRolesN_Guardar">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="mdlRoles_Modificar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info" data-type="warning">
+                    <h4 class="modal-title txt_Idioma_Modificar_Rol">Actualizar rol</h4>
+                </div>
+                <div class="modal-body" id="frmLRolesM">
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label for="txtRolesM_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
+                            <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Rol" id="txtRolesM_Nombre" placeholder="Ingrese el nombre del rol">
+                            <input type="text" id="txtRolesM_ID" hidden disabled>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label class="txt_Idioma_Estatus">Estatus:</label>
+                            <div class="form-check">
+                                <label class="switch">
+                                    <input type="checkbox" for="cbxRolesM_Activo" id="cbxRolesM_Activo">
+                                    <span class="slider"></span>
+                                </label>
+                                <label for="cbxRolesM_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cancelar" tabindex="4" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success txt_Idioma_Guardar" tabindex="3" id="btnRolesM_Guardar">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="mdlRoles_Configurar" style="display: none;" data-backdrop="static" aria-hidden="true" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info bg-info" data-type="warning">
+                    <h4 class="text-white">Role Configuration</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="txt_Idioma_Nombre">Rol Name</label>
+                                <input type="text" id="txtRolesC_nombre" disabled readonly class="form-control" name="name" value="" />
+                                <input type="text" id="txtRolesC_Id" disabled readonly class="form-control" style="display:none;" name="name" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive tabla-md encabezados-fixed">
+                        <table class="table table-hover" id="tblRol_funciones">
+                            <thead>
+                                <tr>
+                                    <th class="txt_Idioma_Modulo">Modulo</th>
+                                    <th class="txt_Idioma_Funcion">Function</th>
+                                    <th width="20%" align="center">Check</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-danger text-white" tabindex="4" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success text-white" id="btnRolesC_guardar" tabindex="4">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

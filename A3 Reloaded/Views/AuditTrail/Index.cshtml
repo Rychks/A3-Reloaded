@@ -1,0 +1,89 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="loader"></div>
+<div class="section-body">
+    <h2 class="section-title">Audit Trail</h2>
+    <div class="section-lead">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="txtAuditTrail_Usuario">Usuario</label>
+                <input type="text" class="form-control txt_Idioma_Iinserte_CWID_nombre" id="txtAuditTrail_Usuario" placeholder="Ingrese el CWID o Nombre">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="txtAuditTrail_Accion">Acción</label>
+                <select class="form-control" id="txtAuditTrail_Accion">
+                    <option value="-1" class="txt_Idioma_Seleccione" selected disabled>Seleccione</option>
+                    <option value="I" class="txt_Idioma_Insercion">Inserción</option>
+                    <option value="M" class="txt_Idioma_Modificacion">Modificfación</option>
+                    <option value="E" class="txt_Idioma_Eliminacion">Eliminación</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="txtAuditTrail_Fecha" class="txt_Idioma_fecha">Fecha</label>
+                <input type="date" class="form-control" id="txtAuditTrail_Fecha1">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="txtAuditTrail_Fecha2" class="txt_Idioma_Del">Del:</label>
+                <input type="date" class="form-control" id="txtAuditTrail_Fecha2">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="txtAuditTrail_Fecha3" class="txt_Idioma_al">Al:</label>
+                <input type="date" class="form-control" id="txtAuditTrail_Fecha3">
+            </div>
+        </div>
+        <div class="form-row">
+            <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnAuditTrail_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
+            <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnAuditTrail_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+            
+            <button  type="button" id="btnAuditTrail_Reporte" class="btn btn-sm btn-icon btn-left ml-3 mb-4 btn-md btn-info"><span class="fa fa-file-pdf"></span> <span class="txt_Idioma_Reporte_AT"></span></button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="card card-primary">
+                <div class="card-body">
+                    <div class="dimmer" id="tblAuditTrail">
+                        <div class="dimmer-content">
+                            <div class="table tabla-md encabezados-fixed">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col" class="txt_Idioma_fecha">Fecha</th>
+                                            <th scope="col" class="txt_Idioma_Usuario">Usuario</th>
+                                            <th scope="col" class="txt_Idioma_Accion">Acción</th>
+                                            <th scope="col" class="txt_Idioma_Valor_anterior">Valor Anterior</th>
+                                            <th scope="col" class="txt_Idioma_Valor_actual">Valor Actual</th>
+                                            <th scope="col" class="txt_Idioma_Justificacion">Justificación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <div id="pgdAuditTrail">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                            <div class="btn-group">
+                                <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                                    <option selected disabled value="-1">Página</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>require(['AuditTrail']);</script>
