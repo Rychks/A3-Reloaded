@@ -2650,6 +2650,9 @@
         });
     }
     function guardarRespuesta_InstruccionRunning() {
+        let id_item = $("#txtItemInstruccionRunning_ID").val();
+        $("#" + id_item + "").addClass("btn-progress");
+        $("#mdlMissingRunning_Panel").modal("hide");
         var frmDatos = new FormData();
         frmDatos.append("IDItem", $("#txtItemInstruccionRunning_ID").val());
         frmDatos.append("ID", $("#txtInstruccionRunning_ID").val());
@@ -2665,9 +2668,11 @@
                     $("#mdlInstruccionRunning_Panel").modal("hide");
                 }
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
-                fn_actualizar_Seccion();
+                //fn_actualizar_Seccion();
+                fn_obtener_itemRunning_ID(id_item)
             },
             error: function (error) {
+                $("#" + id_item + "").addClass("btn-progress");
                 $("#mdlSistema_FirmaElectronica").modal("hide");
                 $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
@@ -2762,6 +2767,7 @@
                 //fn_actualizar_Seccion();
             },
             error: function (error) {
+                $("#" + id_item + "").addClass("btn-progress");
                 $("#mdlSistema_FirmaElectronica").modal("hide");
                 $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
@@ -2769,6 +2775,9 @@
         });
     }
     function guardarRespuesta_FactorRunning() {
+        let id_item = $("#txtItemFactorRunning_ID").val();
+        $("#" + id_item + "").addClass("btn-progress");
+        $("#mdlHipotesisRunning_Panel").modal("hide");
         var frmDatos = new FormData();
         frmDatos.append("IDItem", $("#txtItemFactorRunning_ID").val());
         frmDatos.append("ID", $("#txtFactorRunning_ID").val());
@@ -2797,9 +2806,11 @@
                     $("#mdlFactorRunning_Panel").modal("hide");
                 }
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
-                fn_actualizar_Seccion();
+                fn_obtener_itemRunning_ID(id_item)
+                //fn_actualizar_Seccion();
             },
             error: function (error) {
+                $("#" + id_item + "").addClass("btn-progress");
                 $("#mdlSistema_FirmaElectronica").modal("hide");
                 $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
