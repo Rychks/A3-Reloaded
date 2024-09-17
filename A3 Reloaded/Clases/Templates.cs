@@ -9,11 +9,105 @@ using System.Linq;
 using System.Net.Mail;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.UI;
 
 namespace A3_Reloaded.Clases
 {
     public class Templates
     {
+        public DataTable get_list_status(string id_language)
+        {
+            var msg = "";
+            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+            DataTable dt = new DataTable();
+            try
+            {
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("get_list_status", conn);
+                    cmd.Parameters.Add("@id_language", SqlDbType.Int).Value = id_language;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                if (dt.Columns[0].ToString() == "ErrorNumber")
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                                ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return dt;
+        }
+
+        /* Functions for Accees to Templates*/
+        public DataTable get_templates_acceso_list(string is_enable)
+        {
+            var msg = "";
+            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+            DataTable dt = new DataTable();
+            try
+            {
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("get_templates_acceso_list", conn);
+                    cmd.Parameters.Add("@is_enable", SqlDbType.Int).Value = is_enable;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                if (dt.Columns[0].ToString() == "ErrorNumber")
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                                ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return dt;
+        }
+        /* ***********  +*/
+        public DataTable get_configuration_panels(string id_template)
+        {
+            var msg = "";
+            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+            DataTable dt = new DataTable();
+            try
+            {
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("get_configuration_panels", conn);
+                    cmd.Parameters.Add("@id_template", SqlDbType.Int).Value = id_template;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                if (dt.Columns[0].ToString() == "ErrorNumber")
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                                ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return dt;
+        }
         public bool enviarCorreo(string Destino, string Asunto, string Mensaje, string Adjunto, MemoryStream Archivo, string CC = null)
         {
             var fromAddress = new MailAddress(WebConfigurationManager.AppSettings["Mail_System"]);
@@ -258,7 +352,7 @@ namespace A3_Reloaded.Clases
             }
             return dt;
         }
-        public string registrar_Template(string Folio, int TipoA3, int Version,int Idioma, int Activo, string Descripcion, string Imagen)
+        public string registrar_Template(string Folio, int TipoA3, int Version,int Idioma,int Acceso, int Activo, string Descripcion, string Imagen)
         {
             var msg = "";
             try
@@ -272,6 +366,7 @@ namespace A3_Reloaded.Clases
                     cmd.Parameters.Add("@Folio", SqlDbType.VarChar).Value = Folio;
                     cmd.Parameters.Add("@TipoA3", SqlDbType.Int).Value = TipoA3;
                     cmd.Parameters.Add("@Idioma", SqlDbType.Int).Value = Idioma;
+                    cmd.Parameters.Add("@Acceso", SqlDbType.Int).Value = Acceso;
                     cmd.Parameters.Add("@Version", SqlDbType.Int).Value = Version;
                     cmd.Parameters.Add("@Activo", SqlDbType.Int).Value = Activo;                  
                     cmd.Parameters.Add("@Descripcion", SqlDbType.VarChar).Value = Descripcion;
@@ -393,7 +488,7 @@ namespace A3_Reloaded.Clases
             }
             return dt;
         }
-        public string actualizar_Template(int ID, string Folio, int TipoA3, int Version, int Activo, string Descripcion, string Imagen)
+        public string actualizar_Template(int ID, string Folio, int TipoA3,int Idioma,int Acceso, int Version, int Activo, string Descripcion, string Imagen)
         {
             var msg = "";
             try
@@ -409,6 +504,8 @@ namespace A3_Reloaded.Clases
                     cmd.Parameters.Add("@Descripcion", SqlDbType.VarChar).Value = Descripcion;
                     cmd.Parameters.Add("@Imagen", SqlDbType.VarChar).Value = Imagen;
                     cmd.Parameters.Add("@TipoA3", SqlDbType.Int).Value = TipoA3;
+                    cmd.Parameters.Add("@Idioma", SqlDbType.Int).Value = Idioma;
+                    cmd.Parameters.Add("@Acceso", SqlDbType.Int).Value = Acceso;
                     cmd.Parameters.Add("@Version", SqlDbType.Int).Value = Version;
                     cmd.Parameters.Add("@Activo", SqlDbType.Int).Value = Activo;
                     SqlDataAdapter adp = new SqlDataAdapter(cmd);
@@ -433,7 +530,7 @@ namespace A3_Reloaded.Clases
             }
             return msg;
         }
-        public DataTable mostrar_Templates_Activo(string Idioma_ID)
+        public DataTable mostrar_Templates_Activo(string id_Usuario,string id_idioma)
         {
             SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
             var msg = "";
@@ -443,7 +540,8 @@ namespace A3_Reloaded.Clases
                 using (con)
                 {
                     SqlCommand cmd = new SqlCommand("get_Templates_Activo", con);
-                    cmd.Parameters.Add("@Idioma_ID", SqlDbType.Int).Value = Idioma_ID;
+                    cmd.Parameters.Add("@id_Usuario", SqlDbType.Int).Value = id_Usuario;
+                    cmd.Parameters.Add("@Id_idioma", SqlDbType.Int).Value = id_idioma;
                     cmd.CommandType = CommandType.StoredProcedure;
                     SqlDataAdapter adp = new SqlDataAdapter(cmd);
                     adp.Fill(dt);

@@ -8,6 +8,9 @@ namespace A3_Reloaded.Models
     public class SeccionModel
     {
         public int RowNumber { get; set; }
+        public int id_seccion { get; set; }
+        public int id_cuadrante { get; set; }
+        public int id_template { get; set; }
         public int ID { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }

@@ -168,11 +168,11 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult obtenerTotalPagSubarea(string Nombre, string Departamento, string Activo, int NumRegistros = 5)
+        public JsonResult obtenerTotalPagSubarea(string Nombre, string Departamento, string Activo, int NumRegistros = 50)
         {
             return Json(SA.obtener_TotalPagSubareas(Nombre, Departamento, Activo, NumRegistros));
         }
-        public JsonResult mostrarSubareas(string Nombre, string Departamento, string Activo, int Index = 0, int NumRegistros = 5)
+        public JsonResult mostrarSubareas(string Nombre, string Departamento, string Activo, int Index = 0, int NumRegistros = 50)
         {
             List<SubareaModel> list = new List<SubareaModel>();
             try

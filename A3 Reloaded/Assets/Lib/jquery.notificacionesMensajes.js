@@ -3,7 +3,7 @@
     jQuery.notiMsj = {
         Notificacion: function (Parametros) {
             var Param = $.extend({}, jQuery.notiMsj.default.Notificacion_default, Parametros);
-            var Notificacion = { title: Param.Titulo, message: Param.Mensaje, position: "topRight", timeout: 3000, pauseOnHover: true, progressBar: false, closeOnClick: true, transition: "fadeInDown", layout: 2 };
+            var Notificacion = { title: Param.Titulo, message: Param.Mensaje, position: "topCenter", timeout: 3000, pauseOnHover: true, progressBar: false, closeOnClick: true, transition: "fadeInDown", layout: 2 };
             if (Param.Tipo === "info") {
                 iziToast.info(Notificacion);
             } else if (Param.Tipo === "success") {

@@ -9,8 +9,10 @@ using System.Web.Mvc;
 
 namespace A3_Reloaded.Controllers
 {
+    [Authorize]
     public class SeccionesController : Controller
     {
+
         // GET: Secciones
         Clases.AuditTrail AT = new Clases.AuditTrail();
         Clases.Secciones SE = new Clases.Secciones();
@@ -152,29 +154,20 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
+                //string BYTOST = Request["BYTOST"];
+                //string ZNACKA = Request["ZNACKA"];
+                string BYTOST = HttpContext.User.Identity.Name.ToUpper();
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(BYTOST, ZNACKA);
-                if (firma)
+                string datos = SE.registrar_Seccion(Nombre, Descripcion, 1, Convert.ToInt32(Cuadrante), Convert.ToInt32(Template), Convert.ToInt32(Activo));
+                if (datos == "guardado")
                 {
-                    string datos = SE.registrar_Seccion(Nombre, Descripcion, 1, Convert.ToInt32(Cuadrante), Convert.ToInt32(Template), Convert.ToInt32(Activo));
-                    if (datos == "guardado")
-                    {
-                        noti.Mensaje = Mensajes.Seccion_guardar;
-                        noti.Tipo = "success";
-                        AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Sección: " + Nombre + "", "N/A");
-                    }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.Seccion_guardar_error;
-                        noti.Tipo = "warning";
-                    }
+                    noti.Mensaje = Mensajes.Seccion_guardar;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Sección: " + Nombre + "", "N/A");
                 }
                 else
                 {
-                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Seccion_guardar_error;
                     noti.Tipo = "warning";
                 }
             }
@@ -253,6 +246,33 @@ namespace A3_Reloaded.Controllers
             {
                 DataTable datos = SE.mostrar_Secciones(Nombre,Descripcion, Posicion, Cuadrante,Template, Activo, Index, NumRegistros);
                 list = organizarDatos(datos);
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult get_template_sections_by_id_cuadrant(int id_cuadrante)
+        {
+            List<SeccionModel> list = new List<SeccionModel>();
+            try
+            {
+                DataTable datos = SE.get_template_sections_by_id_cuadrant(id_cuadrante);
+
+                foreach (DataRow row in datos.Rows)
+                {
+                    list.Add(new SeccionModel
+                    {
+                        id_seccion = Convert.ToInt32(row["ID"]),
+                        Nombre = row["Nombre"].ToString(),
+                        Descripcion = row["Descripcion"].ToString(),
+                        Posicion = Convert.ToInt32(row["Posicion"]),
+                        id_cuadrante = Convert.ToInt32(row["id_cuadrante"]),
+                        id_template = Convert.ToInt32(row["id_template"]),
+                    });
+                }
+                
             }
             catch (Exception e)
             {

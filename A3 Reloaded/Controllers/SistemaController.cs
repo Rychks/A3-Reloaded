@@ -17,17 +17,19 @@ namespace A3_Reloaded.Controllers
     public class SistemaController : Controller
     {
         TemplatesRunning TER = new TemplatesRunning();
+        TemplatesRunning templateR = new TemplatesRunning();
         Templates TE = new Templates();
         Secciones SE = new Secciones();
         Items IT = new Items();
         Usuarios US = new Usuarios();
         Notificaciones noti = new Notificaciones();
         AuditTrail AT = new AuditTrail();
+        OEE oee= new OEE();
         public ActionResult Index()
         {
             return View();
         }
-        public ActionResult InicioA3(int Id_a3)
+        public ActionResult InicioA3(int Id_a3 = 0)
         {
             ViewBag.Id = Id_a3;
 
@@ -40,6 +42,42 @@ namespace A3_Reloaded.Controllers
         public ActionResult HistorialA3()
         {
             return View();
+        }
+        public JsonResult get_clasificacion_Falla_by_id_template(int id_template)
+        {
+            return Json(TER.get_clasificacion_Falla_by_id_template(id_template));
+        }
+        public JsonResult get_modo_falla_by_id_template(int id_template)
+        {
+            return Json(TER.get_modo_falla_by_id_template(id_template));
+        }
+        public JsonResult insert_modofalla_running(int id_template, int id_codigo,int id_categoria,string codigo)
+        {
+            try
+            {
+                templateR.insert_modofalla_running(id_template,id_codigo,id_categoria,codigo);
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Investigacion_guardar_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult insert_falla_running(int id_template,string linea,string maquina,string motivo,string fecha,float minutos,string clasificacion)
+        {
+            try
+            {
+                templateR.insert_falla_running(id_template, linea, maquina, motivo, fecha, minutos, clasificacion,"" );
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Investigacion_guardar_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
         }
         public JsonResult obtenerTotalPagTemplatesRunning(string Folio, string TipoA3,string Problem, string Contact, string Estatus,int NumRegistros = 50)
         {
@@ -1526,287 +1564,7 @@ namespace A3_Reloaded.Controllers
             }
             return Json(list, JsonRequestBehavior.AllowGet);
         }
-        public void reporteA3(string ID_Template)
-        {
-            //string Responsable = US.obtener_Nombre_Usuario(HttpContext.User.Identity.Name, "A");
-            string Impresion = Convert.ToDateTime(DateTime.Now).ToString("MM/dd/yyyy HH:mm:ss");
-            DataTable dt = TER.obtener_Template_RunningID(Convert.ToInt32(ID_Template));
-            string Responsable = dt.Rows[0]["Responsable"].ToString();
-            string Folio = dt.Rows[0]["Folio"].ToString();
-            string TipoA3 = dt.Rows[0]["TipoA3"].ToString();
-            string Problema = dt.Rows[0]["Problema"].ToString();
-            string Costo = dt.Rows[0]["Costo"].ToString();
-            string Version = dt.Rows[0]["Versionn"].ToString();
-            string FechaInicio = dt.Rows[0]["FechaInicio"].ToString();
-            string FechaFin = dt.Rows[0]["FechaFin"].ToString();
-            string Id_CA = TER.obtener_id_cuadranteRunning(ID_Template, "A");
-            string Id_CB = TER.obtener_id_cuadranteRunning(ID_Template, "B");
-            string Id_CC = TER.obtener_id_cuadranteRunning(ID_Template, "C");
-            string Id_CD = TER.obtener_id_cuadranteRunning(ID_Template, "D");
-            string Fecha_CA = TER.obtener_fecha_ultima_modificacion(Id_CA);
-            string Fecha_CB = TER.obtener_fecha_ultima_modificacion(Id_CB);
-            string Fecha_CC = TER.obtener_fecha_ultima_modificacion(Id_CC);
-            string Fecha_CD = TER.obtener_fecha_ultima_modificacion(Id_CD);
-            DataTable dt_Res = TER.obtener_Result(Convert.ToInt32(Id_CD));
-            string Nota1 = string.Empty;
-            string Nota2 = string.Empty;
-            if (dt_Res.Rows.Count > 0)
-            {
-                Nota1 = dt_Res.Rows[0]["Nota1"].ToString();
-                Nota2 = dt_Res.Rows[0]["Nota2"].ToString();
-            }
-            DataTable dt_cost = TER.obtener_Cost(Convert.ToInt32(Id_CD));
-            string Cost = string.Empty;
-            string Avoid = string.Empty;
-            string Saving = string.Empty;
-            string Solution = string.Empty;
-            if (dt_cost.Rows.Count > 0)
-            {
-                Cost = dt_cost.Rows[0]["Cost"].ToString();
-                Avoid = dt_cost.Rows[0]["Avoid"].ToString();
-                Saving = dt_cost.Rows[0]["Saving"].ToString();
-                Solution = dt_cost.Rows[0]["Solution"].ToString();
-            }
-            
-            DataTable dt_CA = TER.obtener_secciones_CuadranteRunning_ID(Convert.ToInt32(Id_CA));
-            DataTable dt_CB = TER.obtener_secciones_CuadranteRunning_ID(Convert.ToInt32(Id_CB));
-            DataTable dt_CC = TER.obtener_secciones_CuadranteRunning_ID(Convert.ToInt32(Id_CC));
-            DataTable dt_why = TER.obtener_5w_ID_Cuadrante(Convert.ToInt32(Id_CD));
-            DataTable dt_standard = TER.obtener_Standard_ID_Cuadrante(Convert.ToInt32(Id_CD));
-            DataTable dt_evaluadores = TER.obtener_evaluadores_template_ID(Convert.ToInt32(ID_Template));
-            
-            // Setup DataSet
-            //DataTable datos = CM.reporte_CodigosMaestros(Codigo, Producto, MPI, Activo, Fecha1, Fecha2, Usuario);
-            // Create Report DataSource
-            ReportDataSource Secciones_CA = new ReportDataSource("Secciones_CA", dt_CA);
-            ReportDataSource Secciones_CB = new ReportDataSource("Secciones_CB", dt_CB);
-            ReportDataSource Secciones_CC = new ReportDataSource("Secciones_CC", dt_CC);
-            ReportDataSource why = new ReportDataSource("Why", dt_why);
-            ReportDataSource standard = new ReportDataSource("standar", dt_standard);
-            ReportDataSource evaluadores = new ReportDataSource("Evaluadores", dt_evaluadores);
-            
-            // Variables
-            Warning[] warnings;
-            string[] streamIds;
-            string mimeType = string.Empty;
-            string encoding = string.Empty;
-            string extension = string.Empty;
-
-            // Setup the report viewer object and get the array of bytes
-            ReportViewer viewer = new ReportViewer();
-            viewer.LocalReport.DataSources.Add(Secciones_CA);
-            viewer.LocalReport.DataSources.Add(Secciones_CB);
-            viewer.LocalReport.DataSources.Add(Secciones_CC);
-            viewer.LocalReport.DataSources.Add(why);
-            viewer.LocalReport.DataSources.Add(standard);
-            viewer.LocalReport.DataSources.Add(evaluadores);
-            viewer.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(SubReporte_A3Processing);
-            //viewer.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(SubReporte_StandardProcessing);
-
-            viewer.LocalReport.ReportPath = Server.MapPath(@"/Assets/Reporte/Reporte_A3.rdlc");
-            viewer.LocalReport.SetParameters(new ReportParameter("Responsable", Responsable));
-            viewer.LocalReport.SetParameters(new ReportParameter("Folio", Folio));
-            viewer.LocalReport.SetParameters(new ReportParameter("Tipo", TipoA3));
-            viewer.LocalReport.SetParameters(new ReportParameter("Problema", Problema));
-            viewer.LocalReport.SetParameters(new ReportParameter("Costo", Costo));
-            viewer.LocalReport.SetParameters(new ReportParameter("Version", Version));
-            viewer.LocalReport.SetParameters(new ReportParameter("Nota1", Nota1));
-            viewer.LocalReport.SetParameters(new ReportParameter("Nota2", Nota2));
-            viewer.LocalReport.SetParameters(new ReportParameter("Cost", Cost));
-            viewer.LocalReport.SetParameters(new ReportParameter("Avoid", Avoid));
-            viewer.LocalReport.SetParameters(new ReportParameter("Saving", Saving));
-            viewer.LocalReport.SetParameters(new ReportParameter("Solution", Solution));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Responsable", Mensajes.Responsable));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Folio", Mensajes.Folio));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Version", Mensajes.Version));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Problema", Mensajes.Cual_es_problema));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Costo", Mensajes.Costo));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Nombre", Mensajes.Nombre));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Tipo", Mensajes.Tipo_Firma));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Fecha", Mensajes.Fecha));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Cuadrante", Mensajes.Cuadrante));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Revisor", Mensajes.Revisor));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Aprobador", Mensajes.Aprobador));
-            viewer.LocalReport.SetParameters(new ReportParameter("FechaInicio", FechaInicio));
-            viewer.LocalReport.SetParameters(new ReportParameter("FechaFin", FechaFin));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_FechaFin", Mensajes.Fecha_Fin));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_FechaInicio", Mensajes.Fecha_Inicio));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_FechaModificacion", Mensajes.Fecha_Modificacion));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CA", Fecha_CA));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CB", Fecha_CB));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CC", Fecha_CC));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CD", Fecha_CD));
-            viewer.ProcessingMode = ProcessingMode.Local;
-            viewer.LocalReport.ReportPath = Server.MapPath(@"/Assets/Reporte/Reporte_A3.rdlc");
-
-            //viewer.LocalReport.DataSources.Add(Secciones_CA);
-            //viewer.LocalReport.DataSources.Add(Secciones_CB);
-            //viewer.LocalReport.DataSources.Add(Secciones_CC); // Add datasource here
-            
-            byte[] bytes = viewer.LocalReport.Render("PDF", null, out mimeType, out encoding, out extension, out streamIds, out warnings);
-            string creationDate = DateTime.Now.ToString("dd-MM-yyyy-HH:mm");
-            string Filename = "Reporte_A3" + creationDate;
-            // Now that you have all the bytes representing the PDF report, buffer it and send it to the client.
-            Response.Buffer = true;
-            Response.Clear();
-            Response.ContentType = "Reporte Códigos Maestros";
-            //inline or attachment
-            Response.AddHeader("content-disposition", "inline; filename=" + Filename + "." + extension);
-            Response.BinaryWrite(bytes); // create the file
-            //AT.registrarAuditTrail(DateTime.Now, HttpContext.User.Identity.Name, "I", "N/A", "Reporte PDF Código Maestro", "N/A");
-            Response.Flush(); // send it to the client to download        
-        }
-        public void reporteA3_WP(string ID_Template)
-        {
-            //string Responsable = US.obtener_Nombre_Usuario(HttpContext.User.Identity.Name, "A");
-            string Impresion = Convert.ToDateTime(DateTime.Now).ToString("MM/dd/yyyy HH:mm:ss");
-            DataTable dt = TER.obtener_Template_RunningID(Convert.ToInt32(ID_Template));
-            string Responsable = dt.Rows[0]["Responsable"].ToString();
-            string Folio = dt.Rows[0]["Folio"].ToString();
-            string TipoA3 = dt.Rows[0]["TipoA3"].ToString();
-            string Problema = dt.Rows[0]["Problema"].ToString();
-            string Costo = dt.Rows[0]["Costo"].ToString();
-            string Version = dt.Rows[0]["Versionn"].ToString();
-            string FechaInicio = dt.Rows[0]["FechaInicio"].ToString();
-            string FechaFin = dt.Rows[0]["FechaFin"].ToString();
-            string Id_CA = TER.obtener_id_cuadranteRunning(ID_Template, "A");
-            string Id_CB = TER.obtener_id_cuadranteRunning(ID_Template, "B");
-            string Id_CC = TER.obtener_id_cuadranteRunning(ID_Template, "C");
-            string Id_CD = TER.obtener_id_cuadranteRunning(ID_Template, "D");
-            string Fecha_CA = TER.obtener_fecha_ultima_modificacion(Id_CA);
-            string Fecha_CB = TER.obtener_fecha_ultima_modificacion(Id_CB);
-            string Fecha_CC = TER.obtener_fecha_ultima_modificacion(Id_CC);
-            string Fecha_CD = TER.obtener_fecha_ultima_modificacion(Id_CD);
-            DataTable dt_Res = TER.obtener_Result(Convert.ToInt32(Id_CD));
-            string Nota1 = string.Empty;
-            string Nota2 = string.Empty;
-            if (dt_Res.Rows.Count > 0)
-            {
-                Nota1 = dt_Res.Rows[0]["Nota1"].ToString();
-                Nota2 = dt_Res.Rows[0]["Nota2"].ToString();
-            }
-            DataTable dt_cost = TER.obtener_Cost(Convert.ToInt32(Id_CD));
-            string Cost = string.Empty;
-            string Avoid = string.Empty;
-            string Saving = string.Empty;
-            string Solution = string.Empty;
-            if (dt_cost.Rows.Count > 0)
-            {
-                Cost = dt_cost.Rows[0]["Cost"].ToString();
-                Avoid = dt_cost.Rows[0]["Avoid"].ToString();
-                Saving = dt_cost.Rows[0]["Saving"].ToString();
-                Solution = dt_cost.Rows[0]["Solution"].ToString();
-            }
-
-            DataTable dt_CA = TER.obtener_secciones_CuadranteRunning_ID(Convert.ToInt32(Id_CA));
-            DataTable dt_CB = TER.obtener_secciones_CuadranteRunning_ID(Convert.ToInt32(Id_CB));
-            DataTable dt_CC = TER.obtener_secciones_CuadranteRunning_ID(Convert.ToInt32(Id_CC));
-            DataTable dt_why = TER.obtener_5w_ID_Cuadrante(Convert.ToInt32(Id_CD));
-            DataTable dt_Risk = TER.obtener_risk_cuadrante_id(Convert.ToInt32(Id_CD));
-            DataTable dt_standard = TER.obtener_Standard_ID_Cuadrante(Convert.ToInt32(Id_CD));
-            DataTable dt_evaluadores = TER.obtener_evaluadores_template_ID(Convert.ToInt32(ID_Template));
-
-            // Setup DataSet
-            //DataTable datos = CM.reporte_CodigosMaestros(Codigo, Producto, MPI, Activo, Fecha1, Fecha2, Usuario);
-            // Create Report DataSource
-            ReportDataSource Secciones_CA = new ReportDataSource("Secciones_CA", dt_CA);
-            ReportDataSource Secciones_CB = new ReportDataSource("Secciones_CB", dt_CB);
-            ReportDataSource Secciones_CC = new ReportDataSource("Secciones_CC", dt_CC);
-            ReportDataSource why = new ReportDataSource("Why", dt_why);
-            ReportDataSource standard = new ReportDataSource("standar", dt_standard);
-            ReportDataSource evaluadores = new ReportDataSource("Evaluadores", dt_evaluadores);
-            ReportDataSource Risk = new ReportDataSource("Risk", dt_Risk);
-            // Variables
-            Warning[] warnings;
-            string[] streamIds;
-            string mimeType = string.Empty;
-            string encoding = string.Empty;
-            string extension = string.Empty;
-
-            // Setup the report viewer object and get the array of bytes
-            ReportViewer viewer = new ReportViewer();
-            viewer.LocalReport.DataSources.Add(Secciones_CA);
-            viewer.LocalReport.DataSources.Add(Secciones_CB);
-            viewer.LocalReport.DataSources.Add(Secciones_CC);
-            viewer.LocalReport.DataSources.Add(why);
-            viewer.LocalReport.DataSources.Add(standard);
-            viewer.LocalReport.DataSources.Add(evaluadores);
-            viewer.LocalReport.DataSources.Add(Risk);
-            viewer.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(SubReporte_A3Processing);
-            //viewer.LocalReport.SubreportProcessing += new SubreportProcessingEventHandler(SubReporte_StandardProcessing);
-
-            viewer.LocalReport.ReportPath = Server.MapPath(@"/Assets/Reporte/Reporte_A3_WP.rdlc");
-            viewer.LocalReport.SetParameters(new ReportParameter("Responsable", Responsable));
-            viewer.LocalReport.SetParameters(new ReportParameter("Folio", Folio));
-            viewer.LocalReport.SetParameters(new ReportParameter("Tipo", TipoA3));
-            viewer.LocalReport.SetParameters(new ReportParameter("Problema", Problema));
-            viewer.LocalReport.SetParameters(new ReportParameter("Costo", Costo));
-            viewer.LocalReport.SetParameters(new ReportParameter("Version", Version));
-            viewer.LocalReport.SetParameters(new ReportParameter("Nota2", Nota2));
-            viewer.LocalReport.SetParameters(new ReportParameter("Cost", Cost));
-            viewer.LocalReport.SetParameters(new ReportParameter("Avoid", Avoid));
-            viewer.LocalReport.SetParameters(new ReportParameter("Saving", Saving));
-            viewer.LocalReport.SetParameters(new ReportParameter("Solution", Solution));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Responsable", Mensajes.Responsable));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Folio", Mensajes.Folio));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Version", Mensajes.Version));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Problema", Mensajes.Cual_es_problema));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Costo", Mensajes.Costo));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Nombre", Mensajes.Nombre));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Tipo", Mensajes.Tipo_Firma));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Fecha", Mensajes.Fecha));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Cuadrante", Mensajes.Cuadrante));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Revisor", Mensajes.Revisor));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_Aprobador", Mensajes.Aprobador));
-            viewer.LocalReport.SetParameters(new ReportParameter("FechaInicio", FechaInicio));
-            viewer.LocalReport.SetParameters(new ReportParameter("FechaFin", FechaFin));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_FechaFin", Mensajes.Fecha_Fin));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_FechaInicio", Mensajes.Fecha_Inicio));
-            viewer.LocalReport.SetParameters(new ReportParameter("Idioma_FechaModificacion", Mensajes.Fecha_Modificacion));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CA", Fecha_CA));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CB", Fecha_CB));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CC", Fecha_CC));
-            viewer.LocalReport.SetParameters(new ReportParameter("Fecha_CD", Fecha_CD));
-            viewer.ProcessingMode = ProcessingMode.Local;
-            viewer.LocalReport.ReportPath = Server.MapPath(@"/Assets/Reporte/Reporte_A3_WP.rdlc");
-
-            //viewer.LocalReport.DataSources.Add(Secciones_CA);
-            //viewer.LocalReport.DataSources.Add(Secciones_CB);
-            //viewer.LocalReport.DataSources.Add(Secciones_CC); // Add datasource here
-
-            byte[] bytes = viewer.LocalReport.Render("PDF", null, out mimeType, out encoding, out extension, out streamIds, out warnings);
-            string creationDate = DateTime.Now.ToString("dd-MM-yyyy-HH:mm");
-            string Filename = "Reporte_A3" + creationDate;
-            // Now that you have all the bytes representing the PDF report, buffer it and send it to the client.
-            Response.Buffer = true;
-            Response.Clear();
-            Response.ContentType = "Reporte Códigos Maestros";
-            //inline or attachment
-            Response.AddHeader("content-disposition", "inline; filename=" + Filename + "." + extension);
-            Response.BinaryWrite(bytes); // create the file
-            //AT.registrarAuditTrail(DateTime.Now, HttpContext.User.Identity.Name, "I", "N/A", "Reporte PDF Código Maestro", "N/A");
-            Response.Flush(); // send it to the client to download        
-        }
-        void SubReporte_A3Processing(object sender,SubreportProcessingEventArgs e)
-        {
-            string pathR = e.ReportPath;
-            string dataS = string.Empty;
-            DataTable dt = new DataTable();
-            if(pathR == "SubReporte_Standard")
-            {
-                int ID_Standard = int.Parse(e.Parameters["ID_Standard"].Values[0].ToString());
-                dt = TER.obtener_Standard_ID_info(ID_Standard);
-                dataS = "Standard_info";
-            }
-            else
-            {
-                int Seccion_ID = int.Parse(e.Parameters["Seccion_ID"].Values[0].ToString());
-                dt = TER.obtener_items_seccionID(Seccion_ID);
-                dataS = "Items_Seccion";
-            }          
-            ReportDataSource ds = new ReportDataSource(dataS, dt);
-            e.DataSources.Add(ds);
-        }
+        
         public JsonResult registrar_result(string Cuadrante, string Nota1, string Nota2)
         {
             try
@@ -1966,28 +1724,7 @@ namespace A3_Reloaded.Controllers
             }
             return Json(list, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult valida_firma_Evaluador(string ID)
-        {
-            List<UsuarioModel> list = new List<UsuarioModel>();
-            try
-            {
-                string CWID = HttpContext.User.Identity.Name;
-                DataTable datos = TER.valida_usuario_evaluador(ID, CWID);
-                foreach (DataRow data in datos.Rows)
-                {
-                    list.Add(new UsuarioModel
-                    {
-                        Nombre = data["Nombre"].ToString(),
-                        Rol = data["Tipo"].ToString()
-                    });
-                }
-            }
-            catch (Exception e)
-            {
-                Clases.ErrorLogger.Registrar(this, e.ToString());
-            }
-            return Json(list, JsonRequestBehavior.AllowGet);
-        }
+        
         public JsonResult obtener_estatus_template(string ID)
         {
             try
@@ -2871,6 +2608,26 @@ namespace A3_Reloaded.Controllers
             }
             return filename;
         }
+        void SubReporte_A3Processing(object sender, SubreportProcessingEventArgs e)
+        {
+            string pathR = e.ReportPath;
+            string dataS = string.Empty;
+            DataTable dt = new DataTable();
+            if (pathR == "SubReporte_Standard")
+            {
+                int ID_Standard = int.Parse(e.Parameters["ID_Standard"].Values[0].ToString());
+                dt = TER.obtener_Standard_ID_info(ID_Standard);
+                dataS = "Standard_info";
+            }
+            else
+            {
+                int Seccion_ID = int.Parse(e.Parameters["Seccion_ID"].Values[0].ToString());
+                dt = TER.obtener_items_seccionID(Seccion_ID);
+                dataS = "Items_Seccion";
+            }
+            ReportDataSource ds = new ReportDataSource(dataS, dt);
+            e.DataSources.Add(ds);
+        }
         public string SaveReporte_A3_WP(string ID_Template)
         {
             //string Responsable = US.obtener_Nombre_Usuario(HttpContext.User.Identity.Name, "A");
@@ -3060,22 +2817,7 @@ namespace A3_Reloaded.Controllers
             }
             return Json(list, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult validar_template_WP_id(string ID)
-        {
-            try
-            {
-                //noti.Mensaje = "Se produjo un error al tratar de guardar la información";
-                noti.Id = TER.valida_template_wp(ID);
-                //noti.Error = datos;
-            }
-            catch (Exception e)
-            {
-                noti.Mensaje = Mensajes.Informacion_guardar_error;
-                noti.Tipo = "warning";
-                Clases.ErrorLogger.Registrar(this, e.ToString());
-            }
-            return Json(noti, JsonRequestBehavior.AllowGet);
-        }
+        
         public JsonResult obtener_Rol_usuario()
         {
             try
@@ -3177,6 +2919,51 @@ namespace A3_Reloaded.Controllers
                 Clases.ErrorLogger.Registrar(this, e.ToString());
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+
+        //MODOS DE FALLA
+        public JsonResult get_list_failure_mode_category(string is_enable)
+        {
+            List<FailureModeCategoryModel> list = new List<FailureModeCategoryModel>();
+            try
+            {
+                DataTable datos = oee.get_list_failure_mode_category("1");
+                foreach (DataRow data in datos.Rows)
+                {
+                    list.Add(new FailureModeCategoryModel
+                    {
+                        id_category = Convert.ToInt32(data["id_category"]),
+                        name_category = data["name_category"].ToString(),
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult get_list_failure_mode_by_id_category(string id_category,string is_enable)
+        {
+            List<FailureModeModel> list = new List<FailureModeModel>();
+            try
+            {
+                DataTable datos = oee.get_list_failure_mode_by_id_category(id_category, "1");
+                foreach (DataRow data in datos.Rows)
+                {
+                    list.Add(new FailureModeModel
+                    {
+                        id_category = Convert.ToInt32(data["id_category"]),
+                        id_failure = Convert.ToInt32(data["id_codigo"]),
+                        name_failure = data["name_codigo"].ToString(),
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
         }
     }
 }

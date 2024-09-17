@@ -17,6 +17,8 @@ namespace A3_Reloaded.Controllers
         Instruccion IN = new Instruccion();
         Ishikawua IS = new Ishikawua();
         Nota NO = new Nota();
+        Acciones accion = new Acciones();
+        AnalisisPorque analisis = new AnalisisPorque();
         Hipotesis HI = new Hipotesis();
         Factor FA = new Factor();
         Items IT = new Items();
@@ -224,6 +226,260 @@ namespace A3_Reloaded.Controllers
                 Clases.ErrorLogger.Registrar(this, e.ToString());
             }
             return list;
+        }
+        public JsonResult registrar_Accion(string Titulo, string Descripcion, string Seccion)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                DateTime Registro = DateTime.Now;
+                bool firma = US.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    string id = accion.registrar_acciones(Titulo, Descripcion);
+                    string datos = IT.registrar_Item("Acciones", Convert.ToInt32(id), 0, "TabAcciones", Convert.ToInt32(Seccion), Titulo, 0);
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Item_guardado;
+                        noti.Tipo = "success";
+                        AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Item: " + Titulo + "", "N/A");
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Item_guardado_error;
+                        noti.Tipo = "warning";
+                    }
+                }
+                else
+                {
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Item_guardado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult Modificar_accion(string IDItem, string ID, string Titulo, string Descripcion, string Seccion)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                string Justificacion = Request["ZMYSEL"];
+                DateTime Registro = DateTime.Now;
+                bool firma = US.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    DataTable datosAnterior = accion.obtener_accion_ID(Convert.ToInt32(ID));
+                    accion.Modificar_acciones(Convert.ToInt32(ID), Titulo, Descripcion);
+                    string datos = IT.modificar_Item(Convert.ToInt32(IDItem), "Acciones", Convert.ToInt32(ID), 0, "TabAcciones", Convert.ToInt32(Seccion), Titulo, 0);
+                    if (datos == "guardado")
+                    {
+                        DataTable datosActual = accion.obtener_accion_ID(Convert.ToInt32(ID));
+                        noti.Mensaje = Mensajes.Item_guardado;
+                        noti.Tipo = "success";
+                        string Actual = string.Empty;
+                        string Anterior = string.Empty;
+                        for (int i = 0; i < datosAnterior.Rows.Count; i++)
+                        {
+                            foreach (DataColumn dc_acterior in datosAnterior.Columns)
+                            {
+                                string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                                string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                                string Columna = dc_acterior.ColumnName.ToString();
+                                if (dato_anterior != dato_actual)
+                                {
+                                    if (string.IsNullOrEmpty(Anterior))
+                                    {
+                                        Anterior = dato_anterior;
+                                        Actual = dato_actual;
+                                    }
+                                    else
+                                    {
+                                        Anterior = Anterior + ", " + dato_anterior;
+                                        Actual = Actual + ", " + dato_actual;
+                                    }
+                                }
+                            }
+                        }
+                        AT.registrarAuditTrail(Registro, BYTOST, "M", Anterior, Actual, Justificacion);
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Item_guardado_error;
+                        noti.Tipo = "warning";
+                    }
+                }
+                else
+                {
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Item_guardado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult registrar_analisis_porque(string Titulo, string Descripcion, string Seccion)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                DateTime Registro = DateTime.Now;
+                bool firma = US.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    string id = analisis.registrar_analisis_porque(Titulo, Descripcion);
+                    string datos = IT.registrar_Item("Analisis Porque", Convert.ToInt32(id), 0, "TabAnalisis_Porque", Convert.ToInt32(Seccion), Titulo, 0);
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Item_guardado;
+                        noti.Tipo = "success";
+                        AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Item: " + Titulo + "", "N/A");
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Item_guardado_error;
+                        noti.Tipo = "warning";
+                    }
+                }
+                else
+                {
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Item_guardado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult obtener_analisis_id(string ID)
+        {
+            List<AnalisisPorqueModel> list = new List<AnalisisPorqueModel>();
+            try
+            {
+                DataTable datos = analisis.obtener_analisis_porque_ID(Convert.ToInt32(ID));
+                foreach (DataRow dr in datos.Rows)
+                {
+                    list.Add(new AnalisisPorqueModel
+                    {
+                        ID = Convert.ToInt32(dr["ID"]),
+                        Titulo = dr["Titulo"].ToString(),
+                        Descripcion = dr["Descripcion"].ToString(),
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult obtener_acciones_id(string ID)
+        {
+            List<AccionesModel> list = new List<AccionesModel>();
+            try
+            {
+                DataTable datos = accion.obtener_accion_ID(Convert.ToInt32(ID));
+                foreach (DataRow dr in datos.Rows)
+                {
+                    list.Add(new AccionesModel
+                    {
+                        ID = Convert.ToInt32(dr["ID"]),
+                        Titulo = dr["Titulo"].ToString(),
+                        Descripcion = dr["Descripcion"].ToString(),
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult Modificar_analisis_porque(string IDItem, string ID, string Titulo, string Descripcion, string Seccion)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                string Justificacion = Request["ZMYSEL"];
+                DateTime Registro = DateTime.Now;
+                bool firma = US.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    DataTable datosAnterior = analisis.obtener_analisis_porque_ID(Convert.ToInt32(ID));
+                    analisis.Modificar_analisis(Convert.ToInt32(ID), Titulo, Descripcion);
+                    string datos = IT.modificar_Item(Convert.ToInt32(IDItem), "Analisis Porque", Convert.ToInt32(ID), 0, "TabAnalisis_Porque", Convert.ToInt32(Seccion), Titulo, 0);
+                    if (datos == "guardado")
+                    {
+                        DataTable datosActual = analisis.obtener_analisis_porque_ID(Convert.ToInt32(ID));
+                        noti.Mensaje = Mensajes.Item_guardado;
+                        noti.Tipo = "success";
+                        string Actual = string.Empty;
+                        string Anterior = string.Empty;
+                        for (int i = 0; i < datosAnterior.Rows.Count; i++)
+                        {
+                            foreach (DataColumn dc_acterior in datosAnterior.Columns)
+                            {
+                                string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                                string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                                string Columna = dc_acterior.ColumnName.ToString();
+                                if (dato_anterior != dato_actual)
+                                {
+                                    if (string.IsNullOrEmpty(Anterior))
+                                    {
+                                        Anterior = dato_anterior;
+                                        Actual = dato_actual;
+                                    }
+                                    else
+                                    {
+                                        Anterior = Anterior + ", " + dato_anterior;
+                                        Actual = Actual + ", " + dato_actual;
+                                    }
+                                }
+                            }
+                        }
+                        AT.registrarAuditTrail(Registro, BYTOST, "M", Anterior, Actual, Justificacion);
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Item_guardado_error;
+                        noti.Tipo = "warning";
+                    }
+                }
+                else
+                {
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Item_guardado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
         }
         public JsonResult obtener_item_id(string ID)
         {
@@ -1074,6 +1330,84 @@ namespace A3_Reloaded.Controllers
                 if (firma)
                 {
                     string datos = NO.remover_nota(ID, ID_Item);
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Item_omitido;
+                        noti.Tipo = "success";
+                        AT.registrarAuditTrail(Registro, BYTOST, "E", "N/A", "Item omitido", Justificacion);
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Item_omitido_error;
+                        noti.Tipo = "warning";
+                    }
+                }
+                else
+                {
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Item_omitido_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult eliminar_accion(string ID, string ID_Item)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                string Justificacion = Request["ZMYSEL"];
+                DateTime Registro = DateTime.Now;
+                bool firma = US.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    string datos = accion.remover_acciones(ID, ID_Item);
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Item_omitido;
+                        noti.Tipo = "success";
+                        AT.registrarAuditTrail(Registro, BYTOST, "E", "N/A", "Item omitido", Justificacion);
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Item_omitido_error;
+                        noti.Tipo = "warning";
+                    }
+                }
+                else
+                {
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Item_omitido_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult eliminar_analisis(string ID, string ID_Item)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                string Justificacion = Request["ZMYSEL"];
+                DateTime Registro = DateTime.Now;
+                bool firma = US.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    string datos = analisis.remover_analisis(ID, ID_Item);
                     if (datos == "guardado")
                     {
                         noti.Mensaje = Mensajes.Item_omitido;

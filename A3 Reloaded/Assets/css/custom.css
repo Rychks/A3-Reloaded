@@ -197,7 +197,3 @@ input:checked + .slider:before {
         border-color: rgba(0, 255, 0, 0.4);
         background-color: rgba(0, 255, 0, 0.3);
     }
-
-    select {
-        height: 3.5rem !important
-    }

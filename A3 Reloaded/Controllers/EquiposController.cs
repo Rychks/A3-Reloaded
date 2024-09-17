@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace A3_Reloaded.Controllers
 {
+    [Authorize]
     public class EquiposController : Controller
     {
         // GET: Equipos

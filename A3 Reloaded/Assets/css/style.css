@@ -1992,21 +1992,24 @@ h6 .badge {
   color: #fff; }
 
 .btn-progress {
+    content: '';
     color: transparent !important;
-    position: relative;
+    /*//position: relative;*/
     background-image: url("../img/spinner-white.svg");
     background-position: center;
+    background-size: 25px !important;
     background-repeat: no-repeat;
     font-size: 0px !important;
-    background-size: 30px;
+    width: 4rem;    
 }
 
 /* 3.13 Media */
 .media .media-right {
-  float: right;
-  color: #6777ef;
-  font-weight: 600;
-  font-size: 16px; }
+    float: right;
+    color: #6777ef;
+    font-weight: 600;
+    font-size: 16px;
+}
 .media .media-icon {
   font-size: 20px;
   margin-right: 15px;

@@ -12,40 +12,45 @@
                 <div class="card card-primary">
                     <div class="card-body">
                         <div id="frmUsuarios">
-                            <div class="form-row">
-                                <div class="form-group col-lg-2">
+                            <div class="row">
+                                <div class="form-group col-md-2">
                                     <label for="txtUsuarios_CWID" class="txt_Idioma_CWID">CWID</label>
                                     <input type="text" class="form-control txt_Idioma_Ingese_un_CWID" id="txtUsuarios_CWID" placeholder="Ingrese un CWID">
                                 </div>
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-md-3">
                                     <label for="txtUsuarios_Nombre" class="txt_Idioma_Nombre">Nombre</label>
                                     <input type="text" class="form-control txt_Idioma_Ingrese_un_nombre" id="txtUsuarios_Nombre" placeholder="Ingrese un Nombre">
                                 </div>
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-md-3">
                                     <label for="txtUsuarios_Correo" class="txt_Idioma_Correo">Correo</label>
                                     <input type="text" class="form-control txt_Idioma_Ingrese_correo" id="txtUsuarios_Correo" placeholder="">
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-md-2">
                                     <label for="slcUsuarios_Rol" class="txt_Idioma_Rol">Rol</label>
                                     <select class="form-control" id="slcUsuarios_Rol">
                                         <option value="-1" selected disabled>Seleccione</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-lg-2">
+                                <div class="form-group col-md-2">
                                     <label for="slcUsuarios_Rol" class="txt_Idioma_Departamento">Departamento</label>
                                     <select class="form-control" id="slcUsuarios_Departamento">
                                         <option value="-1" selected disabled>Seleccione</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group col-lg-2">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="cbxUsuarios_Activo">
-                                        <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxUsuarios_Activo">Solo ver activos</label>
+                            <div class="row">
+                                <div class="form-group col-md-2">
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="cbxUsuarios_Activo" checked>
+                                        <label class="form-check-label txt_Idioma_Solo_ver_activos" for="cbxUsuarios_Activo">Solo ver activos</label>
                                     </div>
+                                    @*<div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="cbxUsuarios_Activo">
+            <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxUsuarios_Activo">Solo ver activos</label>
+        </div>*@
                                 </div>
-                                <div class="form-group col-lg-10 text-right">
+                                <div class="form-group col-md-10 text-right">
                                     <button type="button" class="btn btn-sm btn-icon btn-info btn-left txt_Idioma_Buscar" id="btnUsuarios_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left txt_Idioma_Limpiar_filtros" id="btnUsuarios_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
                                     <button type="button" class="btn btn-sm btn-icon btn-success btn-left txt_Idioma_Agregar" id="btnUsuarios_Agregar" data-toggle="modal" data-target="#mdlUsuarios_Agregar">
@@ -109,21 +114,21 @@
                         <h4 class="modal-title txt_Idioma_Registrar_Usuario">Agregar Nuevo Usuario</h4>
                     </div>
                     <div class="modal-body" id="frmUsuariosN">
-                        <div class="form-row">
-                            <div class="form-group col-lg-4">
+                        <div class="row">
+                            <div class="form-group col-md-4">
                                 <label for="txtUsuariosN_CWID" class="txt_Idioma_CWID">CWID:</label>
                                 <input type="text" class="form-control txt_Idioma_Ingese_un_CWID" id="txtUsuariosN_CWID" placeholder="Ingrese el CWID">
                             </div>
-                            <div class="form-group col-lg-4">
+                            <div class="form-group col-md-4">
                                 <label for="txtUsuariosN_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
                                 <input type="text" class="form-control txt_Idioma_Ingrese_un_nombre" id="txtUsuariosN_Nombre" placeholder="Ingrese el Nombre">
                             </div>
-                            <div class="form-group col-lg-4">
+                            <div class="form-group col-md-4">
                                 <label for="txtUsuariosN_App" class="txt_Idioma_Apellido_paterno">Apellido:</label>
                                 <input type="text" class="form-control txt_Idioma_Apellido_paterno" id="txtUsuariosN_App" placeholder="Ingrese el Apellido Paterno">
                             </div>
                         </div>
-                        <div class="form-row">
+                        <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="txtUsuariosN_Correo" class="txt_Idioma_Correo">Correo:</label>
                                 <input type="email" class="form-control txt_Idioma_Ingrese_correo" id="txtUsuariosN_Correo" placeholder="Ingrese el Correo Electrónico">
@@ -141,7 +146,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-row">
+                        <div class="row">
                             <div class="form-group col-md-4">
                                 <label class="txt_Idioma_Estatus">Estatus:</label>
                                 <div class="form-check">
@@ -168,7 +173,7 @@
                         <h4 class="modal-title txt_Idioma_Modificar_Usuario">Modificando Usuario</h4>
                     </div>
                     <div class="modal-body" id="frmUsuariosM">
-                        <div class="form-row">
+                        <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="txtUsuariosM_CWID" class="txt_Idioma_CWID">CWID:</label>
                                 <input type="text" class="form-control txt_Idioma_Ingese_un_CWID" id="txtUsuariosM_CWID">
@@ -183,7 +188,7 @@
                                 <input type="text" class="form-control txt_Idioma_Apellido_paterno" id="txtUsuariosM_App" placeholder="Ingrese">
                             </div>
                         </div>
-                        <div class="form-row">
+                        <div class="row">
                             <div class="form-group col-md-4">
                                 <label for="txtUsuariosM_Correo" class="txt_Idioma_Correo">Correo:</label>
                                 <input type="email" class="form-control txt_Idioma_Ingrese_correo" id="txtUsuariosM_Correo" placeholder="Ingrese el Correo Electrónico">
@@ -201,8 +206,9 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-row">
+                        <div class="row">
                             <div class="form-group col-md-4">
+
                                 <label class="txt_Idioma_Estatus">Estatus:</label>
                                 <div class="form-check">
                                     <label class="switch">

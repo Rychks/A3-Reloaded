@@ -11,6 +11,37 @@ namespace A3_Reloaded.Clases
 {
     public class Secciones
     {
+        public DataTable get_template_sections_by_id_cuadrant(int id_cuadrant)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            var msg = "";
+            DataTable dt = new DataTable();
+            try
+            {
+                using (con)
+                {
+                    SqlCommand cmd = new SqlCommand("get_template_sections_by_id_cuadrant", con);
+                    cmd.Parameters.Add("@id_cuadrant", SqlDbType.Int).Value = id_cuadrant;
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                if (dt.Columns[0].ToString() == "ErrorNumber")
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                                ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return dt;
+        }
         public DataTable obtener_SeccionID(int ID)
         {
             var msg = "";

@@ -151,7 +151,7 @@
                 var Botones = '<div class="item-action dropdown"><a href="javascript:void(0)" data-toggle="dropdown" class="icon" title="Options"><i class="fas fa-bars" style="z-index:-99 !important;"></i></a>' +
                     '<div class="dropdown-menu dropdown-menu-right">' +
                     accesoEditar +
-                    '</div></div>'; 7
+                    '</div></div>';
                 $.mostrarInfo({
                     URLindex: "/Usuarios/obtenerTotalPagUsuarios",
                     URLdatos: "/Usuarios/mostrarUsuarios",

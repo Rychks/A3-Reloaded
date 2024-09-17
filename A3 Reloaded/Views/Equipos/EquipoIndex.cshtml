@@ -9,18 +9,22 @@
 <div class="section-body">
     <h2 class="section-title txt_Idioma_Administracion_Equipos">Administración de Equipos</h2>
     <div class="section-lead">
-        <div class="form-row" id="frmEquipos">
+        <div class="row" id="frmEquipos">
             <div class="form-group col-md-6">
                 <label for="txtEquipos_Nombre" class="txt_Idioma_Equipo">Sub-área</label>
                 <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Equipo" id="txtEquipos_Nombre" placeholder="Ingrese el Nombre de la Linea">
             </div>
-            <div class="form-group col-md-2" style="margin-top:2rem">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="cbxEquipos_Activo">
-                    <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxEquipos_Activo">Solo ver activos</label>
+            <div class="form-group col-md-1" style="margin-top:1.8rem">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="cbxEquipos_Activo" checked>
+                    <label class="form-check-label txt_Idioma_Solo_ver_activos" for="cbxEquipos_Activo">Solo ver activos</label>
                 </div>
+                @*<div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="cbxEquipos_Activo">
+            <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxEquipos_Activo">Solo ver activos</label>
+        </div>*@
             </div>
-            <div class="form-group col-md-4" style="margin-top:2rem">
+            <div class="form-group col-md-4" style="margin-top:1.3rem">
                 <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnEquipos_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
                 <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left  ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnEquipos_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
                 <button type="button" class="btn btn-sm btn-icon btn-success  btn-left  ml-3 mb-4 txt_Idioma_Agregar" id="btnEquipos_Agregar" data-toggle="modal" data-target="#mdlEquipos_Agregar">
@@ -77,14 +81,14 @@
                     <h4 class="modal-title txt_Idioma_Registrar_Equipo">Agregar Nueva Sub-área</h4>
                 </div>
                 <div class="modal-body" id="frmEquiposN">
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-12">
                             <label for="txtEquiposN_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
                             <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Equipo" id="txtEquiposN_Nombre" placeholder="Ingrese el Nombre del Departamento">
 
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
                             <div class="form-check">
@@ -111,14 +115,14 @@
                     <h4 class="modal-title txt_Idioma_Modificar_Equipo">Modificar Sub-área</h4>
                 </div>
                 <div class="modal-body" id="frmEquiposM">
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-12">
                             <label for="txtEquiposM_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
                             <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Subarea" id="txtEquiposM_Nombre" placeholder="Ingrese el Nombre">
                             <input type="text" id="txtEquiposM_ID" hidden disabled>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
                             <div class="form-check">

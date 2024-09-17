@@ -45,6 +45,10 @@ namespace A3_Reloaded.Clases
             }
             return msg;
         }
+        
+        
+        
+        
         public string registrar_Nota(string Titulo, string Descripcion)
         {
             var msg = "";
@@ -132,5 +136,7 @@ namespace A3_Reloaded.Clases
             }
             return dt;
         }
+        
+       
     }
 }

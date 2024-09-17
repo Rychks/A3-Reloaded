@@ -10,27 +10,28 @@
 <div class="loader"></div>
 <div id="tiposA3">
     <h2 class="section-title">A3-Reloaded</h2>
-    <input type="text" id="txt_id_a3_running" name="name" value="@ViewBag.Id" />
+    <input type="text" id="txt_id_a3_running" style="display:none" name="name" value="@ViewBag.Id" />
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <input type="text"  name="name" id="txtGbl_Idioma_ID" style="display:none;" value="@Idioma_ID" />
+                    <input type="text" name="name" id="txtGbl_Idioma_ID" style="display:none;" value="@Idioma_ID" />
                     <h4 class="txt_Idioma_Seleccione_formato_A3">Seleccione un formato de A3</h4>
                     <div class="card-header-action">
-                        <button class="btn btn-primary txt_Idioma_Historial_A3" id="btnTipoA3_Historial_mostrar">Historial A3</button>
+                        <button class="btn btn-primary" data-target="#mdlTemplateR_visual_help" data-toggle="modal" id=""><span class="fa fa-question-circle"></span> Ayuda</button>
+                        <button class="btn btn-danger txt_Idioma_Regresar" id="btnInicioA3_Regresar">Regresar</button>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive tabla-md encabezados-fixed">
-                        <table class="table table-bordered table-hover">
+                    <div class="table tabla-md encabezados-fixed">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th class="txt_Idioma_Imagen_Descriptiva" scope="col">Imagen Descriptiva</th>
                                     <th class="txt_Idioma__Formato_de_A3" scope="col">Formato de A3</th>
                                     <th class="txt_Idioma_Descripcion" scope="col">Descripción</th>
                                     <th class="txt_Idioma_Version" scope="col" style="width:10%;">Version</th>
-                                    <th class="txt_Idioma_Opciones" scope="col" style="width:30%">Opciones</th>
+                                    <th class="txt_Idioma_Opciones" scope="col" style="width:10%">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tblTemplatesActivos" style="font-size:15px">
@@ -41,9 +42,10 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </div>
+
 <div id="pnlInicio_Formulario_Nueva_Investigacion">
     <div class="row">
         <div class="col-lg-12">
@@ -56,226 +58,425 @@
                         </a>
                     </div>
                 </div>
-            </div>
-        </div>        
-    </div>
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card card-primary" id="frmTemplatesRN_Pnl">
-                <div class="card-header">
-                    <h4 class="card-title txt_Idioma_Administracion_Informacion_Template"></h4>
-                </div>
-                <div class="card-body" id="frmTemplatesRN">
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="txtTemplatesRunningN_Folio" class="txt_Idioma_Folio">Folio:</label>
-                            <input type="text" class="form-control" id="txtTemplatesRunningN_Folio" disabled>
-                            <input type="text" id="txtTemplatesRunningN_ID" style="display:none">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6" id="plnTemplate_PmCard">
+                            <div class="form-group d-grid gap-2 mt-2">
+                                <input type="text" disabled style="display:none" data-registro="id_step" name="name" value="" />
+                                <button id="" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_pmcard">
+                                    <i class="fa-solid fa-wrench"></i>
+                                    <span class="txt_Idioma_Top_fallas"></span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-group col-md-4">
-                            <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma__Formato_de_A3">Tipo A3:</label>
-                            <select class="form-control" disabled id="slcTemplatesRunningN_TipoA3">
-                                <option selected disabled value="-1">Seleccione</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="txtTemplatesRunningN_Contact" class="txt_Idioma_Responsable">Responsable:</label>
-                            <input type="text" class="form-control" disabled id="txtTemplatesRunningN_Contact" value="@Usuario" placeholder="Ingrese un Responsable">
+                        <div class="col-lg-6" id="pnlTemplate_failure_mode">
+                            <div class="form-group d-grid gap-2 mt-2">
+                                <input type="text" disabled style="display:none" data-registro="id_step" name="name" value="" />
+                                <button id="" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_failureMode">
+                                    <i class="fa-solid fa-gears"></i>
+                                    <span class="txt_Idioma_Modo_falla"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="txtTemplatesRunningN_Problem" class="txt_Idioma_Cual_es_el_problema">¿Cual es el Problema?:</label>
-                            <textarea class="form-control" style="resize:none; height:150px !important; overflow:auto" id="txtTemplatesRunningN_Problem" placeholder=""></textarea>
+                    <div class="row">
+                        <div class="col-lg-6" id="frmTemplatesRN_Pnl">
+                            <div class="form-group d-grid gap-2 mt-2">
+                                <input type="text" disabled style="display:none" data-registro="id_step" name="name" value="" />
+                                <button id="" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_info_template">
+                                    <i class="fa-solid fa-clipboard-list"> </i>
+                                    <span class="txt_Idioma_Administracion_Informacion_Template"></span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="txtTemplatesRunningN_Cost" class="txt_Idioma_CostoPerdida">costo / pérdida debido al problema:</label>
-                            <textarea class="form-control" style="resize:none; height:150px !important; overflow:auto" id="txtTemplatesRunningN_Cost" placeholder=""></textarea>
+                        <div class="col-lg-6">
+                            <div class="form-group d-grid gap-2 mt-2">
+                                <input type="text" disabled style="display:none" data-registro="id_step" name="name" value="" />
+                                <button id="" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_complement">
+                                    <i class="fa-solid fa-rectangle-list"></i>
+                                    <span class=""></span>  Complementación A3
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button id="btnTemplatesRunningN_Guardar" class="btn btn-lg btn-light"><i class="fa-solid fa-play"></i> <span class="font-weight-bold txt_Idioma_Comenzar_A3"></span> </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="card card-primary" id="frmTemplateR_Evaluadores">
-                <div class="card-header">
-                    <h4 class="card-title txt_Idioma_Evaluadores">Evaluadores</h4>
-                </div>
-                <div class="card-body" id="frmTemplateR_Evaluadores_Body">
-                    <div class="form-row">
-                        <div class="form-group col-lg-6">
-                            <label class="txt_Idioma_Usuario">Usuario:</label>
-                            <select id="slcTemplatesRunningN_Usuarios" class="form-control">
-                                <option value="value">text</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-lg-3">
-                            <label class="txt_Idioma_Tipo_Evaluador">Tipo:</label>
-                            <select id="slcTemplatesRunningN_TiposFirma" class="form-control">
-                                <option value="1" class="txt_Idioma_Revisor">Revisor</option>
-                                <option value="2" class="txt_Idioma_Aprovador">Aprovador</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-lg-3">
-                            <div style="margin-top:30px">
-                                <button type="button" class="btn btn-success txt_Idioma_Agregar" tabindex="3" id="btnTemplateRunningN_Evaluador_Agregar">Añadir Evaluador</button>
-                            </div>
+    </div>
 
+    <div class="modal fade" id="mdlTemplate_pmcard" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 txt_Idioma_Top_fallas">Top 10 Fallas</h1>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label for="slc_PmCardRunning_linea">Linea</label>
+                            <select id="slc_PmCardRunning_linea" class="form-control form-control-sm">
+                                <option value="-1">Seleccione</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-lg-12">
-                            <div class="table-responsive tabla-md encabezados-fixed" style="height:200px !important;">
+                    <div class="row">
+                        <div class="table tabla-md encabezados-fixed">
+                            <table class="table table-hover" id="tbl_PmCardRunning">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Linea</th>
+                                        <th>Maquina</th>
+                                        <th>Motivo</th>
+                                        <th>Minutos</th>
+                                        <th>Clasificación</th>
+                                        <th class="text-center">Eventos</th>
+                                        <th class="text-center">Check</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="mdlTemplate_pmcard_events" data-backdrop="static" data-keyboard="false" tabindex="999" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title txt_Idioma_Eventos fs-5" >Eventos</h1>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="table tabla-md encabezados-fixed">
+                            <table class="table table-hover" id="tbl_events_pmcard">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Linea</th>
+                                        <th>Maquina</th>
+                                        <th>Motivo</th>
+                                        <th>Minutos</th>
+                                        <th>Clasificación</th>
+                                        <th>Comentario</th>                                       
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdlTemplate_failureMode" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 txt_Idioma_Modo_falla">Modo de Falla</h1>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            <label for="slcTemplatesRunningN_failure_mode_category" class="">Categoria:</label>
+                            <select class="form-control" id="slcTemplatesRunningN_failure_mode_category">
+                                <option selected disabled value="-1">Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Failure Mode ID</label>
+                            <input type="text" class="form-control" id="txtTemplatesRunningN_failure_mode_id" name="name" value="" />
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Failure Mode code</label>
+                            <input type="text" class="form-control" id="txtTemplatesRunningN_failure_mode_code" name="name" value="" />
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Failure Mode text</label>
+                            <input type="text" class="form-control" id="txtTemplatesRunningN_failure_mode_text" name="name" value="" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="table tabla-md encabezados-fixed">
+                            <table class="table table-hover" id="tblTemplateRunningN_failure_mode">
+                                <thead>
+                                    <tr>
+                                        <th class="txt_Idioma_Modo_falla">Modo de Falla</th>
+                                        <th style="width:10%">Check</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdlTemplate_info_template" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title txt_Idioma_Administracion_Informacion_Template fs-5">Modo de Falla</h1>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card card-primary" id="">
+                                <div class="card-body" id="frmTemplatesRN">
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <label for="txtTemplatesRunningN_Folio" class="txt_Idioma_Folio">Folio:</label>
+                                            <input type="text" class="form-control" id="txtTemplatesRunningN_Folio" disabled>
+                                            <input type="text" id="txtTemplatesRunningN_ID" style="display:none">
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma__Formato_de_A3">Tipo A3:</label>
+                                            <select class="form-control" disabled id="slcTemplatesRunningN_TipoA3">
+                                                <option selected disabled value="-1">Seleccione</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="txtTemplatesRunningN_Contact" class="txt_Idioma_Responsable">Responsable:</label>
+                                            <input type="text" class="form-control" disabled id="txtTemplatesRunningN_Contact" value="@Usuario" placeholder="Ingrese un Responsable">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label for="txtTemplatesRunningN_Problem" class="txt_Idioma_Cual_es_el_problema">¿Cual es el Problema?:</label>
+                                            <textarea class="form-control" style="resize:none; height:150px !important; overflow:auto" id="txtTemplatesRunningN_Problem" placeholder=""></textarea>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="txtTemplatesRunningN_Cost" class="txt_Idioma_CostoPerdida">costo / pérdida debido al problema:</label>
+                                            <textarea class="form-control" style="resize:none; height:150px !important; overflow:auto" id="txtTemplatesRunningN_Cost" placeholder=""></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card card-primary" id="frmTemplateR_Evaluadores">
+                                <div class="card-header">
+                                    <h4 class="card-title txt_Idioma_Evaluadores">Evaluadores</h4>
+                                </div>
+                                <div class="card-body" id="frmTemplateR_Evaluadores_Body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="slcTemplatesRunningN_Usuarios" class="txt_Idioma_Usuario">Usuario:</label>
+                                                <select id="slcTemplatesRunningN_Usuarios" style="width:100% !important" class="form-control">
+                                                    <option value="value">text</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="slcTemplatesRunningN_TiposFirma" class="txt_Idioma_Tipo_Evaluador">Tipo:</label>
+                                                <select id="slcTemplatesRunningN_TiposFirma" style="width:100% !important" class="form-control">
+                                                    <option value="1" class="txt_Idioma_Revisor">Revisor</option>
+                                                    <option value="2" class="txt_Idioma_Aprovador">Aprovador</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group" style="margin-top: 1.3rem;">
+                                                <button type="button" class="btn btn-success txt_Idioma_Agregar" tabindex="3" id="btnTemplateRunningN_Evaluador_Agregar">Añadir Evaluador</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="table tabla-md encabezados-fixed" style="height:200px !important;">
+                                                <table class="table table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="txt_Idioma_Usuario" scope="col">Usuario</th>
+                                                            <th scope="col" class="txt_Idioma_Tipo_Evaluador">Tipo</th>
+                                                            <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tblTemplateRunningN_Evaluadores" style="font-size:10px">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="mdlTemplate_complement" tabindex="-1"  aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Afectación</h1>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma_Departamento_Afectado">Departamento afectado:</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <select class="form-control" id="slcTemplatesRunningN_Departamento">
+                                        <option selected disabled value="-1">Seleccione</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_Departamento_Agregar" type="button">Añadir</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table  tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
-                                            <th class="txt_Idioma_Usuario" scope="col">Usuario</th>
-                                            <th scope="col" class="txt_Idioma_Tipo_Evaluador">Tipo</th>
+                                            <th class="txt_Idioma_Departamento" scope="col">Departamento</th>
                                             <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tblTemplateRunningN_Evaluadores" style="font-size:10px">
+                                    <tbody id="tblTemplateRunningN_Departamentos" style="font-size:10px">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma_Subarea_Afectado">Sub-área afectada:</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <select class="form-control" id="slcTemplatesRunningN_Subarea">
+                                        <option selected disabled value="-1">Seleccione</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_Subarea_Agregar" type="button">Añadir</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="txt_Idioma_Subarea" scope="col">Sub-área</th>
+                                            <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTemplateRunningN_Subareas" style="font-size:10px">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="slcTemplatesRunningN_Linea" class="txt_Idioma_Linea_Afectado">Linea afectada:</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <select class="form-control" id="slcTemplatesRunningN_Linea">
+                                        <option selected disabled value="-1">Seleccione</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_Linea_Agregar" type="button">Añadir</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="txt_Idioma_Linea" scope="col">Linea</th>
+                                            <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTemplateRunningN_Lineas" style="font-size:10px">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma_Equipo_Afectado">Equipo afectado:</label>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <select class="form-control" id="slcTemplatesRunningN_Equipo">
+                                        <option selected disabled value="-1">Seleccione</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_Equipo_Agregar" type="button">Añadir</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="txt_Idioma_Equipo" scope="col">Equipo</th>
+                                            <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTemplateRunningN_Equipos" style="font-size:10px">
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card card-primary">
-        <div class="card-body">          
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma_Departamento_Afectado">Departamento afectado:</label>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <select class="form-control" id="slcTemplatesRunningN_Departamento">
-                                <option selected disabled value="-1">Seleccione</option>
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_Departamento_Agregar" type="button">Añadir</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="txt_Idioma_Departamento"scope="col">Departamento</th>
-                                    <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblTemplateRunningN_Departamentos" style="font-size:10px">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma_Subarea_Afectado">Sub-área afectada:</label>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <select class="form-control" id="slcTemplatesRunningN_Subarea">
-                                <option selected disabled value="-1">Seleccione</option>
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-success txt_Idioma_Agregar"  id="btnTemplateRunningN_Subarea_Agregar" type="button">Añadir</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="txt_Idioma_Subarea" scope="col">Sub-área</th>
-                                    <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblTemplateRunningN_Subareas" style="font-size:10px">
-                            </tbody>
-                        </table>
-                    </div>                    
-                </div>              
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma_Linea_Afectado">Linea afectada:</label>                    
-                    <div class="form-group">
-                        <div class="input-group">
-                            <select class="form-control" id="slcTemplatesRunningN_Linea">
-                                <option selected disabled value="-1">Seleccione</option>
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_Linea_Agregar" type="button">Añadir</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="txt_Idioma_Linea" scope="col">Linea</th>
-                                    <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblTemplateRunningN_Lineas" style="font-size:10px">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma_Equipo_Afectado">Equipo afectado:</label>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <select class="form-control" id="slcTemplatesRunningN_Equipo">
-                                <option selected disabled value="-1">Seleccione</option>
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_Equipo_Agregar" type="button">Añadir</button>
-                            </div>
-                        </div>
-                    </div>                 
-                    <div class="table-responsive tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="txt_Idioma_Equipo" scope="col">Equipo</th>
-                                    <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblTemplateRunningN_Equipos" style="font-size:10px">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
                 </div>
             </div>
-        </div>
-        <div class="card-footer text-right">
-            <button type="button" class="btn btn-primary txt_Idioma_Comenzar" tabindex="3" id="btnTemplatesRunningN_Guardar">Comenzar</button>
         </div>
     </div>
 </div>
 <div id="pnlTemplatesRunning_Investigacion">
+
     <div class="row">
         <div class="col-lg-9">
             <div class="card card-primary" id="">
                 <div class="card-header">
-                    <h4 id="txtTemplateRunngin_Titulo">Card Header</h4>                    
+                    <h4 id="txtTemplateRunngin_Titulo">Card Header</h4>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="txt_Idioma_Responsable">Responsable</label>
-                                <input id="pnlTemplatesRunningM_Contact" type="text" readonly class="form-control" placeholder="Contact" name="name" value="" />
+                                <input id="pnlTemplatesRunningM_Contact" type="text" readonly class="form-control" disabled placeholder="Contact" name="name" value="" />
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="txt_Idioma_Folio">Folio</label>
-                                <input id="pnlTemplatesRunningM_Folio" type="text" readonly class="form-control" placeholder="Number" name="name" value="" />
+                                <input id="pnlTemplatesRunningM_Folio" type="text" readonly class="form-control" disabled placeholder="Number" name="name" value="" />
                             </div>
                         </div>
                     </div>
@@ -283,20 +484,30 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="txt_Idioma_Cual_es_el_problema">Cual es el Problema</label>
-                                <textarea style="height:150px !important; resize:none; overflow:auto" id="pnlTemplatesRunningM_Problema" readonly class="form-control"></textarea>
+                                <textarea style="height:150px !important; resize:none; overflow:auto" id="pnlTemplatesRunningM_Problema" disabled readonly class="form-control"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="txt_Idioma_CostoPerdida">Costo / Perdida debido al Problema</label>
-                                <textarea style="height:150px !important; resize:none; overflow:auto" id="pnlTemplatesRunningM_Costo" readonly class="form-control"></textarea>
+                                <textarea style="height:150px !important; resize:none; overflow:auto" id="pnlTemplatesRunningM_Costo" disabled readonly class="form-control"></textarea>
                             </div>
                         </div>
                     </div>
+                    <div class="row" id="pnlTemplatesR_info_failure">
+                        <div class="form-group col-lg-6">
+                            <label>Modo de Falla</label>
+                            <input type="text" class="form-control" id="txtTemplateR_modo_falla" disabled readonly name="name" value="" />
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <label>Clasificación</label>
+                            <input type="text" class="form-control" id="txtTemplateR_clasificacion_falla" disabled readonly name="name" value="" />
+                        </div>
+                    </div>
+
                 </div>
                 <input type="text" style="display:none" id="pnlTemplateRunning_Cuadrante_ID_Ejecucion" name="name" value="" />
                 <input type="text" style="display:none" id="pnlTemplateRunning_Cuadrante_Nombre_Ejecucion" name="name" value="" />
-                
             </div>
         </div>
         <div class="col-lg-3">
@@ -308,19 +519,19 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
+                    <div class="form-group d-grid gap-2">
                         <button type="button" class="btn btn-primary btn-block txt_Idioma_Evaluadores" id="btnTemplatesRunningN_Evaluadores">Evaluadores</button>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group d-grid gap-2">
                         <button type="button" class="btn btn-primary btn-block txt_Idioma_Departamento_Afectado" id="btnTemplatesRunningN_Departamentos">Evaluadores</button>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group d-grid gap-2">
                         <button type="button" class="btn btn-primary btn-block txt_Idioma_Subarea_Afectado" id="btnTemplatesRunningN_Subareas">Evaluadores</button>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group d-grid gap-2">
                         <button type="button" class="btn btn-primary btn-block txt_Idioma_Equipo_Afectado" id="btnTemplatesRunningN_Equipos">Evaluadores</button>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group d-grid gap-2">
                         <button type="button" class="btn btn-primary btn-block txt_Idioma_Linea_Afectado" id="btnTemplatesRunningN_Lineas">Evaluadores</button>
                     </div>
                 </div>
@@ -335,11 +546,11 @@
                     <h4 class="card-title txt_Idioma_Cuadrante"></h4>
                 </div>
                 <div class="card-body">
-                    <div class="form-row" id="pnlTemplatesRunning_Cuadrantes">
+                    <div class="row" id="pnlTemplatesRunning_Cuadrantes">
 
                     </div>
                 </div>
-            </div>            
+            </div>
         </div>
     </div>
 </div>
@@ -365,7 +576,7 @@
                         </div>
                         <p class="txt_Idioma_CuadranteD_PROcurrio"> Why did the problem originally occur and the process failed? Further evaluation of the root cause identified in section B or C.</p>
                         <p class="txt_Idioma_CuadranteD_PRPROpcional">Why-Why is optional if you come from section A.</p>
-                        <div class="form-row">
+                        <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <div class="table-responsive tabla-md encabezados-fixed">
@@ -408,8 +619,8 @@
                             </div>
                         </div>
                     </div>
-                </div>             
-                <div class="form-row">
+                </div>
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="form-group">
                             <div class="section-title mt-0">
@@ -420,7 +631,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="table-responsive tabla-md encabezados-fixed">
                             <table class="table table-bordered table-hover">
@@ -445,7 +656,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="pnlResults_CuadranteD" class="form-row">
+                <div id="pnlResults_CuadranteD" class="row">
                     <div class="col-lg-6">
                         <div class="form-group">
                             <div class="section-title mt-0">
@@ -482,15 +693,15 @@
                             <textarea class="form-control" style="resize:none; height:200px !important" id="txtNota2_CuadranteD_Results"></textarea>
                             <input class="form-control" style="display:none" id="txtNota_ID_CuadranteD_Results">
                         </div>
-                        <div class="form-group text-right">
+                        <div class="form-group d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="button" class="btn btn-success btn-lg txt_Idioma_Guardar" id="btnCuadranteD_Guardar_results">Guardar</button>
                         </div>
                     </div>
                 </div>
                 <div id="pnlResults_TemplateWG">
-                    <div class="form-row">
+                    <div class="row">
                         <div class="col-lg-8">
-                           <div class="form-group">
+                            <div class="form-group">
                                 <div class="section-title mt-0">
                                     <p class="txt_Idioma_CuadranteD_MR">Showing the results: (0 error philosophy!)</p>
                                 </div>
@@ -501,8 +712,8 @@
                                     <thead>
                                         <tr>
                                             <th scope="col" class="txt_Idioma_CuadranteD_TR_ItemCausal">Item Cause</th>
-                                            <th scope="col" >P</th>
-                                            <th scope="col" >S</th>
+                                            <th scope="col">P</th>
+                                            <th scope="col">S</th>
                                             <th scope="col" class="txt_Idioma_CuadranteD_TR_RiesgoInicial">Risk Initial</th>
                                             <th scope="col">P</th>
                                             <th scope="col">S</th>
@@ -523,7 +734,7 @@
                             <img class="img-responsive" height="300" width="350" src="~/Assets/img/Templates/Risk_A3.PNG" />
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <div class="section-title mt-0">
@@ -543,13 +754,13 @@
                                 <textarea class="form-control" style="resize:none; height:200px !important;" id="txtNota2_WP_CuadranteD_Results"></textarea>
                                 <input class="form-control" hidden id="txtNota_ID_CuadranteD_Results_wp">
                             </div>
-                            <div class="form-group text-right">
+                            <div class="form-group d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button type="button" class="btn btn-success btn-lg txt_Idioma_Guardar" id="btnCuadranteD_WP_Guardar_results">Guardar</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="form-group">
                             <div class="section-title mt-0">
@@ -560,12 +771,12 @@
 
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="form-group col-lg-4">
                         <label class="txt_Idioma_CuadranteD_CE_Cost"> Costs around the new work to manage ($/ month)</label>
                         <input type="text" class="form-control" id="txtCost_cost_CuadranteD">
                     </div>
-                    <div class="form-group col-lg-4">
+                    <div class="form-group col-lg-3">
                         <label class="txt_Idioma_CuadranteD_CE_Lost"> Loss avoided ($/ month)</label>
                         <input type="text" class="form-control" id="txtCost_Avoid_CuadranteD">
                     </div>
@@ -573,14 +784,13 @@
                         <label class="txt_Idioma_CuadranteD_CE_Savings">Savings or additional costs per month? ($/ month)</label>
                         <input type="text" class="form-control" id="txtCost_Saving_CuadranteD">
                         <input type="text" class="form-control" style="display:none" id="txtCost_ID_CuadranteD">
-                        <div class="text-right" style="margin-top:25px">
-                            <button type="button" class="btn btn-success btn-lg txt_Idioma_Guardar" id="btnCuadranteD_Guardar_Cost">Guardar</button>
-                        </div>
                     </div>
-                   
+                    <div class="form-group col-lg-1 d-grid gap-2 mt-2">
+                        <button type="button" class="btn btn-success btn-sm txt_Idioma_Guardar" id="btnCuadranteD_Guardar_Cost">Guardar</button>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group col-lg-9">
+                <div class="row">
+                    <div class="form-group col-lg-12 text-center">
                         <label class="d-block txt_Idioma_CuadranteD_CE_Solution">
                             Solution confirmed? (zero losses were achieved)
                         </label>
@@ -592,14 +802,18 @@
                             <input class="form-check-input" type="radio" name="inlineRadioOptions" id="rdbCost_Solution_NO" value="option2">
                             <label class="form-check-label txt_Idioma_No" for="inlineRadio2">NO</label>
                         </div>
-                        <p  class="txt_Idioma_CuadranteD_CE_NoResp">
+                        <p class="txt_Idioma_CuadranteD_CE_NoResp">
                             If NO, continue to understand the root-cause (section C) or escalate
                         </p>
-                    </div>      
-                    <div class="form-group col-lg-3 text-right" style="margin-top:40px">
-                        <button type="button" class="btn btn-success btn-lg btn-block txt_Idioma_Finalizar_Investigacion" id="btnTemplateRunning_Finalizar_investigacion">Finalizar Investigación</button>
-                        <button type="button" class="btn btn-info btn-lg  btn-block txt_Idioma_Finalizar_Modificacion" id="btnTemplateRunning_Finalizar_investigacion_Modificacion">Finalizar Modificación</button>
-                    </div> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary btn-lg txt_Idioma_Finalizar_Investigacion" id="btnTemplateRunning_Finalizar_investigacion">Finalizar Investigación</button>
+                            <button type="button" class="btn btn-info btn-lg  txt_Idioma_Finalizar_Modificacion" style="display:none;" id="btnTemplateRunning_Finalizar_investigacion_Modificacion">Finalizar Modificación</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="d-flex justify-content-center">
@@ -613,6 +827,30 @@
     </div>
 </div>
 
+<!-- MODAL VISUAL HELP-->
+<div class="modal fade" id="mdlTemplateR_visual_help" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div style="position: relative; overflow:hidden !important; width:100%; padding-top:56.25%">
+                            <iframe src="~/Assets/Visual_help/ModosdeFallo.pdf" style="position:absolute; top:0; left: 0;bottom:0;right:0;width:100%;height:100%"></iframe>
+                        </div>                       
+                    </div>
+                </div>              
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END MODAL VISUAL HELP-->
+
 <div class="modal fade" role="dialog" id="mdlMissingRunning_Panel" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -620,7 +858,7 @@
                 <h4 class="modal-title" id="txtMissingRunning_Titulo"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <input type="text" id="txtItemMissingRunning_Tabla" style="display:none" name="name" value="" />
                     <input type="text" id="txtItemMissingRunning_ID" style="display:none" name="name" value="" />
                     <input type="text" id="txtItemMissingRunning_Seccion" style="display:none" name="name" value="" />
@@ -629,7 +867,7 @@
                         <input type="text" id="txtMissingRunning_ID" style="display:none" name="name" value="" />
                     </div>
                 </div>
-                <div class="form-row">                    
+                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_Missing_Defecto">Alleged cause of the defect</label>
@@ -691,7 +929,7 @@
                 <h4 class="modal-title" id="txtPreguntaRunning_Texto"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" id="txtItemRunning_Tabla" style="display:none" name="name" value="" />
                         <input type="text" id="txtItemRunning_ID" style="display:none" name="name" value="" />
@@ -736,7 +974,7 @@
                 <h4 class="modal-title" id="txtNotaRunning_Titulo"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row" id="frmNotaRunning">
+                <div class="row" id="frmNotaRunning">
                     <div class="col-lg-12">
                         <input type="text" id="txtItemNotaRunning_Tabla" style="display:none" name="name" value="" />
                         <input type="text" id="txtItemNotaRunning_ID" style="display:none" name="name" value="" />
@@ -765,7 +1003,7 @@
                 <h4 class="modal-title" id="txtInstruccionRunning_Titulo"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" id="txtItemInstruccionRunning_Tabla" style="display:none" name="name" value="" />
                         <input type="text" id="txtItemInstruccionRunning_ID" style="display:none" name="name" value="" />
@@ -790,7 +1028,7 @@
                 <h4 class="modal-title" id="txtIshikawuaRunning_Titulo"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" id="txtItemIshikawuaRunning_Tabla" style="display:none" name="name" value="" />
                         <input type="text" id="txtItemIshikawuaRunning_ID" style="display:none" name="name" value="" />
@@ -800,7 +1038,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="table-responsive tabla-md encabezados-fixed">
                             <table class="table table-bordered table-hover">
@@ -833,11 +1071,11 @@
                 <h4 class="modal-title" id="txtHipotesisRunning_Titulo"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" id="txtItemHipotesisRunning_Tabla" style="display:none" name="name" value="" />
                         <input type="text" id="txtItemHipotesisRunning_ID" style="display:none" name="name" value="" />
-                        <input type="text" id="txtHipotesisRunning_Seccion" style="display:none"  name="name" value="" />
+                        <input type="text" id="txtHipotesisRunning_Seccion" style="display:none" name="name" value="" />
                         <div class="form-group">
                             <p id="txtHipotesisRunning_Descripcion"></p>
                             <input type="text" id="txtHipotesisRunning_ID" style="display:none" name="name" value="" />
@@ -912,7 +1150,7 @@
                 <h4 class="modal-title" id="txtFactorRunning_Titulo"></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" id="txtItemFactorRunning_Tabla" style="display:none" name="name" value="" />
                         <input type="text" id="txtItemFactorRunning_ID" style="display:none" name="name" value="" />
@@ -974,33 +1212,27 @@
 
 
 
-<div class="modal fade" role="dialog" id="mdlReporteA3_Panel" style="display: none;">
+<!--<div class="modal fade" role="dialog" id="mdlReporteA3_Panel" style="display: none;">
     <div class="modal-dialog modal-xl full_modal-dialog" role="document">
         <div class="modal-content full_modal-content">
-            <div class="modal-header modal-header-info" data-type="info">     
-                <div class="row">
-                    <div class="col-8">
-                        <h4 class="modal-title txt_Idioma_ReporteA3">Reporte A3</h4>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-danger txt_Idioma_Cerrar" tabindex="4" data-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
+            <div class="modal-header modal-header-info" data-type="info">
+                <h4 class="modal-title txt_Idioma_ReporteA3">Reporte A3</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
-                    
-                    <div class="col-lg-4" id="pnl_usuario_reporte_firma">
-                        <label class="txt_Idioma_Usuario"></label>
-                        <input type="text" disabled class="form-control" value="@Usuario" />
+                <div class="row">
+                    <div class="col-md-4" id="pnl_usuario_reporte_firma">
+                        <div class="form-group">
+                            <label class="txt_Idioma_Usuario"></label>
+                            <input type="text" disabled class="form-control" value="@Usuario" />
+                        </div>
                     </div>
-                    <div class="col-lg-4" id="pnl_firma_reporte_firma">
+                    <div class="col-md-4" id="pnl_firma_reporte_firma">
                         <div class="form-group">
                             <label class="txt_idioma_Ingrese_Tipo_Firma">Firmar Como:</label>
                             <input type="text" disabled class="form-control" id="txtTemplateRunning_Reporte_Tipo_Firma" name="name" value="" />
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-md-4">
                         <label for="slcTemplateRunning_Reporte_Versiones" class="txt_Idioma_Reporte_Version_Documento" style="font-size:15px">Versión de Documento</label>
                         <select class="form-control" id="slcTemplateRunning_Reporte_Versiones">
                             <option value="value">Version Actual</option>
@@ -1008,72 +1240,75 @@
                             <option value="value">Version 1</option>
                         </select>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <h6 class="title txt_Idioma_Opciones">Opciones</h6>
-                        <div class="form-group">
-                            <button type="button" class="btn btn-danger txt_Idioma_Reporte_Rechazar" id="btnReporteRunning_Rechazar">Rechazar</button>
-                            <button type="button" class="btn btn-success txt_idioma_Firmar" id="btnReporteRunning_Firmar">Firmar</button>
-                            <input type="text" class="form-control" id="txtTemplateRunning_Reporte_ID" style="display:none" />
-                        </div>
-                        <h6 class="title txt_Idioma_Reporte_Flujo_Aprobacion">Flujo de Aprovación</h6>
-                        <div class="table-responsive tabla-md encabezados-fixed">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
-                                        <th scope="col" class="txt_Idioma_Tipo_Evaluador">Rol</th>
-                                        <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
-                                        <th scope="col" class="txt_Idioma_Comentarios">Comentarios</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblTemplateR_Estatus_Revisores" style="font-size:10px;">
-                                    <tr><th colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-lg-5" id="pnlReporte_tbl_AdjuntosRunning">
-                        <h6 class="title txt_Idioma_Reporte_Archivos_Adjuntos">Adjuntos</h6>
-                        <div class="table-responsive tabla-md encabezados-fixed">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
-                                        <th scope="col" class="txt_Idioma_Tipo_Archivo">Tipo de Archivo</th>
-                                        <th scope="col" class="txt_Idioma_Elemento">Item</th>
-                                        <th scope="col" class="txt_Idioma_Seccion">Sección</th>
-                                        <th scope="col" class="txt_Idioma_Cuadrante" width="20%">Cuadrante</th>
-                                        <th scope="col" class="txt_Idioma_Imprimir">Imprimir</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblAdjuntosTemplate_Running" style="font-size:10px">
-                                    <tr><th colspan="7"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-lg-3" id="pnlReporte_tbl_ReporteRunning">
-                        <iframe class="embed-responsive-item" height="100%" width="100%" id="ReporteRunning_url"></iframe>
-                    </div>
-                </div>
-                
+                </div>-->
+@*<div class="row">
+        <div class="col-md-4">
+            <h6 class="title txt_Idioma_Opciones">Opciones</h6>
+            <div class="form-group">
+                <button type="button" class="btn btn-danger txt_Idioma_Reporte_Rechazar" id="btnReporteRunning_Rechazar">Rechazar</button>
+                <button type="button" class="btn btn-success txt_idioma_Firmar" id="btnReporteRunning_Firmar">Firmar</button>
+                <input type="text" class="form-control" id="txtTemplateRunning_Reporte_ID" style="display:none" />
             </div>
+            <h6 class="title txt_Idioma_Reporte_Flujo_Aprobacion">Flujo de Aprovación</h6>
+            <div class="table-responsive tabla-md encabezados-fixed">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
+                            <th scope="col" class="txt_Idioma_Tipo_Evaluador">Rol</th>
+                            <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
+                            <th scope="col" class="txt_Idioma_Comentarios">Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblTemplateR_Estatus_Revisores" style="font-size:10px;">
+                        <tr><th colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-5" id="pnlReporte_tbl_AdjuntosRunning">
+            <h6 class="title txt_Idioma_Reporte_Archivos_Adjuntos">Adjuntos</h6>
+            <div class="table-responsive tabla-md encabezados-fixed">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
+                            <th scope="col" class="txt_Idioma_Tipo_Archivo">Tipo de Archivo</th>
+                            <th scope="col" class="txt_Idioma_Elemento">Item</th>
+                            <th scope="col" class="txt_Idioma_Seccion">Sección</th>
+                            <th scope="col" class="txt_Idioma_Cuadrante" width="20%">Cuadrante</th>
+                            <th scope="col" class="txt_Idioma_Imprimir">Imprimir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblAdjuntosTemplate_Running" style="font-size:10px">
+                        <tr><th colspan="7"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-3" id="pnlReporte_tbl_ReporteRunning">
+            <iframe class="embed-responsive-item" height="100%" width="100%" id="ReporteRunning_url"></iframe>
+        </div>
+    </div>*@
+
+<!--</div>
             <div class="modal-footer bg-whitesmoke br">
                 <button type="button" class="btn btn-danger txt_Idioma_Cerrar" tabindex="4" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
-</div>
+</div>-->
+
+
+
 <div class="modal fade" role="dialog" id="mdlReporte_RechazoPnl" style="display: none;">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-info" data-type="info">
-                <h4 class="modal-title txt_Idioma_Reporte_Comments" id="">Comentarios</h4>                
+                <h4 class="modal-title txt_Idioma_Reporte_Comments" id="">Comentarios</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="form-group">
                             <label for="txtMdlComments_Comentarios" class="txt_Idioma_Reporte_Comments">Comentarios</label>
@@ -1096,10 +1331,10 @@
                 <h4 class="modal-title txt_Idioma_Adjuntos" id="">Adjuntos</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-6">
                         <div class="form-group" id="frmTemplateR_Adjuntos">
-                            <label class="txt_Idioma_Archivo">Archivo:</label>                          
+                            <label class="txt_Idioma_Archivo">Archivo:</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="txtAdjuntos_Item_Archivo">
                                 <input type="text" style="display:none" id="txtAdjuntos_Item_ID">
@@ -1114,7 +1349,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="table-responsive tabla-md encabezados-fixed">
                             <table class="table table-bordered table-hover">
@@ -1126,7 +1361,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tblAdjuntos_Running" style="font-size:15px">
-                                    <tr><th colspan="7"><p class="text-center txt_Idioma_no_existen_registros" >No se encontraron registros</p></th></tr>
+                                    <tr><th colspan="7"><p class="text-center txt_Idioma_no_existen_registros">No se encontraron registros</p></th></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1146,12 +1381,12 @@
                 <h4 class="modal-title txt_Idioma_CuadranteD_PRInvestigacion" id="">Investigaton Why – Why</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row" id="frm5w_CuadranteD">
+                <div class="row" id="frm5w_CuadranteD">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_CuadranteD_PR_Inv_Que">WHAT (What happened?)</label>
                             <textarea id="txt5wCuadranteD_What" style="resize:none;font-size:12px" class="form-control"></textarea>
-                            <input id="txt5wCuadranteD_ID" type="text"  style="display:none" name="name" value="" />
+                            <input id="txt5wCuadranteD_ID" type="text" style="display:none" name="name" value="" />
                         </div>
                         <div class="form-group">
                             <label class="txt_Idioma_CuadranteD_PR_Inv_PQ3">WHY(3) (it showed up?)</label>
@@ -1177,7 +1412,7 @@
                             <label class="txt_Idioma_CuadranteD_PR_Inv_PQ5">WHY(5) (it showed up?)</label>
                             <textarea id="txt5wCuadranteD_Why5" style="resize:none;font-size:12px" class="form-control"></textarea>
                         </div>
-                        
+
                     </div>
                     <br />
                     <div class="col-lg-4">
@@ -1204,9 +1439,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                         </div>
-                        
+
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
@@ -1222,13 +1457,13 @@
                                 <option value="4">Completed</option>
                             </select>
                         </div>
-                        
+
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_Responsable">Responsible</label>
                             <textarea id="txt5wCuadranteD_Name" style="resize:none;font-size:12px" class="form-control"></textarea>
-                        </div>            
+                        </div>
                         <div class="form-group">
                             <label class="txt_Idioma_Missing_DueDate">Due Date</label>
                             <input type="date" id="txt5wCuadranteD_Date" class="form-control" name="name" value="" />
@@ -1250,7 +1485,7 @@
                 <h4 class="modal-title" id=""></h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <h4 class="txt_Idioma_CuadranteD_ST_Nuevo">
@@ -1411,7 +1646,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="form-row" id="frmTemplatesR_Historial">
+                        <div class="row" id="frmTemplatesR_Historial">
                             <div class="form-group col-lg-1">
                                 <label for="txtTemplatesRunning_Folio" class="txt_Idioma_Folio">Folio</label>
                                 <input type="text" class="form-control txt_Idioma_Ingrese_Folio" id="txtTemplatesRunning_History_Folio" placeholder="Ingrese un Folio">
@@ -1499,21 +1734,21 @@
         </div>
     </div>
 </div>
-<div class="modal fade" role="dialog" id="mdlEvaluadores_Panel" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+<div class="modal fade" role="dialog" id="mdlEvaluadores_Panel" style="display: none; overflow: hidden;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-info" data-type="info">
                 <h4 class="modal-title txt_Idioma_Evaluadores" id="">Evaluadores</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-5">
                         <div class="form-group">
                             <label class="txt_Idioma_Nombre"></label>
-                            <select class="form-control" id="slcTemplatesRunningN_Usuarios_Revisor">
+                            <select class="form-control" id="slcTemplatesRunningN_Usuarios_Revisor" style="width: 100%;">
                                 <option value="value">text</option>
                             </select>
-                        </div>                       
+                        </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
@@ -1522,15 +1757,15 @@
                                 <option value="1" class="txt_Idioma_Revisor">Revisor</option>
                                 <option value="2" class="txt_Idioma_Aprovador">Aprovador</option>
                             </select>
-                        </div>                        
+                        </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group" style="margin-top:30px">
                             <button type="button" class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunning_Evaluador_Agregar"></button>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" disabled hidden id="txtEvaluadores_TemplatesR_ID" name="name" value="" />
                         <div class="table-responsive tabla-md encabezados-fixed">
@@ -1542,7 +1777,7 @@
                                         <th scope="col" class="txt_Idioma_Omitir">Omitir</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tblEvaluadoresTemplate_Running" style="font-size:13px">
+                                <tbody id="tblEvaluadoresTemplate_Running" style="font-size:13px !important;">
                                     <tr><th colspan="7"><p class="text-center">No se encontraron registros</p></th></tr>
                                 </tbody>
                             </table>
@@ -1562,7 +1797,7 @@
             <div class="modal-header modal-header-info" data-type="info">
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_CuadranteD_TR_ItemCausal">Item Cause</label>
@@ -1646,7 +1881,7 @@
                 <h4 class="modal-title txt_Idioma_Adjuntos" id="">Adjuntos</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label class="txt_Idioma_Archivo">Archivo:</label>
@@ -1663,7 +1898,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <div class="table-responsive tabla-md encabezados-fixed">
                             <table class="table table-bordered table-hover">
@@ -1674,7 +1909,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tblAdjuntos_Running_D" style="font-size:15px">
-                                    <tr><th colspan="7"><p class="text-center txt_Idioma_no_existen_registros" >No se encontraron registros</p></th></tr>
+                                    <tr><th colspan="7"><p class="text-center txt_Idioma_no_existen_registros">No se encontraron registros</p></th></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1695,7 +1930,7 @@
                 <h4 class="modal-title txt_Idioma_Departamento_Afectado" id="">Evaluadores</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-9">
                         <div class="form-group">
                             <label class="txt_Idioma_Departamento"></label>
@@ -1710,14 +1945,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" disabled hidden id="txtTemplatesRunningN_Departamentos_ID" name="name" value="" />
                         <div class="table-responsive tabla-md encabezados-fixed">
                             <table class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="txt_Idioma_Departamento">Departamento</th>                                        
+                                        <th scope="col" class="txt_Idioma_Departamento">Departamento</th>
                                         <th scope="col" width="10%" class="txt_Idioma_Omitir">Omitir</th>
                                     </tr>
                                 </thead>
@@ -1742,7 +1977,7 @@
                 <h4 class="modal-title txt_Idioma_Linea_Afectado" id="">Evaluadores</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-9">
                         <div class="form-group">
                             <label class="txt_Idioma_Linea"></label>
@@ -1757,7 +1992,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" disabled hidden id="txtTemplatesRunningN_Lineas_ID" name="name" value="" />
                         <div class="table-responsive tabla-md encabezados-fixed">
@@ -1789,7 +2024,7 @@
                 <h4 class="modal-title txt_Idioma_Equipo_Afectado" id="">Equipos Afectados</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-9">
                         <div class="form-group">
                             <label class="txt_Idioma_Equipo"></label>
@@ -1804,7 +2039,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" disabled hidden id="txtTemplatesRunningN_Equipos_ID" name="name" value="" />
                         <div class="table-responsive tabla-md encabezados-fixed">
@@ -1836,7 +2071,7 @@
                 <h4 class="modal-title txt_Idioma_Subarea_Afectado" id="">Sub-area Afectadas</h4>
             </div>
             <div class="modal-body">
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-9">
                         <div class="form-group">
                             <label class="txt_Idioma_Subarea"></label>
@@ -1851,7 +2086,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-row">
+                <div class="row">
                     <div class="col-lg-12">
                         <input type="text" disabled hidden id="txtTemplatesRunningN_Subareas_ID" name="name" value="" />
                         <div class="table-responsive tabla-md encabezados-fixed">

@@ -1,6 +1,8 @@
 ﻿@{
     ViewBag.Title = "Home Page";
     string CWID = HttpContext.Current.User.Identity.Name.ToUpper();
+    A3_Reloaded.Clases.Usuarios US = new A3_Reloaded.Clases.Usuarios();
+    string Usuario = US.obtener_Nombre_Usuario(HttpContext.Current.User.Identity.Name, "R");
 }
 <script>require(['Home']);</script>
 <div>
@@ -9,6 +11,7 @@
             <h1 class="section-title">Home</h1>
         </div>
     </div>
+    <!--VENTANA INICIAL-->
     <div class="mt-4">
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -20,7 +23,7 @@
             <!--HOME TAB-->
             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                 <div class="card-body">
-                    <div class="form-row" id="frm_home_filter_div">
+                    <div class="row" id="frm_home_filter_div">
                         <div class="form-group col-lg-1">
                             <label for="txtHome_Folio">Folio</label>
                             <input type="text" class="form-control txt_Idioma_Ingrese_Folio" id="txtHome_Folio" placeholder="Ingrese un Folio">
@@ -30,7 +33,13 @@
                             <input type="text" class="form-control" value="@CWID" id="txtHome_Contact">
                             <input type="text" class="form-control" value="@CWID" id="txtHome_Contact_aux" disabled style="display:none">
                         </div>
-                        <div class="form-group col-lg-2">
+                        <div class="form-group col-lg-1"> 
+                            <label for="slcHome_Line" class="txt_Idioma_Linea">Linea</label>
+                            <select class="form-control" id="slcHome_Line">
+                                <option value="-1">Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-lg-1">
                             <label for="txtHome_TipoA3" class="txt_Idioma_Tipo_de_A3">Tipo de A3</label>
                             <select class="form-control" id="slcHome_TipoA3">
                                 <option value="-1" selected>Seleccione</option>
@@ -40,15 +49,15 @@
                             <label for="txtHome_KeyWord" class="txt_Idioma_palabra_clave">Key Word</label>
                             <input type="text" class="form-control txt_Idioma_ingrese_palabra_clave" id="txtHome_KeyWord" placeholder="Ingrese una palabra clave">
                         </div>
+                        @*<div class="form-group col-lg-2">
+                                <label for="" class="">Test</label>
+                                <select class="form-control" multiple="multiple" id="slcTestUsuarios">
+                                    <option value="-1" selected>Seleccione</option>
+                                </select>
+                            </div>*@
                         <div class="form-group col-lg-2">
-                            <label for="" class="">Test</label>
-                            <select class="form-control" multiple="multiple" id="slcTestUsuarios">
-                                <option value="-1" selected>Seleccione</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-lg-1">
                             <label for="slcHome_status" class="txt_Idioma_Estatus">Estatus</label>
-                            <select class="form-control" id="slcHome_status">
+                            <select class="form-control" style="width: 100%; height:5px;" id="slcHome_status">
                                 <option class="txt_Idioma_Seleccione" value="-1" selected>Seleccione</option>
                                 <option class="txt_Idioma_Finalizado" value="1">Seleccione</option>
                                 <option class="txt_idioma_Ingrese_En_Revision" value="3">Seleccione</option>
@@ -57,20 +66,27 @@
                             </select>
                         </div>
                         <a class="nav-link" style="display:none;" id="btn_redirect_test" href=""><i class="fa fa-user"></i> <span>Test</span></a>
-                        <div class="form-group col-lg-2" style="margin-top:2.2rem">
-                            <button type="button" class="btn btn-icon btn-info btn-sm" id="btnHome_Search"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
-                            <button type="button" class="btn btn-icon btn-outline-secondary btn-sm" id="btnHome_clearFilter"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
+                        <div class="form-group col-lg-4 d-grid gap-2 d-md-block" style="margin-top:2rem">
+                            <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_Search"><i class="fa fa-search"></i> <span class="txt_Idioma_Buscar">Buscar</span></button>
+                            <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_clearFilter"><i class="fa fa-filter-circle-xmark"></i> <span class="txt_Idioma_Limpiar_filtros">Limpiar Filtros</span> </button>
+                            <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_advanceSearch"><i class="fa fa-filter"></i> <span class="txt_Idioma_Busqueda_Avanzada">Busqueda Avanzada</span></button>
+                            <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_new_investigation"> <i class="fa-solid fa-file-circle-plus"></i> <span class="txt_Idioma_Nueva_investigacion"> Nueva Investigación</span></button>                         
                         </div>
                     </div>
                 </div>
-                <div class="row text-center" align="center">
-                    <div class="col-lg-12">
-                        <label class="custom-switch" style="font-size: 16px !important; font-weight: bold" align="center">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label class="custom-switch" style="font-size: 16px !important; font-weight: bold">
                             <input type="checkbox" checked="checked" id="cbxHome_Activities" name="custom-switch-checkbox" class="custom-switch-input">
                             <span class="custom-switch-indicator"></span>
-                            <span class="custom-switch-description txt_Idioma_mis_actividades" id="cbxHome_Activities_text">My activities</span>
+                            <span class="custom-switch-description txt_Idioma_Mis_Reportes" id="cbxHome_Activities_text">Mis Reportes</span>
                         </label>
-                    </div>                  
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button class="btn btn-icon btn-sm btn-light" data-target="#mdlHome_visual_help" data-toggle="modal" id=""><i class="fa fa-question-circle"> </i> <span class="txt_Idioma_Ayuda"> Ayuda</span></button>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
@@ -79,20 +95,20 @@
                                 <div class="dimmer" id="tblHome_A3History">
                                     <div class="dimmer-content">
                                         <div class="table-responsive tabla-md encabezados-fixed">
-                                            <table class="table table-hover text-center">
+                                            <table class="table table-hover ">
                                                 <thead>
-                                                    <tr>
-                                                        <th class="txt_Idioma_Folio" scope="col" width="10%">Folio A3</th>
-                                                        <th class="txt_Idioma_Version" scope="col">Version</th>
-                                                        <th class="txt_Idioma__Formato_de_A3" scope="col">Tipo de A3</th>
-                                                        <th class="txt_Idioma_Falla" scope="col">Failure</th>
-                                                        <th class="txt_Idioma_Responsable" scope="col">Responsable</th>
+                                                    <tr class="text-center">
+                                                        <th class="txt_Idioma_Folio" scope="col" width="5%">Folio A3</th>
+                                                        <th class="txt_Idioma_Version" scope="col" width="5%">Version</th>
+                                                        <th class="txt_Idioma__Formato_de_A3" width="15%" scope="col">Tipo de A3</th>
+                                                        <th class="txt_Idioma_Cual_es_el_problema" scope="col">Failure</th>
+                                                        <th class="txt_Idioma_Responsable text-center" width="15%" scope="col">Responsable</th>
                                                         @*<th class="txt_Idioma_Rol" scope="col">Rol</th>*@
-                                                        <th class="txt_Idioma_Estatus" scope="col">Estatus</th>
-                                                        <th class="txt_Idioma_Opciones" scope="col" colspan="2">Opciones</th>
+                                                        <th class="txt_Idioma_Estatus text-center" width="8%" scope="col">Estatus</th>
+                                                        <th class="txt_Idioma_Opciones text-center" scope="col" width="5%" colspan="2">Opciones</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody class="text-center">
                                                     <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
                                                 </tbody>
                                             </table>
@@ -122,5 +138,164 @@
             <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
         </div>
     </div>
-    
+
+    <!-- MODAL VISUAL HELP-->
+    <div class="modal fade" id="mdlHome_visual_help" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div style="position: relative; overflow:hidden !important; width:100%; padding-top:56.25%">
+                                <iframe src="~/Assets/Visual_help/PantallaInicial.pdf" style="position:absolute; top:0; left: 0;bottom:0;right:0;width:100%;height:100%"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL VISUAL HELP-->
+    <div class="modal fade" role="dialog" id="mdlReporteA3_Panel" style="display: none;">
+        <div class="modal-dialog modal-xl full_modal-dialog" role="document">
+            <div class="modal-content full_modal-content">
+                <div class="modal-header modal-header-info" data-type="info">
+                    <div class="row">
+                        <h4 class="modal-title txt_Idioma_ReporteA3">Reporte A3</h4>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="col-md-4" id="pnl_usuario_reporte_firma">
+                            <label class="txt_Idioma_Usuario"></label>
+                            <input type="text" disabled class="form-control" value="@Usuario" />
+                        </div>
+                        <div class="col-md-4" id="pnl_firma_reporte_firma">
+                            <div class="form-group">
+                                <label class="txt_idioma_Ingrese_Tipo_Firma">Firmar Como:</label>
+                                <input type="text" disabled class="form-control" id="txtTemplateRunning_Reporte_Tipo_Firma" name="name" value="" />
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="slcTemplateRunning_Reporte_Versiones" class="txt_Idioma_Reporte_Version_Documento" style="font-size:15px">Versión de Documento</label>
+                            <select class="form-control" id="slcTemplateRunning_Reporte_Versiones">
+                                <option value="value">Version Actual</option>
+                                <option value="value">Version 2</option>
+                                <option value="value">Version 1</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <h6 class="title txt_Idioma_Opciones">Opciones</h6>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-danger txt_Idioma_Reporte_Rechazar" id="btnReporteRunning_Rechazar">Rechazar</button>
+                                    <button type="button" class="btn btn-success txt_idioma_Firmar" id="btnReporteRunning_Firmar">Firmar</button>
+                                    <input type="text" class="form-control" id="txtTemplateRunning_Reporte_ID" style="display:none" />
+                                </div>
+                                <h6 class="title txt_Idioma_Reporte_Flujo_Aprobacion">Flujo de Aprovación</h6>
+                                <div class="dimmer">
+                                    <div class="dimmer-content">
+                                        <div class="table-responsive tabla-md encabezados-fixed" style="max-height:200px !important;">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
+                                                        <th scope="col" class="txt_Idioma_Tipo_Evaluador">Rol</th>
+                                                        <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
+                                                        <th scope="col" class="txt_Idioma_Comentarios">Comentarios</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tblTemplateR_Estatus_Revisores" style="font-size:10px;">
+                                                    <tr><th colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <h6 class="title txt_Idioma_Reporte_Archivos_Adjuntos">Adjuntos</h6>
+                                <div class="dimmer">
+                                    <div class="dimmer-content">
+                                        <div class="table-responsive tabla-md encabezados-fixed" style="max-height:200px !important">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
+                                                        <th scope="col" class="txt_Idioma_Tipo_Archivo">Tipo de Archivo</th>
+                                                        <th scope="col" class="txt_Idioma_Elemento">Item</th>
+                                                        <th scope="col" class="txt_Idioma_Seccion">Sección</th>
+                                                        <th scope="col" class="txt_Idioma_Cuadrante" width="20%">Cuadrante</th>
+                                                        <th scope="col" class="txt_Idioma_Imprimir">Imprimir</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tblAdjuntosTemplate_Running" style="font-size:10px">
+                                                    <tr><th colspan="7"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-md-4" id="pnlReporte_tbl_AdjuntosRunning">
+                            </div>*@
+                        <div class="col-md-8" id="pnlReporte_tbl_ReporteRunning">
+                            <iframe class="embed-responsive-item" style="width:100%; height:32rem;" id="ReporteRunning_url"></iframe>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" tabindex="4" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--MODAL PARA INICIAR A3 NUEVOS-->
+    <div class="modal fade" id="mdlHome_new_investigation" tabindex="-1" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title fs-5 txt_Idioma_Nueva_investigacion" id="exampleModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="txt_Idioma_Seleccione_formato_A3">Seleccione un formato de A3</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive tabla-md encabezados-fixed">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th class="txt_Idioma_Imagen_Descriptiva" scope="col">Imagen Descriptiva</th>
+                                                <th class="txt_Idioma__Formato_de_A3" scope="col">Formato de A3</th>
+                                                <th class="txt_Idioma_Descripcion" scope="col">Descripción</th>
+                                                <th class="txt_Idioma_Version" scope="col" style="width:10%;">Version</th>
+                                                <th class="txt_Idioma_Opciones" scope="col" style="width:20%">Opciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblTemplatesActivos" style="font-size:12px">
+                                            <tr><th colspan="7"><p class="text-center">No se encontraron registros</p></th></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

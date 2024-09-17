@@ -14,7 +14,10 @@ namespace A3_Reloaded.Models
         public string Imagen { get; set; }
         public string Descripcion { get; set; }
         public string TipoA3 { get; set; }
+        public string Acceso { get; set; }
+        public string PmCard { get; set; }
         public int Version { get; set; }
+        public string template_version { get; set; }
         public int Activo { get; set; }
         public string Contact { get; set; }
         public string Problem { get; set; }

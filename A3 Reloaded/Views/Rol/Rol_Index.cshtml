@@ -8,18 +8,22 @@
 <div class="section-body">
     <h2 class="section-title txt_Idioma_Administracion_Roles">Administración de Roles</h2>
     <div class="section-lead">
-        <div class="form-row" id="frmRoles">
+        <div class="row" id="frmRoles">
             <div class="form-group col-md-6">
                 <label for="txtRoles_Nombre" class="txt_Idioma_Rol">Rol</label>
                 <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Rol" id="txtRoles_Nombre" placeholder="Ingrese el Nombre de la Linea">
             </div>
-            <div class="form-group col-md-2" style="margin-top:2rem">
-                <div class="custom-control custom-checkbox">
+            <div class="form-group col-md-2" style="margin-top:1.5rem">
+                <div class="form-check form-switch" >
+                    <input class="form-check-input" type="checkbox" role="switch" id="cbxRoles_Activo" checked>
+                    <label class="form-check-label " for="cbxRoles_Activo">Solo ver activos</label>
+                </div>
+                @*<div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="cbxRoles_Activo">
                     <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxRoles_Activo">Solo ver activos</label>
-                </div>
+                </div>*@
             </div>
-            <div class="form-group col-md-4" style="margin-top:2rem">
+            <div class="form-group col-md-4" style="margin-top:1rem">
                 <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnRoles_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
                 <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left  ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnRoles_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
                 <button type="button" class="btn btn-sm btn-icon btn-success  btn-left  ml-3 mb-4 txt_Idioma_Agregar" id="btnRoles_Agregar" data-toggle="modal" data-target="#mdlRoles_Agregar">
@@ -76,14 +80,14 @@
                     <h4 class="modal-title txt_Idioma_Registrar_Rol">Agregar nuevo rol</h4>
                 </div>
                 <div class="modal-body" id="frmRolesN">
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-12">
                             <label for="txtRolesN_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
                             <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Rol" id="txtRolesN_Nombre" placeholder="Ingrese el nombre del rol">
 
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
                             <div class="form-check">
@@ -110,14 +114,14 @@
                     <h4 class="modal-title txt_Idioma_Modificar_Rol">Actualizar rol</h4>
                 </div>
                 <div class="modal-body" id="frmLRolesM">
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-12">
                             <label for="txtRolesM_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
                             <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Rol" id="txtRolesM_Nombre" placeholder="Ingrese el nombre del rol">
                             <input type="text" id="txtRolesM_ID" hidden disabled>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
                             <div class="form-check">

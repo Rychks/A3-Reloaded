@@ -9,12 +9,13 @@
         $("#pnlTemplatesRunning_Investigacion").hide();
         $("#pnlTemplatesRunning_secciones").hide();
         $.CargarIdioma.Textos({
-            Funcion: fn_continue_a3
+            Funcion: fn_cargaTiposA3
         });
 
         $("#btnMenuPrin").click(function () {
             $("#tiposA3").slideDown(1000);
             $("#pnlTemplatesRunning_Investigacion").hide();
+            window.location.href = "/Home";
         });
         $("#btnHistorialA3_Regresar").click(function () {
             $("#tiposA3").slideDown();
@@ -38,6 +39,7 @@
         //crear nueva investigacion
         $("#tblTemplatesActivos").on("click", ".btnComenzar", function () {
             var id = $(this).parents("tr").find(".idTemplate").html();
+            var PmCard = $(this).parents("tr").find("[data-registro=PmCard]").html();
             var url = "/Templates/obtenerTemplate";
             $.post(url, data = { ID: id }).done(function (res) {
                 if (res != "") {
@@ -45,6 +47,9 @@
                         $("#txtTemplatesRunningN_ID").val(item.ID);
                         $("#slcTemplatesRunningN_TipoA3").generarLista({ URL: "/Templates/Lista_Formatos_A3", Seleccion: item.TipoA3 });
                         $("#slcTemplatesRunningN_Usuarios").generarLista({ URL: "/Usuarios/Lista_Usuarios" });
+                        $("#slcTemplatesRunningN_Usuarios").select2({
+                            dropdownParent: $('#mdlTemplate_info_template .modal-content')
+                        });
                         $("#slcTemplatesRunningN_Departamento").generarLista({ URL: "/Departamento/Lista_Departamentos" });
                         $("#slcTemplatesRunningN_Subarea").generarLista({ URL: "/Subareas/Lista_Subareas" });
                         $("#slcTemplatesRunningN_Linea").generarLista({ URL: "/Lineas/Lista_Lineas" });
@@ -52,6 +57,16 @@
                         fn_obtener_folio_nueva_investigacion();
                         $("#pnlTemplateRunning_Cuadrante_D").hide();
                         $("#tiposA3").hide();
+                        get_configuration_panels(id)
+                       
+                        if (PmCard != "0") {
+                            $("#slc_PmCardRunning_linea").generarLista({ URL: "/Lineas/Lista_Lineas" });
+                            get_list_failure_mode_category();
+                            $("#plnTemplate_PmCard").show();
+
+                        } else {
+                            $("#plnTemplate_PmCard").hide();
+                        }
                         $("#pnlInicio_Formulario_Nueva_Investigacion").show();
                         $("#tblTemplateRunningN_Evaluadores").empty();
                     });
@@ -59,7 +74,15 @@
                     $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: null });
                 }
             }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
+            
         });
+        /* FUNCTION TO GET TOP 5 FAILURES*/
+        $("#slc_PmCardRunning_linea").change(function () {
+            let Linea_text = $("#slc_PmCardRunning_linea option:selected").text();
+            fn_getTop5_faiulres(Linea_text);
+        })
+
+        /* **************************  */
         $("#btnTemplatesRunningN_Guardar").click(function () {
             var rows = $('#tblTemplateRunningN_Evaluadores tr').length;
             if (rows > 0) {
@@ -310,6 +333,7 @@
                             texto_alert = $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion_mensaje_mitad');
                         }
                         if (res == "1") {
+                            alert();
                             $.notiMsj.Confirmacion({
                                 Tipo: "MD",
                                 Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion'),
@@ -321,6 +345,10 @@
                                         Justificacion: true,
                                         Funcion: registrar_firma_reabrir_A3
                                     });
+                                },
+                                FuncionF: function () {
+                                    alert();
+                                    window.location.replace("/Home/Index");
                                 }
                             });
                         } else {
@@ -380,9 +408,9 @@
                 var data2 = { ID: ID };
                 $.post(url2, data2).done(function (info) {
                     if (info.Id == "1") {
-                        $("#ReporteRunning_url").attr("src", "/Sistema/reporteA3_WP?ID_Template=" + ID + "");
+                        $("#ReporteRunning_url").attr("src", "/Reportes/reporteA3_WP?ID_Template=" + ID + "");
                     } else {
-                        $("#ReporteRunning_url").attr("src", "/Sistema/reporteA3?ID_Template=" + ID + "");
+                        $("#ReporteRunning_url").attr("src", "/Reportes/reporteA3?ID_Template=" + ID + "");
                     }
                 });
             }
@@ -395,7 +423,7 @@
                     $("#btnReporteRunning_Rechazar").show();
                 });
             } else {
-                var versionURL = "/Sistema/obtener_version_documento";
+                var versionURL = "/Reportes/obtener_version_documento";
                 var versionData = { Template: ID, Documento: valor };
                 $.post(versionURL, versionData).done(function (version) {
                     fn_obtener_flujo_reporte_A3(ID, version);
@@ -450,7 +478,12 @@
         //Evaluadores Running
         $("#btnTemplatesRunningN_Evaluadores").click(function () {
             var ID = $("#txtTemplatesRunningN_ID").val();
+            
             $("#slcTemplatesRunningN_Usuarios_Revisor").generarLista({ URL: "/Usuarios/Lista_Usuarios" });
+            $("#slcTemplatesRunningN_Usuarios_Revisor").select2({
+                dropdownParent: $('#mdlEvaluadores_Panel .modal-content')
+            });
+           
             fn_obtener_evaluadores(ID);
             $("#mdlEvaluadores_Panel").modal("show");
         });
@@ -829,30 +862,17 @@
         $("#btnTemplateRunning_Finalizar_investigacion").click(function () {
             $("#btnFirmaElectronica_Firmar").removeClass("btn-progress")
             $.firmaElectronica.MostrarFirma({
+                Justificacion: false,
                 Funcion: registrar_firma_templateRunning_finalizado
             });
         });
         $("#btnTemplateRunning_Finalizar_investigacion_Modificacion").click(function () {
             $.firmaElectronica.MostrarFirma({
+                Justificacion: false,
                 Funcion: registrar_firma_templateRunning_Modificado
             });
         });
-        $("#btnReporteRunning_Rechazar").click(function () {
-            $("#txtMdlComments_Comentarios").val(null);
-            $("#mdlReporte_RechazoPnl").modal("show");
-        });
-        $("#btnReporteRunning_Firmar").click(function () {
-            let tipo_firma = $("#txtTemplateRunning_Reporte_Tipo_Firma").val();
-            if (tipo_firma == $.CargarIdioma.Obtener_Texto('txt_Idioma_Revisor')) {
-                $.firmaElectronica.MostrarFirma({
-                    Funcion: registrar_firma_Revision_A3
-                });
-            } else if (tipo_firma == $.CargarIdioma.Obtener_Texto('txt_Idioma_Aprovador')) {
-                $.firmaElectronica.MostrarFirma({
-                    Funcion: registrar_firma_Aprobacion_A3
-                });
-            }
-        }),
+        
         $("#btnMdlComments_Guardar").click(function () {
             let comentarios = $("#txtMdlComments_Comentarios").val();
             if (comentarios != "") {
@@ -860,17 +880,231 @@
                 let tipo_firma = $("#txtTemplateRunning_Reporte_Tipo_Firma").val();
                 if (tipo_firma == $.CargarIdioma.Obtener_Texto('txt_Idioma_Revisor')) {
                     $.firmaElectronica.MostrarFirma({
+                        Justificacion: false,
                         Funcion: registrar_firma_Rechazar_Revision_A3
                     });
                 } else if (tipo_firma == $.CargarIdioma.Obtener_Texto('txt_Idioma_Aprovador')) {
                     $.firmaElectronica.MostrarFirma({
+                        Justificacion: false,
                         Funcion: registrar_firma_Rechazar_Aprobacion_A3
                     });
                 }
             } else { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null }); }
            
         });
+        $("#tbl_PmCardRunning").on("click", ".checkbox_topFailures", function () {
+            if ($(this).prop("checked")) {
+                $(".checkbox_topFailures").attr("disabled", "disabled")
+                $(this).prop("checked", true);
+                $(this).removeAttr("disabled");
+
+                var minutos = $(this).parents("tr").find("[data-registro=minutos]").html();
+                var motivo = $(this).parents("tr").find("[data-registro=motivo]").html();
+                var maquina = $(this).parents("tr").find("[data-registro=maquina]").html();
+                var linea = $(this).parents("tr").find("[data-registro=linea]").html();
+
+                $("#txtTemplatesRunningN_Problem").val(motivo);
+                $("#txtTemplatesRunningN_Cost").val(minutos + ' Minutos de paro');
+                $("#slcTemplatesRunningN_Departamento option").filter(function () {
+                    //may want to use $.trim in here
+                    return $(this).text() == "Producción";
+                }).prop('selected', true);
+                $("#slcTemplatesRunningN_Linea option").filter(function () {
+                    //may want to use $.trim in here
+                    return $(this).text() == linea; simon
+                }).prop('selected', true);
+
+                $("#slcTemplatesRunningN_Equipo option").filter(function () {
+                    //may want to use $.trim in here
+                    return $(this).text() == maquina;
+                }).prop('selected', true);
+                $("#btnTemplateRunningN_Equipo_Agregar").click();
+                $("#btnTemplateRunningN_Linea_Agregar").click();
+                $("#btnTemplateRunningN_Departamento_Agregar").click();
+            } else {
+                $(".checkbox_topFailures").removeAttr("disabled", "disabled")
+                $("#txtTemplatesRunningN_Problem").val(null);
+                $("#txtTemplatesRunningN_Cost").val(null);
+                $("#tblTemplateRunningN_Equipos").empty();
+                $("#tblTemplateRunningN_Lineas").empty();
+                $("#tblTemplateRunningN_Departamentos").empty();
+            }
+       
+        })
+        $("#tbl_PmCardRunning").on("click","tr",function () {
+
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        $("#tblTemplateRunningN_failure_mode").on("click", ".checkbox_failureMode", function () {
+            if ($(this).prop("checked")) {
+                $(".checkbox_failureMode").attr("disabled", "disabled")
+                $(this).prop("checked", true);
+                $(this).removeAttr("disabled");
+
+                var text = $(this).parents("tr").find("[data-registro=failure_mode_text]").html();
+                var id = $(this).parents("tr").find("[data-registro=failure_mode_id]").html();
+                var category = $("#slcTemplatesRunningN_failure_mode_category option:selected").text();
+                $("#txtTemplatesRunningN_failure_mode_text").val(text);
+                $("#txtTemplatesRunningN_failure_mode_id").val(id);
+                $("#txtTemplatesRunningN_failure_mode_code").val('/' + category + '/' + text);
+            } else {
+                $(".checkbox_failureMode").removeAttr("disabled", "disabled")
+                $("#txtTemplatesRunningN_failure_mode_text").val(null);
+                $("#txtTemplatesRunningN_failure_mode_id").val(null);
+                $("#txtTemplatesRunningN_failure_mode_code").val(null);
+            }
+
+        });
+        $("#tbl_PmCardRunning").on("click", ".btnEvents", function () {
+            var fecha = $(this).parents("tr").find("[data-registro=fecha]").html();
+            var linea = $(this).parents("tr").find("[data-registro=linea]").html();
+            var maquina = $(this).parents("tr").find("[data-registro=maquina]").html();
+            var motivo = $(this).parents("tr").find("[data-registro=motivo]").html();
+            var clasificacion = $(this).parents("tr").find("[data-registro=clasificacion]").html();
+            fn_get_faiulres_events(fecha, linea, maquina, motivo, clasificacion)
+        });
+        $("#slcTemplatesRunningN_failure_mode_category").change(function () {
+            var id_category = $(this).val();
+            if (id_category != "-1") {
+                get_list_failure_mode_by_id_category(id_category);
+            }
+        })
     });
+    function get_configuration_panels(id_template) {
+        var url = "/Templates/get_configuration_panels";
+        var frmDatos = new FormData();
+        frmDatos.append("id_template", id_template);
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (result) {
+                $("#pnlTemplateRunning_Cuadrante_D").hide();
+                $("#tiposA3").hide();
+                $("#pnlInicio_Formulario_Nueva_Investigacion").hide();
+                $("#pnlTemplate_failure_mode").hide();
+                $("#plnTemplate_PmCard").hide();
+                console.log(result);
+                $.each(result, function (i, item) {
+                    $("#" + item.label_panel + "").show();
+                })
+            },
+            error: function (error) {
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+
+    /*FUNCTION TO GET FAILRE MODE LIST */
+    function get_list_failure_mode_by_id_category(id_category) {
+        var url = "/Sistema/get_list_failure_mode_by_id_category";
+        var frmDatos = new FormData();
+        frmDatos.append("id_category", id_category);
+        frmDatos.append("is_enable", 1);        
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (result) {
+                $("#tblTemplateRunningN_failure_mode tbody").empty();
+                $.each(result, function (i, item) {
+                    $("#tblTemplateRunningN_failure_mode tbody").append(
+                        $('<tr>')
+                            .append($('<td data-registro="failure_mode_id" style="display:none">').append(item.id_failure))
+                            .append($('<td data-registro="failure_mode_text" style="display:none">').append(item.name_failure))
+                            .append($('<td>').append(item.name_failure))
+                            .append($('<td>').append('  <input type="checkbox" class="checkbox_failureMode" name="name" value="" />'))
+                    );
+                })
+            },
+            error: function (error) {
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+    function get_list_failure_mode_category() {
+        var url = "/Sistema/get_list_failure_mode_category";
+        var post_data = { is_enable: 1 };
+        $("#slcTemplatesRunningN_failure_mode_category").empty();
+        $("#slcTemplatesRunningN_failure_mode_category").append('<option selected disabled value="-1">Seleccione</option>')
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: false,
+            processData: false,
+            data: post_data,
+            success: function (result) {
+                $.each(result, function (i, item) {
+                    $("#slcTemplatesRunningN_failure_mode_category").append('<option value="'+item.id_category+'">'+item.name_category+'</option>')
+                });
+            },
+            error: function (error) {
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+    /* FUNCTION TO GET TOP 5 FAILURES FROM CONTROLLER */
+
+    function fn_getTop5_faiulres(Linea) {
+        try {
+            var url = "/OEE/get_top5Failures";
+            var post_data = { Linea: Linea };
+            $.post(url, post_data).done(function (result) {
+                $("#tbl_PmCardRunning tbody").empty();
+                $.each(result, function (i, item) {
+                    $("#tbl_PmCardRunning tbody").append(
+                        $('<tr>')
+                            .append($('<td data-registro="fecha">').append(item.Fecha))
+                            .append($('<td data-registro="linea">').append(item.Linea))
+                            .append($('<td data-registro="maquina">').append(item.Maquina))
+                            .append($('<td data-registro="motivo">').append(item.Motivo))
+                            .append($('<td data-registro="minutos">').append(item.Minutos))
+                            .append($('<td data-registro="clasificacion">').append(item.Clasificacion))
+                            .append($('<td class="text-center">').append('<button type="button" class="btn btn-sm btn-light btnEvents"><i class="fa-solid fa-eye"></i></button>'))
+                            .append($('<td class="text-center">').append('<input type="checkbox" class="checkbox_topFailures" name="name" value="" />'))
+                    );
+                })
+                
+            }).fail(function (error) {
+                $.notiMsj.Notificacion({ Mensaje: error, Tipo: "danger", Error: null });
+            });
+        } catch (e) {
+
+        }
+    }
+    function fn_get_faiulres_events(fecha,linea,maquina,motivo,clasificacion) {
+        try {
+            var url = "/OEE/obtener_eventos_falla";
+            var post_data = {
+                fecha: fecha, linea, linea, maquina: maquina, motivo: motivo, clasificacion: clasificacion
+            };
+            $.post(url, post_data).done(function (result) {
+                $("#tbl_events_pmcard tbody").empty();
+                $.each(result, function (i, item) {
+                    $("#tbl_events_pmcard tbody").append(
+                        $('<tr>')
+                            .append($('<td data-registro="fecha">').append(item.Fecha))
+                            .append($('<td data-registro="linea">').append(item.Linea))
+                            .append($('<td data-registro="maquina">').append(item.Maquina))
+                            .append($('<td data-registro="motivo">').append(item.Motivo))
+                            .append($('<td data-registro="minutos">').append(item.Minutos))
+                            .append($('<td data-registro="clasificacion">').append(item.Clasificacion))
+                            .append($('<td data-registro="comentario">').append(item.Comentario))
+                    );
+                })
+                $("#mdlTemplate_pmcard_events").modal("show");
+            }).fail(function (error) {
+                $.notiMsj.Notificacion({ Mensaje: error, Tipo: "danger", Error: null });
+            });
+        } catch (e) {
+
+        }
+    }
+    /* *********************************************** */
     function fn_continue_a3() {
         let ID = $("#txt_id_a3_running").val()
         $("#txtTemplatesRunningN_ID").val(ID);
@@ -901,6 +1135,9 @@
                                     Justificacion: true,
                                     Funcion: registrar_firma_reabrir_A3
                                 });
+                            },
+                            FuncionF: function () {
+                                window.location.replace("/Home")
                             }
                         });
                     } else {
@@ -1246,6 +1483,9 @@
             }
         });
     }
+    $("#btnInicioA3_Regresar").click(function () {
+        window.location.href = "/Home";
+    })
     function fn_obtener_folio_nueva_investigacion() {
         var url = "/Templates/obtener_siguiente_folio";
         $.get(url).done(function (folio) {
@@ -1256,32 +1496,39 @@
         //$("#mdlTemplatesRunning_Agregar").modal("show");
     }
     function fn_cargaTiposA3() {
-        let url = "/Templates/mostrarTemplatesActivo";
-        let idioma_ID = $("#txtGbl_Idioma_ID").val();
-        let Data = { Idioma_ID: idioma_ID }
-        $.post(url, Data).done(function (data) {
-            $("#tblTemplatesActivos").empty();
-            var rol = $("#txt_Rol_Usuario").val();
-            var text_idioma = $.CargarIdioma.Obtener_Texto('txt_Idioma_Nueva_investigacion');
-            $.each(data, function (i, item) {
-                var Botones = '<button class="btn btn-block btn-primary btnComenzar">' + text_idioma + '</button>';
-                if (rol == "3") {
-                    Botones = '<button disabled class="btn btn-block btn-primary  btnComenzar">' + text_idioma + '</button>';
-                } else { Botones = '<button class="btn btn-block btn-primary btnComenzar">' + text_idioma + '</button>'; }
-                $("#tblTemplatesActivos").append(
-                    $('<tr>')
-                        .append($('<td style="display:none;" class="idTemplate">').append(item.ID))
-                        .append($('<td style="text-align:center;">').append('<img height="50" width="50" src="/Assets/img/Templates/' + item.Imagen + '"/>'))
-                        .append($('<td>').append(item.TipoA3))
-                        .append($('<td>').append(item.Descripcion))
-                        .append($('<td>').append(item.Version))
-                        .append($('<td>').append(Botones))
-                );
+        let id_a3 = $("#txt_id_a3_running").val();
+        if (id_a3 == "0") {
+            let url = "/Templates/mostrarTemplatesActivo";
+            let idioma_ID = $("#txtGbl_Idioma_ID").val();
+            let Data = { Idioma_ID: idioma_ID }
+            $.post(url, Data).done(function (data) {
+                $("#tblTemplatesActivos").empty();
+                var rol = $("#txt_Rol_Usuario").val();
+                var text_idioma = $.CargarIdioma.Obtener_Texto('txt_Idioma_Nueva_investigacion');
+                $.each(data, function (i, item) {
+                    var Botones = '<button class="btn btn-block btn-primary btnComenzar">' + text_idioma + '</button>';
+                    if (rol == "3") {
+                        Botones = '<button disabled class="btn btn-block btn-primary  btnComenzar">' + text_idioma + '</button>';
+                    } else { Botones = '<button class="btn btn-block btn-primary btnComenzar">' + text_idioma + '</button>'; }
+                    $("#tblTemplatesActivos").append(
+                        $('<tr>')
+                            .append($('<td style="display:none;" class="idTemplate">').append(item.ID))
+                            .append($('<td data-registro="PmCard" style="display:none">').append(item.PmCard))
+                            .append($('<td style="text-align:center;">').append('<img height="50" width="50" src="/Assets/img/Templates/' + item.Imagen + '"/>'))
+                            .append($('<td>').append(item.TipoA3))
+                            .append($('<td>').append(item.Descripcion))
+                            .append($('<td>').append(item.Version))
+                            .append($('<td>').append(Botones))
+                    );
+                });
+
+            }).fail(function (error) {
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
             });
-           
-        }).fail(function (error) {
-            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
-        });
+        } else {
+            fn_continue_a3()
+        }
+        
     }
     function fn_agregar_evaluadores() {
         var ID_Usuario = $("#slcTemplatesRunningN_Usuarios option:selected").val();
@@ -1532,8 +1779,11 @@
                     fn_registrar_Subarea_running(res.Id);
                     fn_registrar_Linea_running(res.Id);
                     fn_registrar_Equipo_running(res.Id);
+                    fn_insert_falla_running(res.Id)
+                    fn_insert_modofalla_running(res.Id)
                     fn_mostrar_Investigacion(res.Id);
                     fn_mostrar_Cuadrantes_btn(res.Id);
+                    
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });                
@@ -1543,6 +1793,74 @@
                 $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
             }
+        });
+    }
+    function fn_insert_modofalla_running(id_template) {
+        $('#tblTemplateRunningN_failure_mode tbody').find('input[type="checkbox"]:checked').each(function () {
+
+            var id_codigo = $(this).parent("td").parent("tr").find("[data-registro=failure_mode_id]").html();
+            var text_failure_mode = $(this).parent("td").parent("tr").find("[data-registro=failure_mode_text]").html();
+            var id_categoria = $("#slcTemplatesRunningN_failure_mode_category option:selected").val();
+            var text_categoria = $("#slcTemplatesRunningN_failure_mode_category option:selected").text();
+            var codigo = '/' + text_categoria + '/' + text_failure_mode
+            var frmDatos = new FormData();
+            frmDatos.append("id_template", id_template);
+            frmDatos.append("id_codigo", id_codigo);
+            frmDatos.append("id_categoria", id_categoria);
+            frmDatos.append("codigo", codigo);
+
+            $.ajax({
+                type: "POST",
+                url: "/Sistema/insert_modofalla_running",
+                contentType: false,
+                processData: false,
+                data: frmDatos,
+                success: function (res) {
+                    if (res.Tipo == "success") {
+
+                    }
+                    $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                },
+                error: function (error) {
+                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+                }
+            });
+        });
+    }
+    function fn_insert_falla_running(id_template) {
+        $('#tbl_PmCardRunning tbody').find('input[type="checkbox"]:checked').each(function () {
+            var linea = $(this).parent("td").parent("tr").find("[data-registro=linea]").html();
+            var maquina = $(this).parent("td").parent("tr").find("[data-registro=maquina]").html();
+            var motivo = $(this).parent("td").parent("tr").find("[data-registro=motivo]").html();
+            var minutos = $(this).parent("td").parent("tr").find("[data-registro=minutos]").html();
+            var clasificacion = $(this).parent("td").parent("tr").find("[data-registro=clasificacion]").html();
+            var fecha = $(this).parent("td").parent("tr").find("[data-registro=fecha]").html();
+
+            var frmDatos = new FormData();
+            frmDatos.append("id_template", id_template);
+            frmDatos.append("linea", linea);
+            frmDatos.append("maquina", maquina);
+            frmDatos.append("motivo", motivo);
+            frmDatos.append("minutos", minutos);
+            frmDatos.append("clasificacion", clasificacion);
+            frmDatos.append("fecha", fecha);
+
+            $.ajax({
+                type: "POST",
+                url: "/Sistema/insert_falla_running",
+                contentType: false,
+                processData: false,
+                data: frmDatos,
+                success: function (res) {
+                    if (res.Tipo == "success") {
+
+                    }
+                    $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                },
+                error: function (error) {
+                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+                }
+            });
         });
     }
     function fn_registrar_evaluadores(ID_Template) {
@@ -1596,6 +1914,20 @@
             });
         });
     }
+    function fn_get_clasificacion_Falla_by_id_template(id) {
+        var url = "/Sistema/get_clasificacion_Falla_by_id_template";
+        var data = { id_template: id };
+        $.post(url, data).done(function (result) {
+            $("#txtTemplateR_clasificacion_falla").val(result);
+        }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
+    }
+    function fn_get_modo_falla_by_id_template(id) {
+        var url = "/Sistema/get_modo_falla_by_id_template";
+        var data = { id_template: id };
+        $.post(url, data).done(function (result) {            
+            $("#txtTemplateR_modo_falla").val(result);
+        }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
+    }
     function fn_mostrar_Investigacion(id) {
         var url = "/Sistema/obtenerTemplateRunningID";
         var data = { ID: id };
@@ -1608,6 +1940,8 @@
                 $("#pnlTemplatesRunningM_Costo").val(item.Costo);
                 $("#txtTemplatesRunningN_ID").val(id);
             });
+            fn_get_clasificacion_Falla_by_id_template(id)
+            fn_get_modo_falla_by_id_template(id)
             $("#pnlTemplatesRunning_Investigacion").show();
             $("#tiposA3").hide();
             $("#pnlHistorial").hide();
@@ -1633,10 +1967,10 @@
                     EstatusMsg = $.CargarIdioma.Obtener_Texto('txt_Idioma_Pendiente');
                 }
                 $("#pnlTemplatesRunning_Cuadrantes").append('<div class="col-lg-3">' +
-                    '<div class="form-group">' +
-                    '<textarea class= "form-control" disabled style = "height:150px !important; resize:none; overflow:auto; border:0px; outline:none;" > ' + item.Descripcion + '</textarea >' +
+                    '<div class="form-group">' +                    
+                    '<textarea class= "form-control mt-1" disabled style = "height:120px !important; resize:none; overflow:auto; border:0px; outline:none;" > ' + item.Descripcion + '</textarea >' +
                     '</div > ' +
-                    '<div class="form-group">' +
+                    '<div class="form-group d-grid gap-2">' +
                     '<button id="' + item.ID + '" name="' + item.Nombre + '" style="font-size:30px; font-weight:bold; height:100px" class="btn btn-block ' + btnClass + ' btn-lg" > ' + item.Nombre + '</button>' +
                     '<p>' + EstatusMsg+'</p>'+
                     '</div></div > ');
@@ -1732,7 +2066,7 @@
         var data = { ID: ID };
         var Tipo;
         $("#ReporteRunning_url").attr("src", "");
-        $("#btnReporteRunning_Firmar").hide();
+        $("#btnReporteRunning_Firmard").hide();
         $("#btnReporteRunning_Rechazar").hide();
         $("#txtTemplateRunning_Reporte_Tipo_Firma").val("N/A");
         $("#txtTemplateRunning_Reporte_ID").val(ID);
@@ -2028,9 +2362,9 @@
                             .append($('<td style="display:none;" data-registro="Id_Seccion">').append(id_seccion))
                             .append($('<td data-registro="texto">').append(item.Texto))
                             .append($('<td data-registro="respuesta">').append(item.Respuesta))
-                            .append($('<td>').append(Botones))
+                            .append($('<td data-registro="botones">').append(Botones))
                             .append($('<td>').append(Adjuntos))
-                            .append($('<td>').append(Estatus))
+                            .append($('<td data-registro="estatus">').append(Estatus))
                     );
                 } else {
                     $("#tblSeccionRunning" + id_seccion).append(
@@ -2039,9 +2373,9 @@
                             .append($('<td style="display:none;" data-registro="Id_Seccion">').append(id_seccion))
                             .append($('<td data-registro="texto">').append(item.Texto))
                             .append($('<td data-registro="respuesta">').append(item.Respuesta))
-                            .append($('<td>').append(Botones))
+                            .append($('<td data-registro="botones">').append(Botones))
                             .append($('<td>').append(Adjuntos))
-                            .append($('<td>').append(Estatus))
+                            .append($('<td data-registro="estatus">').append(Estatus))
                     );
                 }               
             });
@@ -2140,18 +2474,19 @@
         });
     }
     function obtener_estatus_template() {
-        $("#btnTemplateRunning_Finalizar_investigacion").hide()
-        $("#btnTemplateRunning_Finalizar_investigacion_Modificacion").hide();
-        var url = "/Sistema/obtener_estatus_template";
-        var ID_Template = $("#txtTemplatesRunningN_ID").val();
-        var data = { ID: ID_Template };
-        $.post(url, data).done(function (info) {
-            if (info.Id == "1") {
-                $("#btnTemplateRunning_Finalizar_investigacion").show()
-            } else if (info.Id == "4") {
-                $("#btnTemplateRunning_Finalizar_investigacion_Modificacion").show();
-            }
-        })
+        $("#btnTemplateRunning_Finalizar_investigacion").show()
+        //$("#btnTemplateRunning_Finalizar_investigacion").hide()
+        //$("#btnTemplateRunning_Finalizar_investigacion_Modificacion").hide();
+        //var url = "/Sistema/obtener_estatus_template";
+        //var ID_Template = $("#txtTemplatesRunningN_ID").val();
+        //var data = { ID: ID_Template };
+        //$.post(url, data).done(function (info) {
+        //    if (info.Id !== "9") {
+                
+        //    } else if (info.Id == "9") {
+        //        $("#btnTemplateRunning_Finalizar_investigacion_Modificacion").show();
+        //    }
+        //})
     }
     function fn_obtener_evaluadores(id) {
         var url = "/Sistema/obtener_evaluadores_template_id";
@@ -2179,14 +2514,37 @@
         });
     }
     function fn_obtener_itemRunning_ID(id_item) {
-        $("#" + id_item + "").removeClass("btn-progress")
+        setTimeout(function () {
+            $("#" + id_item + "").removeClass("btn-progress")
+        }, 1000);
+        
         var url = "/Sistema/get_detail_item_running";
         var data = { id_item: id_item };
         $.post(url, data).done(function (data) {
+            var idioma_Pendiente = $.CargarIdioma.Obtener_Texto("txt_Idioma_Pendiente");
+            var Idioma_Finalizado = $.CargarIdioma.Obtener_Texto("txt_Idioma_Finalizado");
+            var Idioma_Cambiar = $.CargarIdioma.Obtener_Texto("txt_Idioma_CambiarRespuesta");
+            var Idioma_Responder = $.CargarIdioma.Obtener_Texto("txt_Idioma_Responder");
             let respuesta = $("#" + id_item + "").parents("tr").find("[data-registro=respuesta]")
+            let estatus = $("#" + id_item + "").parents("tr").find("[data-registro=estatus]")
+            let botones = $("#" + id_item + "").parents("tr").find("[data-registro=botones]")
+            let Estatus_item = "";
+            let Botones_item = "";
             $(respuesta).empty()
+            $(estatus).empty()
+            $(botones).empty()
             $.each(data, function (i, item) {
+                console.log(item.Estatus);
                 $(respuesta).append(item.Respuesta);
+                if (item.Estatus == 0) {
+                    Estatus_item = '<div class="badge badge-danger">' + idioma_Pendiente + '</div>';
+                    Botones_item = '<button id="' + item.ID + '" name="ItemID" class="btn btn-success btnResp" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + Idioma_Responder + '"><i class="far fa-edit"></i> ' + Idioma_Responder + '</button>';
+                } else {
+                    Estatus_item = '<div class="badge badge-success">' + Idioma_Finalizado + '</div>';
+                    Botones_item = '<button id="' + item.ID + '" name="ItemID" class="btn btn-primary btnResp" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + Idioma_Cambiar + '"><i class="far fa-edit"></i> ' + Idioma_Cambiar + '</button>';
+                }
+                $(estatus).append(Estatus_item)
+                $(botones).append(Botones_item)
             });
         }).fail(function (error) {
             console.log(error)
@@ -2984,7 +3342,7 @@
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/registrar_Evaluadores_Running",
+            url: "/Sistema/registrar_evluadores",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -3205,13 +3563,13 @@
     //Finalizar Investigacion
     function registrar_firma_templateRunning_finalizado(param) {
         var frmDatos = new FormData();
-        frmDatos.append("Template", $("#txtTemplatesRunningN_ID").val());
+        frmDatos.append("id_template", $("#txtTemplatesRunningN_ID").val());
         frmDatos.append("BYTOST", param.BYTOST);
         frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/registrar_firma_finalizar_A3",
+            url: "/Reportes/Finish_investigation_process",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -3219,7 +3577,7 @@
                 if (res.Tipo == "success") {
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    window.location.replace("/Sistema/InicioA3");
+                    window.location.replace("/Home/Index");
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });               
@@ -3234,13 +3592,13 @@
     function registrar_firma_reabrir_A3(param) {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var frmDatos = new FormData();
-        frmDatos.append("Template", ID_Template);
+        frmDatos.append("id_template", ID_Template);
         frmDatos.append("BYTOST", param.BYTOST);
         frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/registrar_firma_reabrir_A3",
+            url: "/Reportes/registrar_firma_reabrir_A3",
             contentType: false,
             processData: false,
             data: frmDatos,

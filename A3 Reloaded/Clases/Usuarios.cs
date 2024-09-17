@@ -18,6 +18,37 @@ namespace A3_Reloaded.Clases
          * 'T' -> Nombre Apellido Paterno y Materno
          * 'R' -> Nombre Apellido Paterno (CWID)
          */
+        public string obtener_ID_Usuario(string CWID)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.get_id_Usuario('" + CWID + "');";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        msg = reader[0].ToString();
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return msg;
+        }
         public string obtener_Nombre_Usuario(string CWID, string Opcion)
         {
             SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);

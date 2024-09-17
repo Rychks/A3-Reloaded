@@ -11,7 +11,304 @@ namespace A3_Reloaded.Clases
 {
     public class TemplatesRunning
     {
-        public int obtener_TotalPag_BandejaA3(string Folio, string TipoA3, string Problem, string Contact, string Estaus,string Band, int PageSize)
+        public string get_modo_falla_by_id_template(int id_template)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.get_modo_falla_by_id_template(" + id_template + ");";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        msg = reader[0].ToString();
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return msg;
+        }
+        public string get_clasificacion_Falla_by_id_template(int id_template)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.get_clasificacion_Falla_by_id_template(" + id_template + ");";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        msg = reader[0].ToString();
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return msg;
+        }
+        //FUNCTION TO INSERT DATA IN insert_modofalla_running
+        public string insert_modofalla_running(int id_template, int id_codigo, int id_category, string codigo)
+        {
+            var msg = "";
+            try
+            {
+                DataTable dt = new DataTable();
+                var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("insert_modofalla_running", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@id_template", SqlDbType.Int).Value = id_template;
+                    cmd.Parameters.Add("@id_codigo", SqlDbType.Int).Value = id_codigo;
+                    cmd.Parameters.Add("@id_category", SqlDbType.Int).Value = id_category;
+                    cmd.Parameters.Add("@codigo", SqlDbType.VarChar).Value = codigo;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row[0].ToString() != "guardado")
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                            ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                    else
+                    {
+                        msg = row[0].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return msg;
+        }
+        //END FUNCTION
+        //FUNCTION TO INSERT DATA IN insert_falla_running
+        public string insert_falla_running(int id_template, string linea, string maquina, string motivo,string fecha,float minutos,string clasificacion,string codigo)
+        {
+            var msg = "";
+            try
+            {
+                DataTable dt = new DataTable();
+                var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("insert_falla_running", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@id_template", SqlDbType.Int).Value = id_template;
+                    cmd.Parameters.Add("@linea", SqlDbType.VarChar).Value = linea;
+                    cmd.Parameters.Add("@maquina", SqlDbType.VarChar).Value = maquina;
+                    cmd.Parameters.Add("@motivo", SqlDbType.VarChar).Value = motivo;
+                    cmd.Parameters.Add("@fecha", SqlDbType.VarChar).Value = fecha;
+                    cmd.Parameters.Add("@minutos", SqlDbType.Float).Value = minutos;
+                    cmd.Parameters.Add("@clasificacion", SqlDbType.VarChar).Value = clasificacion;
+                    cmd.Parameters.Add("@codigo", SqlDbType.VarChar).Value = codigo;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row[0].ToString() != "guardado")
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                            ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                    else
+                    {
+                        msg = row[0].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return msg;
+        }
+        //END FUNCTION
+        public int is_aproval_flow_complete(int id_template, int version_template)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            int res = 0;
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.is_aproval_flow_complete(" + id_template + ","+ version_template + ");";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        if (int.TryParse(reader[0].ToString(), out res))
+                        {
+                            res = Convert.ToInt32(reader[0]);
+                        }
+                        else
+                        {
+                            msg = "No devuelve un valor esperado. Revisar la función en la base de datos.";
+                        }
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return res;
+        }
+        
+        public int get_previus_version_template(int id_template)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            int res = 0;
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.get_previus_version_template(" + id_template + ");";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        if (int.TryParse(reader[0].ToString(), out res))
+                        {
+                            res = Convert.ToInt32(reader[0]);
+                        }
+                        else
+                        {
+                            msg = "No devuelve un valor esperado. Revisar la función en la base de datos.";
+                        }
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return res;
+        }
+        public int get_actual_version_template(int id_template)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            int res = 0;
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.get_actual_version_template(" + id_template + ");";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        if (int.TryParse(reader[0].ToString(), out res))
+                        {
+                            res = Convert.ToInt32(reader[0]);
+                        }
+                        else
+                        {
+                            msg = "No devuelve un valor esperado. Revisar la función en la base de datos.";
+                        }
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return res;
+        }
+        public string Reopen_investigation(int id_template,int version_template)
+        {
+            var msg = "";
+            try
+            {
+                DataTable dt = new DataTable();
+                var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("Reopen_investigation", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@id_template", SqlDbType.Int).Value = id_template;
+                    cmd.Parameters.Add("@version_template", SqlDbType.Int).Value = version_template;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row[0].ToString() != "success")
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                            ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                    else
+                    {
+                        msg = row[0].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return msg;
+        }
+        public int obtener_TotalPag_BandejaA3(string Folio, string TipoA3, string Problem, string Contact, string Estaus,string Band,string Linea, int PageSize)
         {
             SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
             int res = 0;
@@ -28,6 +325,7 @@ namespace A3_Reloaded.Clases
                     "," + (Contact == "" || Contact == null ? (object)DBNull.Value + "null" : ("'" + Contact + "'")) +
                     "," + (Estaus == "" || Estaus == null ? (object)DBNull.Value + "null" : Estaus) +
                     "," + (Band == "" || Band == null ? (object)DBNull.Value + "null" : Band) +
+                    "," + (Linea == "" || Linea == null ? (object)DBNull.Value + "null" : Linea) +
                     "," + PageSize + ");";
                 sql.Connection = con;
                 using (reader = sql.ExecuteReader())
@@ -56,7 +354,7 @@ namespace A3_Reloaded.Clases
             }
             return res;
         }
-        public DataTable obtenerRegistros_BandejaA3(string Folio, string TipoA3, string Problem, string Contact, string Estaus,int Idioma,string Band, int PageIndex, int PageSize)
+        public DataTable obtenerRegistros_BandejaA3(string Folio, string TipoA3, string Problem, string Contact,string aux_user, string Estaus,int Idioma,string Band,string Linea, int PageIndex, int PageSize)
         {
             SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
             var msg = "";
@@ -70,9 +368,11 @@ namespace A3_Reloaded.Clases
                     cmd.Parameters.Add("@TipoA3", SqlDbType.VarChar).Value = TipoA3 == "" || TipoA3 == null ? (object)DBNull.Value : TipoA3;
                     cmd.Parameters.Add("@Problem", SqlDbType.VarChar).Value = Problem == "" || Problem == null ? (object)DBNull.Value : Problem;
                     cmd.Parameters.Add("@Usuario", SqlDbType.VarChar).Value = Contact == "" || Contact == null ? (object)DBNull.Value : Contact;
+                    cmd.Parameters.Add("@UsuarioAux", SqlDbType.VarChar).Value = aux_user == "" || aux_user == null ? (object)DBNull.Value : aux_user;
                     cmd.Parameters.Add("@Estatus", SqlDbType.Int).Value = Estaus == "" || Estaus == null ? (object)DBNull.Value : Convert.ToSingle(Estaus, CultureInfo.CreateSpecificCulture("en-US"));
                     cmd.Parameters.Add("@Idioma", SqlDbType.Int).Value = Idioma;
                     cmd.Parameters.Add("@Band", SqlDbType.Int).Value = Band;
+                    cmd.Parameters.Add("@Linea", SqlDbType.Int).Value = Linea == "" || Linea == null ? (object)DBNull.Value : Convert.ToSingle(Linea, CultureInfo.CreateSpecificCulture("en-US")); ;
                     cmd.Parameters.Add("@PageIndex", SqlDbType.Int).Value = PageIndex;
                     cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = PageSize;
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1098,6 +1398,36 @@ namespace A3_Reloaded.Clases
                 ErrorLogger.Registrar(this, e.ToString(), msg);
             }
             return msg;
+        }
+        public DataTable obtener_secciones_CuadranteRunning_ID_for_report(string ID)
+        {
+            var msg = "";
+            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+            DataTable dt = new DataTable();
+            try
+            {
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("get_secciones_cuadranteID", conn);
+                    cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID == "" || ID == null ? (object)DBNull.Value : Convert.ToSingle(ID, CultureInfo.CreateSpecificCulture("en-US"));
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                if (dt.Columns[0].ToString() == "ErrorNumber")
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                                ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return dt;
         }
         public DataTable obtener_secciones_CuadranteRunning_ID(int ID)
         {

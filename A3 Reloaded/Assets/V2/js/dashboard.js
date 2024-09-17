@@ -25,7 +25,7 @@ require.config({
         'AuditTrail': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos','Idioma'],
         'Usuario': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos'],
         'Departamento': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos'],
-        'InicioA3': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma','select2'],
+        'InicioA3': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'select2'],
         'Items': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos'],
         'Lenguage': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos','AuxPrograma'],
         'Pregunta': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos','selectize'],
@@ -37,6 +37,7 @@ require.config({
         'Equipos': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos'],
         'Home': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma','select2'],
         'Rol': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos'],
+        'EditTemplate': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos'],
     },
     paths: {
         'core': 'Assets/V2/js/core',
@@ -89,6 +90,7 @@ require.config({
         'Equipos': 'Assets/Modulos/Equipos',
         'Home': 'Assets/Modulos/Home',
         'Rol': 'Assets/Modulos/Rol',
+        'EditTemplate': 'Assets/Modulos/EditTemplate',
     },
     waitSeconds: 200
 });

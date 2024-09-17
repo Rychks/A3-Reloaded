@@ -416,5 +416,27 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
+
+        public JsonResult get_profile_users(string cwid)
+        {
+            List<UsuarioModel> list = new List<UsuarioModel>();
+            try
+            {
+                ProfileUser profileUser = new ProfileUser(cwid);
+              
+                list.Add(new UsuarioModel
+                    {
+                        Nombre = profileUser.name,
+                        App = profileUser.lastname,
+                        Correo = profileUser.mail,
+                        Departamento = profileUser.department
+                    });
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
     }
 }

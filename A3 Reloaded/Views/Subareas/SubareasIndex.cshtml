@@ -9,7 +9,7 @@
 <div class="section-body">
     <h2 class="section-title txt_Idioma_Administracion_Subareas">Administración de Sub-áreas</h2>
     <div class="section-lead">
-        <div class="form-row" id="frmSubareas">
+        <div class="row" id="frmSubareas">
             <div class="form-group col-md-3">
                 <label for="txtSubareas_Nombre" class="txt_Idioma_Subarea">Sub-área</label>
                 <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Subarea" id="txtSubareas_Nombre" placeholder="Ingrese el Nombre de la Sub-área">
@@ -20,13 +20,17 @@
                     <option value="-1">Seleccione</option>
                 </select>
             </div>
-            <div class="form-group col-md-2" style="margin-top:2rem">
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="cbxSubareas_Activo">
-                    <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxSubareas_Activo">Solo ver activos</label>
+            <div class="form-group col-md-1" style="margin-top:1.8rem">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="cbxSubareas_Activo" checked>
+                    <label class="form-check-label txt_Idioma_Solo_ver_activos" for="cbxSubareas_Activo">Solo ver activos</label>
                 </div>
+                @*<div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="cbxSubareas_Activo">
+            <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxSubareas_Activo">Solo ver activos</label>
+        </div>*@
             </div>
-            <div class="form-group col-md-4" style="margin-top:2rem">
+            <div class="form-group col-md-4" style="margin-top:1.3rem">
                 <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnSubareas_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
                 <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left  ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnSubareas_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
                 <button type="button" class="btn btn-sm btn-icon btn-success  btn-left  ml-3 mb-4 txt_Idioma_Agregar" id="btnSubareas_Agregar" data-toggle="modal" data-target="#mdlSubareas_Agregar">
@@ -83,7 +87,7 @@
                     <h4 class="modal-title txt_Idioma_Registrar_Subarea">Agregar Nueva Sub-área</h4>
                 </div>
                 <div class="modal-body" id="frmSubareasN">
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-6">
                             <label for="txtSubareasN_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
                             <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Subarea" id="txtSubareasN_Nombre" placeholder="Ingrese el Nombre del Departamento">
@@ -96,7 +100,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
                             <div class="form-check">
@@ -123,7 +127,7 @@
                     <h4 class="modal-title txt_Idioma_Modificar_Subarea">Modificar Sub-área</h4>
                 </div>
                 <div class="modal-body" id="frmSubareasM">
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-6">
                             <label for="txtSubareaM_Nombre" class="txt_Idioma_Nombre">Nombre:</label>
                             <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Subarea" id="txtSubareasM_Nombre" placeholder="Ingrese el Nombre">
@@ -136,7 +140,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
                             <div class="form-check">

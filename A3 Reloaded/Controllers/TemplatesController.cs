@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
 
 namespace A3_Reloaded.Controllers
 {
@@ -25,6 +26,51 @@ namespace A3_Reloaded.Controllers
         {
             
             return View();
+        }
+        public ActionResult EditTemplate()
+        {
+            return View();
+        }
+        public JsonResult get_configuration_panels(string id_template)
+        {
+            List<PanelConfigurationModel> list = new List<PanelConfigurationModel>();
+            try
+            {
+                DataTable datos = TE.get_configuration_panels(id_template);
+                foreach (DataRow data in datos.Rows)
+                {
+                    list.Add(new PanelConfigurationModel
+                    {
+                        label_panel = data["label_panel"].ToString(),
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult get_templates_acceso_list(string Activo)
+        {
+            List<ListaModel> list = new List<ListaModel>();
+            try
+            {
+                DataTable datos = TE.get_templates_acceso_list(Activo);
+                foreach (DataRow data in datos.Rows)
+                {
+                    list.Add(new ListaModel
+                    {
+                        ID = Convert.ToInt32(data["Id"]),
+                        Opcion = data["Name"].ToString(),
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
         }
         public JsonResult obtenerTemplate(int ID)
         {
@@ -101,6 +147,8 @@ namespace A3_Reloaded.Controllers
                             Descripcion = data["Descripcion"].ToString(),
                             Idioma = data["Idioma"].ToString(),
                             Imagen = data["Imagen"].ToString(),
+                            Acceso = data["Acceso"].ToString(),
+                            PmCard = data["PmCard"].ToString(),
                             TipoA3 = data["TipoA3"].ToString(),
                             Version = Convert.ToInt32(data["Versionn"]),
                             Activo = Convert.ToInt32(data["Activo"])
@@ -116,7 +164,10 @@ namespace A3_Reloaded.Controllers
                             Idioma = data["Idioma"].ToString(),
                             Imagen = data["Imagen"].ToString(),
                             TipoA3 = data["TipoA3"].ToString(),
+                            Acceso = data["Acceso"].ToString(),
+                            PmCard = data["PmCard"].ToString(),
                             Version = Convert.ToInt32(data["Versionn"]),
+                            template_version = data["Versionn"].ToString(),
                             Activo = Convert.ToInt32(data["Activo"])
                         });
                     }
@@ -167,7 +218,7 @@ namespace A3_Reloaded.Controllers
             }
             return Comparacion;
         }
-        public JsonResult guardarTemplates(string Folio,string TipoA3, string Idioma, string Activo,string Descripcion,HttpPostedFileBase Imagen)
+        public JsonResult guardarTemplates(string Folio,string TipoA3, string Idioma,string Acceso, string Activo,string Descripcion,HttpPostedFileBase Imagen = null)
         {
             try
             {
@@ -189,7 +240,7 @@ namespace A3_Reloaded.Controllers
                         string filepath = "/Assets/Img/Templates/" + filename;
                         Imagen.SaveAs(Path.Combine(Server.MapPath("/Assets/Img/Templates"), filename));
                     }     
-                    string datos = TE.registrar_Template(Folio,Convert.ToInt32(TipoA3),1, Convert.ToInt32(Idioma), Convert.ToInt32(Activo),Descripcion, filename);
+                    string datos = TE.registrar_Template(Folio,Convert.ToInt32(TipoA3),1, Convert.ToInt32(Idioma), Convert.ToInt32(Acceso), Convert.ToInt32(Activo),Descripcion, filename);
                     if (datos == "guardado")
                     {
                         noti.Mensaje = Mensajes.template_guardado;
@@ -217,7 +268,7 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult actualizarTemplate(int ID, string Folio, string Descripcion, HttpPostedFileBase Imagen,string TipoA3,string version, string Activo)
+        public JsonResult actualizarTemplate(int ID, string Folio, string Descripcion, HttpPostedFileBase Imagen,string TipoA3,string Idioma, string Acceso, string version, string Activo)
         {
             try
             {
@@ -242,7 +293,7 @@ namespace A3_Reloaded.Controllers
                         Imagen.SaveAs(Path.Combine(Server.MapPath("/Assets/Img/Templates"), filename));
                     }
                     string v = datosAnterior.Rows[0]["ID"].ToString();
-                    string datos = TE.actualizar_Template(ID, Folio,Convert.ToInt32(TipoA3),Convert.ToInt32(version), Convert.ToInt32(Activo),Descripcion,filename);
+                    string datos = TE.actualizar_Template(ID, Folio,Convert.ToInt32(TipoA3), Convert.ToInt32(Idioma), Convert.ToInt32(Acceso), Convert.ToInt32(version), Convert.ToInt32(Activo),Descripcion,filename);
                     if (datos == "guardado")
                     {
                         noti.Mensaje = Mensajes.template_modificado;
@@ -386,10 +437,12 @@ namespace A3_Reloaded.Controllers
         public JsonResult mostrarTemplatesActivo()
         {
             string ID_Language = LE.obtener_Idioma_Usuario(HttpContext.User.Identity.Name.ToUpper());
+            //string ID_Language = US.(HttpContext.User.Identity.Name.ToUpper());
+            string Id_usuario = US.obtener_ID_Usuario(HttpContext.User.Identity.Name.ToUpper());
             List<TemplateModel> list = new List<TemplateModel>();
             try
             {
-                DataTable datos = TE.mostrar_Templates_Activo(ID_Language);
+                DataTable datos = TE.mostrar_Templates_Activo(Id_usuario, ID_Language);
                 list = organizarDatos(datos);
             }
             catch (Exception e)
@@ -439,79 +492,67 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string Usuario = Request["BYTOST"];
-                string Pass = Request["ZNACKA"];
-                string Justificacion = Request["ZMYSEL"];
+                string usuario = HttpContext.User.Identity.Name.ToUpper();
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(Usuario, Pass);
-                if (firma)
+                DataTable datosAnterior = TE.obtener_cuadranteID(ID);
+                string v = datosAnterior.Rows[0]["ID"].ToString();
+                string datos = TE.modificar_cuadrante(Descripcion, ID);
+                if (datos == "guardado")
                 {
-                    DataTable datosAnterior = TE.obtener_cuadranteID(ID);                    
-                    string v = datosAnterior.Rows[0]["ID"].ToString();
-                    string datos = TE.modificar_cuadrante(Descripcion, ID);
-                    if (datos == "guardado")
-                    {
-                        noti.Mensaje = Mensajes.Cuadrante_modificar;
-                        noti.Tipo = "success";
+                    noti.Mensaje = Mensajes.Cuadrante_modificar;
+                    noti.Tipo = "success";
 
-                        DataTable datosActual = TE.obtener_cuadranteID(ID);
-                        string Actual = string.Empty;
-                        string Anterior = string.Empty;
-                        for (int i = 0; i < datosAnterior.Rows.Count; i++)
+                    DataTable datosActual = TE.obtener_cuadranteID(ID);
+                    string Actual = string.Empty;
+                    string Anterior = string.Empty;
+                    for (int i = 0; i < datosAnterior.Rows.Count; i++)
+                    {
+                        foreach (DataColumn dc_acterior in datosAnterior.Columns)
                         {
-                            foreach (DataColumn dc_acterior in datosAnterior.Columns)
+                            string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                            string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                            string Columna = dc_acterior.ColumnName.ToString();
+                            if (dato_anterior != dato_actual)
                             {
-                                string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
-                                string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
-                                string Columna = dc_acterior.ColumnName.ToString();
-                                if (dato_anterior != dato_actual)
+                                if (Columna == "Activo")
                                 {
-                                    if (Columna == "Activo")
+                                    string Activo_Anterior = string.Empty;
+                                    string Activo_Actual = string.Empty;
+                                    if (dato_anterior == "1") { Activo_Anterior = "Activo"; } else { Activo_Anterior = "Inactivo"; }
+                                    if (dato_actual == "1") { Activo_Actual = "Activo"; } else { Activo_Actual = "Inactivo"; }
+                                    if (string.IsNullOrEmpty(Anterior))
                                     {
-                                        string Activo_Anterior = string.Empty;
-                                        string Activo_Actual = string.Empty;
-                                        if (dato_anterior == "1") { Activo_Anterior = "Activo"; } else { Activo_Anterior = "Inactivo"; }
-                                        if (dato_actual == "1") { Activo_Actual = "Activo"; } else { Activo_Actual = "Inactivo"; }
-                                        if (string.IsNullOrEmpty(Anterior))
-                                        {
-                                            Anterior = Activo_Anterior;
-                                            Actual = Activo_Actual;
-                                        }
-                                        else
-                                        {
-                                            Anterior = Anterior + ", " + Activo_Anterior;
-                                            Actual = Actual + ", " + Activo_Actual;
-                                        }
+                                        Anterior = Activo_Anterior;
+                                        Actual = Activo_Actual;
                                     }
                                     else
                                     {
-                                        if (string.IsNullOrEmpty(Anterior))
-                                        {
-                                            Anterior = dato_anterior;
-                                            Actual = dato_actual;
-                                        }
-                                        else
-                                        {
-                                            Anterior = Anterior + ", " + dato_anterior;
-                                            Actual = Actual + ", " + dato_actual;
-                                        }
+                                        Anterior = Anterior + ", " + Activo_Anterior;
+                                        Actual = Actual + ", " + Activo_Actual;
+                                    }
+                                }
+                                else
+                                {
+                                    if (string.IsNullOrEmpty(Anterior))
+                                    {
+                                        Anterior = dato_anterior;
+                                        Actual = dato_actual;
+                                    }
+                                    else
+                                    {
+                                        Anterior = Anterior + ", " + dato_anterior;
+                                        Actual = Actual + ", " + dato_actual;
                                     }
                                 }
                             }
                         }
+                    }
 
-                        AT.registrarAuditTrail(Registro, Usuario, "M", Anterior, Actual, Justificacion);
-                    }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.Cuadrante_modifcar_error;
-                        noti.Tipo = "warning";
-                    }
+                    AT.registrarAuditTrail(Registro, usuario, "M", Anterior, Actual, "Modificación");
                 }
                 else
                 {
-                    AT.registrarAuditTrail(Registro, Usuario, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Cuadrante_modifcar_error;
                     noti.Tipo = "warning";
                 }
             }
