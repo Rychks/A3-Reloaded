@@ -6,7 +6,6 @@
         $("#divLoaderCuadranteD").hide()
         $("#pnlInicio_Formulario_Nueva_Investigacion").hide();
         $("#pnlTemplatesRunning_Investigacion").hide();
-        $("#pnlTemplatesRunning_Investigacion").hide();
         $("#pnlTemplatesRunning_secciones").hide();
         $.CargarIdioma.Textos({
             Funcion: fn_cargaTiposA3
@@ -60,12 +59,14 @@
                         get_configuration_panels(id)
                        
                         if (PmCard != "0") {
+                            $("#txtBand_pmcard_templateRN").val(1);
                             $("#slc_PmCardRunning_linea").generarLista({ URL: "/Lineas/Lista_Lineas" });
                             get_list_failure_mode_category();
                             $("#plnTemplate_PmCard").show();
 
                         } else {
                             $("#plnTemplate_PmCard").hide();
+                            $("#txtBand_pmcard_templateRN").val(0);
                         }
                         $("#pnlInicio_Formulario_Nueva_Investigacion").show();
                         $("#tblTemplateRunningN_Evaluadores").empty();
@@ -84,36 +85,80 @@
 
         /* **************************  */
         $("#btnTemplatesRunningN_Guardar").click(function () {
+
+            var num_failure_mode = $('#tblTemplateRunningN_failure_mode tbody').find('input[type="checkbox"]:checked').length;
+            var num_failure_pm_card = $('#tbl_PmCardRunning tbody').find('input[type="checkbox"]:checked').length;
+          
             var rows = $('#tblTemplateRunningN_Evaluadores tr').length;
-            if (rows > 0) {
-                $.auxFormulario.camposVacios({
-                    Seccion: $("#frmTemplatesRN_Pnl"),
-                    NoVacio: function () {
-                        $.firmaElectronica.MostrarFirma({
-                            Funcion: fn_comenzar_Investigacion
-                        });
-                    },
-                    EsVacio: function () {
-                        $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
-                        $('html, body').animate({
-                            scrollTop: $("#frmTemplatesRN").offset().top
-                        }, 500);
-                        $("#frmTemplatesRN").css({ "border": "solid", "border-color": "red" });
+            var pmcard_band = $("#txtBand_pmcard_templateRN").val();
+            console.log(pmcard_band);
+            if (pmcard_band == 1) {
+                if (rows > 0 && num_failure_pm_card > 0) {
+                    $.auxFormulario.camposVacios({
+                        Seccion: $("#frmTemplatesRN"),
+                        NoVacio: function () {
+                            $.firmaElectronica.MostrarFirma({
+                                Funcion: fn_comenzar_Investigacion
+                            });
+                        },
+                        EsVacio: function () {
+                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
+                            //$("#btnTemplatesRN_info").addClass("validate-div");
+                        }
+                    });
+                } else {
+                    if (rows == 0 && num_failure_pm_card == 0) {
+                        $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "red" });
                         setInterval(function () {
-                            $("#frmTemplatesRN").css("border", "none");
-                        }, 2000);
+                            $("#btnTemplatesRN_info").css("border", "none");
+                        }, 4000);
+
+                        $("#btnTemplateRn_pmcard").css({ "border": "solid", "border-color": "red" });
+                        setInterval(function () {
+                            $("#btnTemplateRn_pmcard").css("border", "none");
+                        }, 4000);
+                    } else {
+                        if (num_failure_pm_card == 0) {
+                            $("#btnTemplateRn_pmcard").css({ "border": "solid", "border-color": "red" });
+                            setInterval(function () {
+                                $("#btnTemplateRn_pmcard").css("border", "none");
+                            }, 4000);
+                        } else {
+                            $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "red" });
+                            setInterval(function () {
+                                $("#btnTemplatesRN_info").css("border", "none");
+                            }, 4000);
+
+                        }
                     }
-                });
+                    
+                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
+                }
             } else {
-                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
-                $('html, body').animate({
-                    scrollTop: $("#frmTemplateR_Evaluadores").offset().top
-                }, 500);
-                $("#frmTemplateR_Evaluadores_Body").css({ "border": "solid", "border-color": "red" });
-                setInterval(function () {
-                    $("#frmTemplateR_Evaluadores_Body").css("border", "none");
-                }, 2000);
+                if (rows > 0) {
+                    $.auxFormulario.camposVacios({
+                        Seccion: $("#frmTemplatesRN"),
+                        NoVacio: function () {
+                            $.firmaElectronica.MostrarFirma({
+                                Funcion: fn_comenzar_Investigacion
+                            });
+                        },
+                        EsVacio: function () {
+                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
+                            $("#btnTemplatesRN_info").addClass("validate-div");
+                        }
+                    });
+                } else {
+                    if (rows == 0) {
+                        $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "red" });
+                        setInterval(function () {
+                            $("#btnTemplatesRN_info").css("border", "none");
+                        }, 4000);
+                    }
+                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
+                }
             }
+            
         });
         //
         $("#btnTemplateRunningN_Evaluador_Agregar").click(function () {
@@ -983,7 +1028,7 @@
             success: function (result) {
                 $("#pnlTemplateRunning_Cuadrante_D").hide();
                 $("#tiposA3").hide();
-                $("#pnlInicio_Formulario_Nueva_Investigacion").hide();
+                //$("#pnlInicio_Formulario_Nueva_Investigacion").hide();
                 $("#pnlTemplate_failure_mode").hide();
                 $("#plnTemplate_PmCard").hide();
                 console.log(result);
@@ -1771,14 +1816,16 @@
             processData: false,
             data: frmDatos,
             success: function (res) {
+                var id_template = res.Id;
                 if (res.Tipo == "success") {
+                    console.log(id_template);
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                     fn_registrar_evaluadores(res.Id);
                     fn_registrar_departamento_running(res.Id);
                     fn_registrar_Subarea_running(res.Id);
                     fn_registrar_Linea_running(res.Id);
-                    fn_registrar_Equipo_running(res.Id);
+                    fn_registrar_Equipo_running(id_template);
                     fn_insert_falla_running(res.Id)
                     fn_insert_modofalla_running(res.Id)
                     fn_mostrar_Investigacion(res.Id);
@@ -1929,6 +1976,7 @@
         }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
     }
     function fn_mostrar_Investigacion(id) {
+        $("#pnlTemplatesR_info_failure").hide();
         var url = "/Sistema/obtenerTemplateRunningID";
         var data = { ID: id };
         $.post(url, data).done(function (datos) {
@@ -1940,8 +1988,15 @@
                 $("#pnlTemplatesRunningM_Costo").val(item.Costo);
                 $("#txtTemplatesRunningN_ID").val(id);
             });
-            fn_get_clasificacion_Falla_by_id_template(id)
-            fn_get_modo_falla_by_id_template(id)
+            var band_pmcard_Template = $("#txtBand_pmcard_templateRN").val();
+            if (band_pmcard_Template == 1) {
+                fn_get_clasificacion_Falla_by_id_template(id)
+                fn_get_modo_falla_by_id_template(id)
+                $("#pnlTemplatesR_info_failure").show();
+            } else {
+                $("#pnlTemplatesR_info_failure").hide();
+            }
+            
             $("#pnlTemplatesRunning_Investigacion").show();
             $("#tiposA3").hide();
             $("#pnlHistorial").hide();

@@ -11,6 +11,11 @@
 
 }
 
+.validate-div {
+    border:solid;
+    border-color: red;
+}
+
 .text-right {
     margin-left:auto !important; 
     margin-right: 0 !important;
