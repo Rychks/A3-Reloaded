@@ -1,5 +1,45 @@
 ﻿define(["jquery"], function ($) {
     $(document).ready(function () {
+        $("#cbxFilter_turno2").click(function () {
+            if ($("#cbxFilter_turno2").prop("checked")) {
+                $("#cbxFilter_turno2").val("SEGUNDO")
+            } else {
+                $("#cbxFilter_turno2").val("")
+            }
+            fn_filter_topfallas_turnos()
+        });
+        $("#cbxFilter_turno3").click(function () {
+            if ($("#cbxFilter_turno3").prop("checked")) {
+                $("#cbxFilter_turno3").val("TERCERO")
+            } else {
+                $("#cbxFilter_turno3").val("")
+            }
+            fn_filter_topfallas_turnos()
+        });
+        $("#cbxFilter_turno1").click(function () {
+            if ($("#cbxFilter_turno1").prop("checked")) {
+                $("#cbxFilter_turno1").val("PRIMERO")
+            } else {
+                $("#cbxFilter_turno1").val("")
+            }
+            fn_filter_topfallas_turnos()
+        });
+        $("#btnTodos_filter").click(function () {
+            $("#txtFilter_Type_A3").val("")
+            fn_filter_typesA3()
+        })
+        $("#btnA3R_filter").click(function () {
+            $("#txtFilter_Type_A3").val("A3 Reloaded")
+            fn_filter_typesA3()
+        })
+        $("#btnA3Lite_filter").click(function () {
+            $("#txtFilter_Type_A3").val("A3 Lite")
+            fn_filter_typesA3()
+        })
+        $("#btnPm_filter").click(function () {
+            $("#txtFilter_Type_A3").val("Problem Statement")
+            fn_filter_typesA3()
+        })
         $("#pnlHistorial").hide();
         $("#tiposA3").show();
         $("#divLoaderSecciones").hide();
@@ -20,13 +60,13 @@
             $("#tiposA3").slideDown();
             $("#pnlHistorial").hide();
         });
-        $("#btnTipoA3_Historial_mostrar").click(function () {
-            $("#slcTemplatesRunning_History_TipoA3").generarLista({ URL: "/Templates/Lista_Formatos_A3" });
-            $("#tiposA3").slideUp();
-            $("#pnlHistorial").show();
-            $("#pnlInicio_Formulario_Nueva_Investigacion").hide();
-            fn_TemplatesRunning_History();
-        });
+        //$("#btnTipoA3_Historial_mostrar").click(function () {
+        //    $("#slcTemplatesRunning_History_TipoA3").generarLista({ URL: "/Templates/Lista_Formatos_A3" });
+        //    $("#tiposA3").slideUp();
+        //    $("#pnlHistorial").show();
+        //    $("#pnlInicio_Formulario_Nueva_Investigacion").hide();
+        //    fn_TemplatesRunning_History();
+        //});
         $("#btnReporteRunning_Ver_Adjuntos").click(function () {
             $("#pnlReporte_tbl_AdjuntosRunning").show();
             $("#pnlReporte_tbl_ReporteRunning").hide();
@@ -37,6 +77,10 @@
         });
         //crear nueva investigacion
         $("#tblTemplatesActivos").on("click", ".btnComenzar", function () {
+            $("#btnTemplateRn_pmcard").css("border", "none");
+            $("#btnTemplateRn_failure_mode").css("border", "none");
+            $("#btnTemplatesRN_info").css("border", "none");
+            $("#btnTemplate_Complementacion").css("border", "none");
             var id = $(this).parents("tr").find(".idTemplate").html();
             var PmCard = $(this).parents("tr").find("[data-registro=PmCard]").html();
             var url = "/Templates/obtenerTemplate";
@@ -82,11 +126,29 @@
             let Linea_text = $("#slc_PmCardRunning_linea option:selected").text();
             fn_getTop5_faiulres(Linea_text);
         })
-
-        /* **************************  */
-        $("#btnTemplatesRunningN_Guardar").click(function () {
-
+        $("#btnContinuar_pmcard").click(function () {
+            var num_failure_pm_card = $('#tbl_PmCardRunning tbody').find('input[type="checkbox"]:checked').length;
+            if (num_failure_pm_card > 0) {
+                $("#btnTemplateRn_pmcard").css({ "border": "solid", "border-color": "#abc32f" });
+            }
+        });
+        $("#btnContinuar_FailureMode").click(function () {
             var num_failure_mode = $('#tblTemplateRunningN_failure_mode tbody').find('input[type="checkbox"]:checked').length;
+            if (num_failure_mode > 0) {
+                $("#btnTemplateRn_failure_mode").css({ "border": "solid", "border-color": "#abc32f" });
+            }
+        })
+        $("#btnContinuar_infoTemplate").click(function () {
+            var rows = $('#tblTemplateRunningN_Evaluadores tr').length;
+            if (rows > 0) {
+                $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "#abc32f" });
+            }
+        });
+        $("#btnContinuar_complemento").click(function () {
+            $("#btnTemplate_Complementacion").css({ "border": "solid", "border-color": "#abc32f" });
+        });
+        /* **************************  */
+        $("#btnTemplatesRunningN_Guardar").click(function () {           
             var num_failure_pm_card = $('#tbl_PmCardRunning tbody').find('input[type="checkbox"]:checked').length;
           
             var rows = $('#tblTemplateRunningN_Evaluadores tr').length;
@@ -97,9 +159,7 @@
                     $.auxFormulario.camposVacios({
                         Seccion: $("#frmTemplatesRN"),
                         NoVacio: function () {
-                            $.firmaElectronica.MostrarFirma({
-                                Funcion: fn_comenzar_Investigacion
-                            });
+                            fn_comenzar_Investigacion()
                         },
                         EsVacio: function () {
                             $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
@@ -139,9 +199,7 @@
                     $.auxFormulario.camposVacios({
                         Seccion: $("#frmTemplatesRN"),
                         NoVacio: function () {
-                            $.firmaElectronica.MostrarFirma({
-                                Funcion: fn_comenzar_Investigacion
-                            });
+                            fn_comenzar_Investigacion();
                         },
                         EsVacio: function () {
                             $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
@@ -247,21 +305,23 @@
         $("#btnTemplateRunningN_Departamentos_Agregar").click(function () {
             var departamento = $("#slcTemplatesRunningN_Departamentos_Departamento option:selected").val();
             if (departamento != "-1") {
-                $.firmaElectronica.MostrarFirma({
-                    Justificacion: false,
-                    Funcion: fn_agregar_departamento_running
-                });
+                fn_agregar_departamento_running();
             } else {
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
             }          
         });
         $("#tblTemplateRunningN_Departamentos_Datos").on("click", ".btnRemoverRegistro", function () {
             var ID = $(this).parents("tr").find("[data-registro=ID]").html();
-            $("#txtTemplatesRunningN_Departamentos_ID").val(ID);
-            $.firmaElectronica.MostrarFirma({
-                Justificacion: true,
-                Funcion: fn_remover_departamento_running
-            });
+            $.notiMsj.Confirmacion({
+                Tipo: "MD",
+                Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir_title'),
+                Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir'),
+                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                FuncionV: function () {
+                    fn_remover_departamento_running(ID)
+                }
+            });           
         });
         //Funciones Lineas Running
         $("#btnTemplatesRunningN_Lineas").click(function () {
@@ -273,21 +333,23 @@
         $("#btnTemplateRunningN_Lineas_Agregar").click(function () {
             var linea = $("#slcTemplatesRunningN_Lineas_Linea option:selected").val();
             if (linea != "-1") {
-                $.firmaElectronica.MostrarFirma({
-                    Justificacion: false,
-                    Funcion: fn_agregar_linea_running
-                });
+                fn_agregar_linea_running()
             } else {
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
             }
         });
         $("#tblTemplateRunningN_Lineas_Datos").on("click", ".btnRemoverRegistro", function () {
             var ID = $(this).parents("tr").find("[data-registro=ID]").html();
-            $("#txtTemplatesRunningN_Lineas_ID").val(ID);
-            $.firmaElectronica.MostrarFirma({
-                Justificacion: true,
-                Funcion: fn_remover_linea_running
-            });
+            $.notiMsj.Confirmacion({
+                Tipo: "MD",
+                Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir_title'),
+                Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir'),
+                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                FuncionV: function () {
+                    fn_remover_linea_running(ID)
+                }
+            });         
         });
         //Funciones Equipos Running
         $("#btnTemplatesRunningN_Equipos").click(function () {
@@ -297,23 +359,25 @@
             $("#mdlEquipos_Panel").modal("show");
         });
         $("#btnTemplateRunningN_Equipos_Agregar").click(function () {
-            var linea = $("#slcTemplatesRunningN_Equipos_Equipo option:selected").val();
-            if (linea != "-1") {
-                $.firmaElectronica.MostrarFirma({
-                    Justificacion: false,
-                    Funcion: fn_agregar_Equipos_running
-                });
+            var id_equipo = $("#slcTemplatesRunningN_Equipos_Equipo option:selected").val();
+            if (id_equipo != "-1") {
+                fn_agregar_Equipos_running()
             } else {
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
             }
         });
         $("#tblTemplateRunningN_Equipos_Datos").on("click", ".btnRemoverRegistro", function () {
             var ID = $(this).parents("tr").find("[data-registro=ID]").html();
-            $("#txtTemplatesRunningN_Equipos_ID").val(ID);
-            $.firmaElectronica.MostrarFirma({
-                Justificacion: true,
-                Funcion: fn_remover_Equipos_running
-            });
+            $.notiMsj.Confirmacion({
+                Tipo: "MD",
+                Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir_title'),
+                Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir'),
+                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                FuncionV: function () {
+                    fn_remover_Equipos_running(ID)
+                }
+            });    
         });
         //Funciones Subareas
         $("#btnTemplatesRunningN_Subareas").click(function () {
@@ -359,58 +423,7 @@
             window.open(url, '_blank');
             return false;
         });
-        $("#tblTemplatesRunning_History").on("click", ".btnContinuar", function () {
-            var ID = $(this).parents("tr").find("[data-registro=ID]").html();
-            $("#txtTemplatesRunningN_ID").val(ID);
-            var url = "/Sistema/obtener_estatus_template";
-            var data = { ID: ID };
-            $.post(url, data).done(function (info) {
-                var res = "0";
-                var url1 = "/Sistema/valida_responsable_usuario";
-                var data1 = { ID: ID };
-                $.post(url1, data1).done(function (info1) {
-                    res = info1.Id;
-                    if (info.Id == "3" || info.Id == "2" || info.Id == "0") {
-                        var texto_alert;
-                        if (info.Id == "3") {
-                            texto_alert = $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion_mensaje_completo');
-                        } else {
-                            texto_alert = $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion_mensaje_mitad');
-                        }
-                        if (res == "1") {
-                            alert();
-                            $.notiMsj.Confirmacion({
-                                Tipo: "MD",
-                                Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion'),
-                                Mensaje: texto_alert,
-                                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
-                                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
-                                FuncionV: function () {
-                                    $.firmaElectronica.MostrarFirma({
-                                        Justificacion: true,
-                                        Funcion: registrar_firma_reabrir_A3
-                                    });
-                                },
-                                FuncionF: function () {
-                                    alert();
-                                    window.location.replace("/Home/Index");
-                                }
-                            });
-                        } else {
-                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Error_Reabrir_Investigacion'), Tipo: "danger", Error: null });
-                        }
-                    } else {
-                        if (res == "1") {
-                            fn_mostrar_Investigacion(ID);
-                            fn_mostrar_Cuadrantes_btn(ID);
-                            $("#pnlTemplateRunning_Cuadrante_D").hide();
-                        } else {
-                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Error_Reabrir_Investigacion'), Tipo: "danger", Error: null });
-                        }
-                    }
-                });
-            });
-        });
+        
         //Reportes
         $("#btnTemplatesRunning_Reporte_Est_Departamento").click(function () {
             url = "/Reportes/Reporte_Departamento";
@@ -486,10 +499,123 @@
         });
         //ACCIONES DE BOTONES EN A3
         //Genera el formulario para contestar items 
+        let t
+        $("#ItemTemplateRunning_SeccionRunning").on("keyup", "textarea[data-registro=input_pregunta]", function () {
+            var input = $(this);
+            var value = $(this).val()
+            var id_elemento = $(this).parents("tr").find("[data-registro=Id_Elemento]").html();
+            var id_item = $(this).parents("tr").find("[data-registro=Id_item]").html();
+            clearTimeout(t);
+            t = setTimeout(() => {
+                var frmDatos = new FormData();
+                frmDatos.append("IDItem", id_item);
+                frmDatos.append("ID", id_elemento);
+                frmDatos.append("Comentarios", '');
+                var tipo = $("#txtPreguntaRunning_TipoRespuesta").val();
+                frmDatos.append("Respuesta", value);
+                $.ajax({
+                    type: "POST",
+                    url: "/Sistema/guardar_respuesta",
+                    contentType: false,
+                    processData: false,
+                    data: frmDatos,
+                    success: function (res) {
+                        if (res.Tipo == "success") {
+                            $("#txtPreguntaRunning_Comentarios").val(null);
+                        }
+                        $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                        fn_obtener_itemRunning_ID(id_item);
+                    },
+                    error: function (error) {
+                        $("#" + id_item + "").removeClass("btn-progress")
+                        $("#mdlSistema_FirmaElectronica").modal("hide");
+                        $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                        $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+                    }
+                });
+            }, 2000);
+        });
+        $("#ItemTemplateRunning_SeccionRunning").on("keyup", "input[data-registro=comentarios]", function () {
+            var input = $(this);
+            var value = $(this).val()
+            var id_elemento = $(this).parents("tr").find("[data-registro=Id_Elemento]").html();
+            var id_item = $(this).parents("tr").find("[data-registro=Id_item]").html();
+            var respuesta = $(this).parents("tr").find('input[type="radio"]:checked').val();
+            clearTimeout(t);
+            t = setTimeout(() => {
+                var frmDatos = new FormData();
+                frmDatos.append("IDItem", id_item);
+                frmDatos.append("ID", id_elemento);
+                frmDatos.append("Comentarios", value);
+                frmDatos.append("Respuesta", respuesta);
+                $.ajax({
+                    type: "POST",
+                    url: "/Sistema/guardar_respuesta",
+                    contentType: false,
+                    processData: false,
+                    data: frmDatos,
+                    success: function (res) {
+                        if (res.Tipo == "success") {
+                            $("#mdlItemRunning_Panel").modal("hide");
+                            $("#txtPreguntaRunning_Comentarios").val(null);
+                        }
+                        $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                        fn_obtener_itemRunning_ID(id_item);
+                    },
+                    error: function (error) {
+                        $("#" + id_item + "").addClass("btn-progress");
+                        $("#mdlSistema_FirmaElectronica").modal("hide");
+                        $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                        $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+                    }
+                });
+            }, 2000);
+        });
+        $("#ItemTemplateRunning_SeccionRunning").on("click", "input", function () {
+            var value = $(this).val()
+            var id_elemento = $(this).parents("tr").find("[data-registro=Id_Elemento]").html();
+            
+            var comentarios = $(this).parents("tr").find("[data-registro=comentarios]").val();
+            let name = this.name;
+            var id_item = name.replace('inlineRadioOptions', '');
+            //console.log({ id: id_item, value: value, id_elemento: id_elemento, comentarios: comentarios }); 
+            if (name != "comentarios_respuesta") {
+                var frmDatos = new FormData();
+                frmDatos.append("IDItem", id_item);
+                frmDatos.append("ID", id_elemento);
+                frmDatos.append("Comentarios", comentarios);
+                var tipo = $("#txtPreguntaRunning_TipoRespuesta").val();
+                var respuesta = value;
+                frmDatos.append("Respuesta", respuesta);
+                $.ajax({
+                    type: "POST",
+                    url: "/Sistema/guardar_respuesta",
+                    contentType: false,
+                    processData: false,
+                    data: frmDatos,
+                    success: function (res) {
+                        if (res.Tipo == "success") {
+                            $("#mdlItemRunning_Panel").modal("hide");
+                            $("#txtPreguntaRunning_Comentarios").val(null);
+                        }
+                        $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                        fn_obtener_itemRunning_ID(id_item);
+                    },
+                    error: function (error) {
+                        $("#" + id_item + "").addClass("btn-progress");
+                        $("#mdlSistema_FirmaElectronica").modal("hide");
+                        $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                        $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+                    }
+                });
+            }            
+             //prints: 123
+        });
         $("#ItemTemplateRunning_SeccionRunning").on("click", "button", function () {
             
             let id = this.id;
             let name = this.name;
+
             if (name == "ItemID") {
                 obtenerElemento_Caracteristicas(id);
             } else if (name == "btnAdjuntos") {
@@ -672,17 +798,16 @@
             if (!Archivo) {
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
             } else {
-                $.firmaElectronica.MostrarFirma({
-                    Funcion: fn_guardarAdjunto
-                });
+                fn_guardarAdjunto()
             }
         });
         $("#tblAdjuntos_Running").on("click", ".btnOmitirAdjunto", function () {
             var id = $(this).parents("tr").find(".idAdjunto").html();
             $("#txtAdjuntos_ID").val(id);
-            $.firmaElectronica.MostrarFirma({
-                Funcion: fn_omitirAdjunto
-            });
+            fn_omitirAdjunto();
+            //$.firmaElectronica.MostrarFirma({
+            //    Funcion: 
+            //});
         });
         //
         $("#btnInvestigation5why_Agregar").click(function () {
@@ -906,9 +1031,15 @@
         //Finalizar Investigacion
         $("#btnTemplateRunning_Finalizar_investigacion").click(function () {
             $("#btnFirmaElectronica_Firmar").removeClass("btn-progress")
-            $.firmaElectronica.MostrarFirma({
-                Justificacion: false,
-                Funcion: registrar_firma_templateRunning_finalizado
+            $.notiMsj.Confirmacion({
+                Tipo: "MD",
+                Titulo: "Finalizar Investigación",
+                Mensaje: "¿Desea finalizar la investigación?",
+                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                FuncionV: function () {
+                    registrar_firma_templateRunning_finalizado()
+                }
             });
         });
         $("#btnTemplateRunning_Finalizar_investigacion_Modificacion").click(function () {
@@ -1031,7 +1162,6 @@
                 //$("#pnlInicio_Formulario_Nueva_Investigacion").hide();
                 $("#pnlTemplate_failure_mode").hide();
                 $("#plnTemplate_PmCard").hide();
-                console.log(result);
                 $.each(result, function (i, item) {
                     $("#" + item.label_panel + "").show();
                 })
@@ -1045,6 +1175,9 @@
     /*FUNCTION TO GET FAILRE MODE LIST */
     function get_list_failure_mode_by_id_category(id_category) {
         var url = "/Sistema/get_list_failure_mode_by_id_category";
+        $("#tblTemplateRunningN_failure_mode tbody").empty();
+        $("#tblTemplateRunningN_failure_mode tbody").append(' <tr><td style="text-align:center" colspan="100%"><div class="spinner-border" style="height:12rem; width:12rem;" role="status">' +
+            '<span class= "visually-hidden" > Loading...</span ></div></td></tr>')
         var frmDatos = new FormData();
         frmDatos.append("id_category", id_category);
         frmDatos.append("is_enable", 1);        
@@ -1061,8 +1194,8 @@
                         $('<tr>')
                             .append($('<td data-registro="failure_mode_id" style="display:none">').append(item.id_failure))
                             .append($('<td data-registro="failure_mode_text" style="display:none">').append(item.name_failure))
-                            .append($('<td>').append(item.name_failure))
-                            .append($('<td>').append('  <input type="checkbox" class="checkbox_failureMode" name="name" value="" />'))
+                            .append($('<td style="font-size:15px">').append(item.name_failure))
+                            .append($('<td style="font-size:15px">').append(' <input type="checkbox" style="height:1.5rem; width:1.5rem;" class="form-check-input checkbox_failureMode" name="name" value="" />'))
                     );
                 })
             },
@@ -1098,19 +1231,26 @@
         try {
             var url = "/OEE/get_top5Failures";
             var post_data = { Linea: Linea };
+            $("#tbl_PmCardRunning tbody").empty();
+            $("#tbl_PmCardRunning tbody").append(' <tr><td style="text-align:center" colspan="100%"><div class="spinner-border" style="height:12rem; width:12rem;" role="status">' +
+                '<span class= "visually-hidden" > Loading...</span ></div></td></tr>')
             $.post(url, post_data).done(function (result) {
                 $("#tbl_PmCardRunning tbody").empty();
                 $.each(result, function (i, item) {
                     $("#tbl_PmCardRunning tbody").append(
                         $('<tr>')
-                            .append($('<td data-registro="fecha">').append(item.Fecha))
-                            .append($('<td data-registro="linea">').append(item.Linea))
-                            .append($('<td data-registro="maquina">').append(item.Maquina))
-                            .append($('<td data-registro="motivo">').append(item.Motivo))
-                            .append($('<td data-registro="minutos">').append(item.Minutos))
-                            .append($('<td data-registro="clasificacion">').append(item.Clasificacion))
-                            .append($('<td class="text-center">').append('<button type="button" class="btn btn-sm btn-light btnEvents"><i class="fa-solid fa-eye"></i></button>'))
-                            .append($('<td class="text-center">').append('<input type="checkbox" class="checkbox_topFailures" name="name" value="" />'))
+                            .append($('<td data-registro="fecha" style="font-size:15px !important">').append(item.Fecha))
+                            .append($('<td data-registro="linea" style="font-size:15px !important">').append(item.Linea))
+                            .append($('<td data-registro="maquina" style="font-size:15px !important">').append(item.Maquina))
+                            .append($('<td data-registro="motivo" style="font-size:15px !important"> ').append(item.Motivo))
+                            .append($('<td data-registro="minutos" style="font-size:15px !important"> ').append(item.Minutos))
+                            .append($('<td data-registro="clasificacion" style="font-size:15px !important"> ').append(item.Clasificacion))
+                            .append($('<td data-registro="turno" style="font-size:15px !important">').append(item.Turno))
+                            .append($('<td data-registro="Lote" style="display:none">').append(item.Lote))
+                            .append($('<td data-registro="SKU" style="display:none">').append(item.SKU))
+                            .append($('<td data-registro="Producto" style="display:none">').append(item.Producto))
+                            .append($('<td class="text-center" style="font-size:18px !important"> ').append('<button type="button" class="btn btn-sm btn-light btnEvents"><i class="fa-solid fa-eye"></i></button>'))
+                            .append($('<td class="text-center" style="font-size:18px !important"> ').append('<input type="checkbox" style="height:1.5rem; width:1.5rem;" class="form-check-input checkbox_topFailures" name="name" value="" />'))
                     );
                 })
                 
@@ -1127,21 +1267,25 @@
             var post_data = {
                 fecha: fecha, linea, linea, maquina: maquina, motivo: motivo, clasificacion: clasificacion
             };
+            $("#mdlTemplate_pmcard_events").modal("show");
+            $("#tbl_events_pmcard tbody").empty();
+            $("#tbl_events_pmcard tbody").append(' <tr><td style="text-align:center" colspan="100%"><div class="spinner-border" style="height:12rem; width:12rem;" role="status">' +
+                '<span class= "visually-hidden" > Loading...</span ></div></td></tr>')
             $.post(url, post_data).done(function (result) {
                 $("#tbl_events_pmcard tbody").empty();
                 $.each(result, function (i, item) {
                     $("#tbl_events_pmcard tbody").append(
                         $('<tr>')
-                            .append($('<td data-registro="fecha">').append(item.Fecha))
-                            .append($('<td data-registro="linea">').append(item.Linea))
-                            .append($('<td data-registro="maquina">').append(item.Maquina))
-                            .append($('<td data-registro="motivo">').append(item.Motivo))
-                            .append($('<td data-registro="minutos">').append(item.Minutos))
-                            .append($('<td data-registro="clasificacion">').append(item.Clasificacion))
-                            .append($('<td data-registro="comentario">').append(item.Comentario))
+                            .append($('<td style="font-size:15px" data-registro="fecha">').append(item.Fecha))
+                            .append($('<td style="font-size:15px" data-registro="linea">').append(item.Linea))
+                            .append($('<td style="font-size:15px" data-registro="maquina">').append(item.Maquina))
+                            .append($('<td style="font-size:15px" data-registro="motivo">').append(item.Motivo))
+                            .append($('<td style="font-size:15px" data-registro="minutos">').append(item.Minutos))
+                            .append($('<td style="font-size:15px" data-registro="clasificacion">').append(item.Clasificacion))
+                            .append($('<td style="font-size:15px" data-registro="comentario">').append(item.Comentario))
                     );
                 })
-                $("#mdlTemplate_pmcard_events").modal("show");
+                
             }).fail(function (error) {
                 $.notiMsj.Notificacion({ Mensaje: error, Tipo: "danger", Error: null });
             });
@@ -1201,9 +1345,9 @@
         });
     }
     function fn_obtener_departamentos_running() {
-        var id = $("#txtTemplatesRunningN_ID").val();
-        var url = "/Sistema/obtener_registros_Departamentos_running";
-        var data = { ID: id };
+        var id_template = $("#txtTemplatesRunningN_ID").val();
+        var url = "/Departamento/obtener_registros_Departamentos_running";
+        var data = { id_template: id_template };
         $.post(url, data).done(function (info) {
             $("#tblTemplateRunningN_Departamentos_Datos").empty();
             var Omitir = '<button class="btn btn-icon btn-danger btnRemoverRegistro" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Omitir Registro"><i class="fa fa-times"></i></button>';
@@ -1212,8 +1356,8 @@
                     $("#tblTemplateRunningN_Departamentos_Datos").append(
                         $('<tr>')
                             .append($('<td data-registro="ID" style="display:none;">').append(item.ID))
-                            .append($('<td>').append(item.Nombre))
-                            .append($('<td>').append(Omitir))
+                            .append($('<td style="font-size:16px;">').append(item.Nombre))
+                            .append($('<td style="font-size:16px;">').append(Omitir))
                     );
                 });
             } else {
@@ -1226,14 +1370,11 @@
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var Departamento = $("#slcTemplatesRunningN_Departamentos_Departamento option:selected").val();
         var frmDatos = new FormData();
-        frmDatos.append("Template", ID_Template);
-        frmDatos.append("Departamento", Departamento);        
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
-        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        frmDatos.append("id_template", ID_Template);
+        frmDatos.append("id_departamento", Departamento);
         $.ajax({
             type: "POST",
-            url: "/Sistema/registro_Departamento_Running_Firma",
+            url: "/Departamento/registro_Departamento_Running",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -1251,18 +1392,14 @@
             }
         });
     }
-    function fn_remover_departamento_running(Param) {
+    function fn_remover_departamento_running(id_registro) {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var frmDatos = new FormData();
-        frmDatos.append("ID", $("#txtTemplatesRunningN_Departamentos_ID").val());
-        frmDatos.append("ID_Investigacion", $("#txtTemplatesRunningN_ID").val());
-        frmDatos.append("BYTOST", Param.BYTOST);
-        frmDatos.append("ZNACKA", Param.ZNACKA);
-        frmDatos.append("ZMYSEL", Param.ZMYSEL);
+        frmDatos.append("id_registro", id_registro);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/omitir_departamento",
+            url: "/Departamento/omitir_departamento",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -1270,7 +1407,6 @@
                 if (res.Tipo == "success") {
                     fn_obtener_departamentos_running(ID_Template);
                 }
-                $("#mdlSistema_FirmaElectronica").modal("hide");
                 $("#txtEvaluadores_TemplatesR_ID").val(null);
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
@@ -1283,9 +1419,9 @@
         });
     }
     function fn_obtener_Lineas_running() {
-        var id = $("#txtTemplatesRunningN_ID").val();
-        var url = "/Sistema/obtener_registros_Lineas_running";
-        var data = { ID: id };
+        var id_template = $("#txtTemplatesRunningN_ID").val();
+        var url = "/Lineas/obtener_registros_Lineas_running";
+        var data = { id_template: id_template };
         $.post(url, data).done(function (info) {
             $("#tblTemplateRunningN_Lineas_Datos").empty();
             var Omitir = '<button class="btn btn-icon btn-danger btnRemoverRegistro" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Omitir Registro"><i class="fa fa-times"></i></button>';
@@ -1304,18 +1440,16 @@
 
         });
     }
-    function fn_agregar_linea_running(param) {
+    function fn_agregar_linea_running() {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var Linea = $("#slcTemplatesRunningN_Lineas_Linea option:selected").val();
         var frmDatos = new FormData();
-        frmDatos.append("Template", ID_Template);
-        frmDatos.append("Linea", Linea);
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
+        frmDatos.append("id_template", ID_Template);
+        frmDatos.append("id_linea", Linea);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/registro_Linea_Running_Firma",
+            url: "/Lineas/registro_Linea_Running",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -1333,18 +1467,14 @@
             }
         });
     }
-    function fn_remover_linea_running(Param) {
+    function fn_remover_linea_running(id_registro) {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var frmDatos = new FormData();
-        frmDatos.append("ID", $("#txtTemplatesRunningN_Lineas_ID").val());
-        frmDatos.append("ID_Investigacion", $("#txtTemplatesRunningN_ID").val());
-        frmDatos.append("BYTOST", Param.BYTOST);
-        frmDatos.append("ZNACKA", Param.ZNACKA);
-        frmDatos.append("ZMYSEL", Param.ZMYSEL);
+        frmDatos.append("id_registro", id_registro);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/omitir_lineas",
+            url: "/Lineas/omitir_lineas",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -1365,9 +1495,9 @@
         });
     }
     function fn_obtener_Equipos_running() {
-        var id = $("#txtTemplatesRunningN_ID").val();
-        var url = "/Sistema/obtener_registros_Equipos_running";
-        var data = { ID: id };
+        var id_template = $("#txtTemplatesRunningN_ID").val();
+        var url = "/Equipos/obtener_registros_Equipos_running";
+        var data = { id_template: id_template };
         $.post(url, data).done(function (info) {
             $("#tblTemplateRunningN_Equipos_Datos").empty();
             var Omitir = '<button class="btn btn-icon btn-danger btnRemoverRegistro" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Omitir Registro"><i class="fa fa-times"></i></button>';
@@ -1386,25 +1516,23 @@
 
         });
     }
-    function fn_agregar_Equipos_running(param) {
-        var ID_Template = $("#txtTemplatesRunningN_ID").val();
-        var Equipo = $("#slcTemplatesRunningN_Equipos_Equipo option:selected").val();
+    function fn_agregar_Equipos_running() {
+        var id_template = $("#txtTemplatesRunningN_ID").val();
+        var id_equipo = $("#slcTemplatesRunningN_Equipos_Equipo option:selected").val();
         var frmDatos = new FormData();
-        frmDatos.append("Template", ID_Template);
-        frmDatos.append("Equipo", Equipo);
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
+        frmDatos.append("id_template", id_template);
+        frmDatos.append("id_equipo", id_equipo);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/registro_Equipo_Running_Firma",
+            url: "/Equipos/registro_Equipo_Running",
             contentType: false,
             processData: false,
             data: frmDatos,
             success: function (res) {
                 if (res.Tipo == "success") {
                     $("#mdlSistema_FirmaElectronica").modal("hide");
-                    fn_obtener_Equipos_running(ID_Template);
+                    fn_obtener_Equipos_running(id_template);
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
@@ -1415,18 +1543,13 @@
             }
         });
     }
-    function fn_remover_Equipos_running(Param) {
+    function fn_remover_Equipos_running(id_registro) {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var frmDatos = new FormData();
-        frmDatos.append("ID", $("#txtTemplatesRunningN_Equipos_ID").val());
-        frmDatos.append("ID_Investigacion", $("#txtTemplatesRunningN_ID").val());
-        frmDatos.append("BYTOST", Param.BYTOST);
-        frmDatos.append("ZNACKA", Param.ZNACKA);
-        frmDatos.append("ZMYSEL", Param.ZMYSEL);
-        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        frmDatos.append("id_registro", id_registro);
         $.ajax({
             type: "POST",
-            url: "/Sistema/omitir_equipo",
+            url: "/Equipos/omitir_equipo",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -1607,9 +1730,9 @@
                             $('<tr>')
                                 .append($('<td style="display:none;" class="IDUsuario">').append(ID_Usuario))
                                 .append($('<td style="display:none;" class="IDTipo">').append(Nom_Tipo_Usuario))
-                                .append($('<td>').append(Nom_Usuario))
-                                .append($('<td>').append(Nom_Tipo_Usuario_val))
-                                .append($('<td>').append(Omitir))
+                                .append($('<td style="font-size:15px;">').append(Nom_Usuario))
+                                .append($('<td style="font-size:15px;">').append(Nom_Tipo_Usuario_val))
+                                .append($('<td style="text-align:center;">').append(Omitir))
                         );
                     }
                 } else {
@@ -1617,9 +1740,9 @@
                         $('<tr>')
                             .append($('<td style="display:none;" class="IDUsuario">').append(ID_Usuario))
                             .append($('<td style="display:none;" class="IDTipo">').append(Nom_Tipo_Usuario))
-                            .append($('<td>').append(Nom_Usuario))
-                            .append($('<td>').append(Nom_Tipo_Usuario_val))
-                            .append($('<td>').append(Omitir))
+                            .append($('<td style="font-size:15px;">').append(Nom_Usuario))
+                            .append($('<td style="font-size:15px;">').append(Nom_Tipo_Usuario_val))
+                            .append($('<td style="text-align:center;">').append(Omitir))
                     );
                 }
             }
@@ -1647,7 +1770,7 @@
                         $('<tr>')
                             .append($('<td style="display:none;" class="Departamento_ID">').append(Departamento_ID))
                             .append($('<td>').append(Departamento_Nombre))
-                            .append($('<td>').append(Omitir))
+                            .append($('<td style="text-align:center">').append(Omitir))
                     );
                 }
             } else {
@@ -1655,7 +1778,7 @@
                     $('<tr>')
                         .append($('<td style="display:none;" class="Departamento_ID">').append(Departamento_ID))
                         .append($('<td>').append(Departamento_Nombre))
-                        .append($('<td>').append(Omitir))
+                        .append($('<td style="text-align:center">').append(Omitir))
                 );
             }
         } else {
@@ -1682,7 +1805,7 @@
                         $('<tr>')
                             .append($('<td style="display:none;" class="Subarea_ID">').append(Subarea_ID))
                             .append($('<td>').append(Subarea_Nombre))
-                            .append($('<td>').append(Omitir))
+                            .append($('<td style="text-align:center">').append(Omitir))
                     );
                 }
             } else {
@@ -1690,7 +1813,7 @@
                     $('<tr>')
                         .append($('<td style="display:none;" class="Subarea_ID">').append(Subarea_ID))
                         .append($('<td>').append(Subarea_Nombre))
-                        .append($('<td>').append(Omitir))
+                        .append($('<td style="text-align:center">').append(Omitir))
                 );
             }
         } else {
@@ -1717,7 +1840,7 @@
                         $('<tr>')
                             .append($('<td style="display:none;" class="Linea_ID">').append(Linea_ID))
                             .append($('<td>').append(Lnea_Nombre))
-                            .append($('<td>').append(Omitir))
+                            .append($('<td style="text-align:center">').append(Omitir))
                     );
                 }
             } else {
@@ -1725,7 +1848,7 @@
                     $('<tr>')
                         .append($('<td style="display:none;" class="Linea_ID">').append(Linea_ID))
                         .append($('<td>').append(Lnea_Nombre))
-                        .append($('<td>').append(Omitir))
+                        .append($('<td style="text-align:center">').append(Omitir))
                 );
             }
         } else {
@@ -1752,7 +1875,7 @@
                         $('<tr>')
                             .append($('<td style="display:none;" class="Equipo_ID">').append(Equipo_ID))
                             .append($('<td>').append(Equipo_Nombre))
-                            .append($('<td>').append(Omitir))
+                            .append($('<td style="text-align:center">').append(Omitir))
                     );
                 }
             } else {
@@ -1760,7 +1883,7 @@
                     $('<tr>')
                         .append($('<td style="display:none;" class="Equipo_ID">').append(Equipo_ID))
                         .append($('<td>').append(Equipo_Nombre))
-                        .append($('<td>').append(Omitir))
+                        .append($('<td style="text-align:center">').append(Omitir))
                 );
             }
         } else {
@@ -1799,6 +1922,7 @@
         });
     }
     function fn_comenzar_Investigacion(param) {
+        var folio_template = $("#txtTemplatesRunningN_Folio").val();
         var frmDatos = new FormData();
         frmDatos.append("ID", $("#txtTemplatesRunningN_ID").val());
         frmDatos.append("Folio", $("#txtTemplatesRunningN_Folio").val());
@@ -1806,9 +1930,10 @@
         frmDatos.append("Contact", $("#txtTemplatesRunningN_Contact").val());
         frmDatos.append("Problem", $("#txtTemplatesRunningN_Problem").val());
         frmDatos.append("Cost", $("#txtTemplatesRunningN_Cost").val());
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
-        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        //frmDatos.append("BYTOST", param.BYTOST);
+        //frmDatos.append("ZNACKA", param.ZNACKA);
+        $("#btnTemplatesRunningN_Guardar").addClass("btn-progress");
+        
         $.ajax({
             type: "POST",
             url: "/Sistema/comenzar_investigacion",
@@ -1821,25 +1946,35 @@
                     console.log(id_template);
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    fn_registrar_evaluadores(res.Id);
-                    fn_registrar_departamento_running(res.Id);
-                    fn_registrar_Subarea_running(res.Id);
+                    fn_registrar_evaluadores(id_template);
+                    fn_registrar_departamento_running(id_template);
+                    //fn_registrar_Subarea_running(id_template);
+                    
+                    fn_registrar_Equipo_running(res.Id);
                     fn_registrar_Linea_running(res.Id);
-                    fn_registrar_Equipo_running(id_template);
                     fn_insert_falla_running(res.Id)
                     fn_insert_modofalla_running(res.Id)
-                    fn_mostrar_Investigacion(res.Id);
-                    fn_mostrar_Cuadrantes_btn(res.Id);
+                    fn_crear_estructura_investigacion($("#txtTemplatesRunningN_ID").val(), res.Id)
                     
+                   
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
-                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });                
+                //$.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });                
             },
             error: function (error) {
                 $("#mdlSistema_FirmaElectronica").modal("hide");
                 $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
             }
+        });
+    }
+    function fn_crear_estructura_investigacion(id_template,id_templateRunning) {
+        var url = "/Sistema/crear_estructuraInvestigacion";
+        var data = { template_id: id_template, templateRunning_id: id_templateRunning };
+        $.post(url, data).done(function () {
+            fn_mostrar_Investigacion(id_templateRunning);
+            fn_mostrar_Cuadrantes_btn(id_templateRunning);
+            $("#btnTemplatesRunningN_Guardar").removeClass("btn-progress");
         });
     }
     function fn_insert_modofalla_running(id_template) {
@@ -1866,7 +2001,7 @@
                     if (res.Tipo == "success") {
 
                     }
-                    $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                    //$.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
                 },
                 error: function (error) {
                     $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
@@ -1881,6 +2016,9 @@
             var motivo = $(this).parent("td").parent("tr").find("[data-registro=motivo]").html();
             var minutos = $(this).parent("td").parent("tr").find("[data-registro=minutos]").html();
             var clasificacion = $(this).parent("td").parent("tr").find("[data-registro=clasificacion]").html();
+            var lote = $(this).parent("td").parent("tr").find("[data-registro=Lote]").html();
+            var sku = $(this).parent("td").parent("tr").find("[data-registro=SKU]").html();
+            var producto = $(this).parent("td").parent("tr").find("[data-registro=Producto]").html();
             var fecha = $(this).parent("td").parent("tr").find("[data-registro=fecha]").html();
 
             var frmDatos = new FormData();
@@ -1890,6 +2028,9 @@
             frmDatos.append("motivo", motivo);
             frmDatos.append("minutos", minutos);
             frmDatos.append("clasificacion", clasificacion);
+            frmDatos.append("lote", lote);
+            frmDatos.append("sku", sku);
+            frmDatos.append("producto", producto);
             frmDatos.append("fecha", fecha);
 
             $.ajax({
@@ -1902,7 +2043,7 @@
                     if (res.Tipo == "success") {
 
                     }
-                    $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                    //$.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
                 },
                 error: function (error) {
                     $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
@@ -1923,9 +2064,9 @@
     }
     function fn_registrar_departamento_running(ID_Template) {
         $('#tblTemplateRunningN_Departamentos tr').each(function () {
-            var Departamento = $(this).find(".Departamento_ID").html();
-            var url = "/Sistema/registro_Departamento_Running";
-            var data = { Template: ID_Template, Departamento: Departamento };
+            var id_departamento = $(this).find(".Departamento_ID").html();
+            var url = "/Departamento/registro_Departamento_Running";
+            var data = { id_template: ID_Template, id_departamento: id_departamento };
             $.post(url, data).done(function () {
 
             });
@@ -1944,8 +2085,9 @@
     function fn_registrar_Linea_running(ID_Template) {
         $('#tblTemplateRunningN_Lineas tr').each(function () {
             var Linea = $(this).find(".Linea_ID").html();
-            var url = "/Sistema/registro_Linea_Running";
-            var data = { Template: ID_Template, Linea: Linea };
+            var url = "/Lineas/registro_Linea_Running";
+            var data = { id_template: ID_Template, id_linea: Linea };
+            console.log(data);
             $.post(url, data).done(function () {
 
             });
@@ -1954,8 +2096,9 @@
     function fn_registrar_Equipo_running(ID_Template) {
         $('#tblTemplateRunningN_Equipos tr').each(function () {
             var Equipo = $(this).find(".Equipo_ID").html();
-            var url = "/Sistema/registro_Equipo_Running";
-            var data = { Template: ID_Template, Equipo: Equipo };
+            var url = "/Equipos/registro_Equipo_Running";
+            var data = { id_template: ID_Template, id_equipo: Equipo };
+            console.log(data);
             $.post(url, data).done(function () {
 
             });
@@ -1982,12 +2125,16 @@
         $.post(url, data).done(function (datos) {
             $.each(datos, function (i, item) {
                 $("#txtTemplateRunngin_Titulo").text("A3 Reloaded - " + item.TipoA3);
+                if (item.TipoA3 == "Problem Statement") {
+                    $("#txtBand_pmcard_templateRN").val(1);
+                }
                 $("#pnlTemplatesRunningM_Folio").val(item.Folio);
                 $("#pnlTemplatesRunningM_Contact").val(item.Responsable);
                 $("#pnlTemplatesRunningM_Problema").val(item.Problema);
                 $("#pnlTemplatesRunningM_Costo").val(item.Costo);
                 $("#txtTemplatesRunningN_ID").val(id);
             });
+            
             var band_pmcard_Template = $("#txtBand_pmcard_templateRN").val();
             if (band_pmcard_Template == 1) {
                 fn_get_clasificacion_Falla_by_id_template(id)
@@ -2033,89 +2180,7 @@
         }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
     }    
     //Historial A3
-    function fn_TemplatesRunning_History(Pagina) {
-        var Folio = $("#txtTemplatesRunning_History_Folio").val();
-        var TipoA3 = $("#slcTemplatesRunning_History_TipoA3 option:selected").text();
-        var Contact = $("#txtTemplatesRunning_History_Contact").val();
-        var Problem = $("#txtTemplatesRunning_Problem").val();
-        var Estatus = $("#slcTemplatesRunning_History_Estatus option:selected").text();
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_Idioma_En_Proceso')) {Estatus = 0;}
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_idioma_Ingrese_En_Revision')) {Estatus = 3;}
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_idioma_Ingrese_En_Modificacion')) {Estatus = 2;}
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_Idioma_Finalizado')) { Estatus = 1; }
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione')) { Estatus = null; }
-        if (Folio == "") { Folio = null; }
-        if (TipoA3 == $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione')) { TipoA3 = null; }
-        if (Contact == "") { Contact = null; }
-        if (Problem == "") { Problem = null; }
-        var Datos = { Folio: Folio, TipoA3: TipoA3, Problem: Problem, Contact: Contact, Estatus: Estatus, Index: Pagina };
-        var rol = $("#txt_Rol_Usuario").val();
-        
-        $.mostrarInfo({
-            URLindex: "/Sistema/obtenerTotalPagTemplatesRunning",
-            URLdatos: "/Sistema/mostrarTemplatesRunning",
-            Datos: Datos,
-            Version: 2,
-            Tabla: $("#tblTemplatesRunning_History"),
-            Paginado: $("#pagTemplatesRunning_History"),
-            Mostrar: function (i, item) {
-                var Estatus = '<div class="badge badge-danger">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Activo') + '</div>';
-                if (item.Estatus == "1") {
-                    Estatus = '<div class="badge badge-light">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_En_Proceso') + '</div>';
-                } else if (item.Estatus == "2") {
-                    Estatus = '<div class="badge badge-info">' + $.CargarIdioma.Obtener_Texto('txt_idioma_Ingrese_En_Revision') + '</div>';
-                }
-                else if (item.Estatus == "4") {
-                    Estatus = '<div class="badge badge-info">' + $.CargarIdioma.Obtener_Texto('txt_idioma_Ingrese_En_Modificacion') + '</div>';
-                } else if (item.Estatus == "3") {
-                    Estatus = '<div class="badge badge-success">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Finalizado') + '</div>';
-                } else if (item.Estatus == "0") {
-                    Estatus = '<div class="badge badge-danger">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Reporte_Rechazado') + '</div>';
-                }
-                var Botones = '<button class="btn btn-icon btn-primary btnContinuar" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Continuar Investigación"><i class="far fa-edit"></i></button>';
-
-                if (rol == "3") {
-                    Botones = '<button disabled class="btn btn-icon btn-primary btnContinuar" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Continuar Investigación"><i class="far fa-edit"></i></button>';
-                } else {
-                    Botones = '<button  class="btn btn-icon btn-primary btnContinuar" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Continuar_Investigacion') +'"><i class="far fa-edit"></i></button>';
-                }
-                var Boton_Reporte = '<button class="btn btn-icon btn-success btnPdf" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_ReporteA3')+'"><i class="far fa-file-pdf"></i></button>';
-                 
-                $("#tblTemplatesRunning_History").find("tbody").append(
-                    $('<tr>')
-                        .append($('<td data-registro="ID" style="display:none">').append(item.ID))
-                        .append($('<td>').append(item.RowNumber))
-                        .append($('<td style="display:none;" class="estatusTemplateRunning">').append(item.Estatus))
-                        .append($('<td>').append(item.Folio))
-                        .append($('<td>').append(item.TipoA3))
-                        .append($('<td>').append(item.Version))
-                        .append($('<td>').append(item.Contact))
-                        .append($('<td>').append(item.Problem))
-                        .append($('<td>').append(Estatus))
-                        .append($('<td>').append(Botones))
-                        .append($('<td>').append(Boton_Reporte))
-                );
-            }
-        });
-    }
-    function fn_Reporte_A3_Generados() {
-        var Folio = $("#txtTemplatesRunning_History_Folio").val();
-        var TipoA3 = $("#slcTemplatesRunning_History_TipoA3 option:selected").text();
-        var Contact = $("#txtTemplatesRunning_History_Contact").val();
-        var Estatus = $("#slcTemplatesRunning_History_Estatus option:selected").text();
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_Idioma_En_Proceso')) { Estatus = 0; }
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_idioma_Ingrese_En_Revision')) { Estatus = 3; }
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_idioma_Ingrese_En_Modificacion')) { Estatus = 2; }
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_Idioma_Finalizado')) { Estatus = 1; }
-        if (Estatus == $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione')) { Estatus = ""; }
-        if (Folio == "") { Folio = ""; }
-        if (TipoA3 == $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione')) { TipoA3 = ""; }
-        if (Contact == "") { Contact = ""; }
-        url = "/Sistema/reporte_A3_Generado?Folio=" + Folio + "&TipoA3=" + TipoA3 + "&Contact=" + Contact + "&Estatus=" + Estatus + "";
-
-        window.open(url, '_blank');
-        return false;
-    }
+  
     function fn_validar_Evaluador(ID) {
         var url = "/Sistema/valida_firma_Evaluador";
         var data = { ID: ID };
@@ -2308,7 +2373,7 @@
                 $.each(data, function (i, item) {
                     //if (item.Control == "0") {
                     if (1 == 1) {
-                        $("#ItemTemplateRunning_SeccionRunning").append('<div class="form-group divSeccion><div class="table-responsive tabla-md encabezados-fixed"><div class="section-title mt-0">' + item.Nombre + '</div><small>' + item.Descripcion + '</small><table class="table table-bordered tablaSeccion table-hover"><thead ><tr><th scope="col">' + idioma_Texto + '</th><th scope="col">' + idioma_Respuesta + '</th><th colspan="2" style="width:30%">' + Idioma_Opciones + '</th><th  style="width:10%" >' + Idioma_Estatus + '</th></tr></thead><tbody id="tblSeccionRunning' + item.ID + '" style="font-size:15px"><tr><th colspan="7"><p class="text-center">' + $.CargarIdioma.Obtener_Texto("txt_Idioma_no_existen_registros") + '</p></th></tr></tbody></table></div></div>');
+                        $("#ItemTemplateRunning_SeccionRunning").append('<div class="form-group divSeccion><div class="table-responsive tabla-md encabezados-fixed"><div class="section-title mt-0">' + item.Nombre + '</div><small>' + item.Descripcion + '</small><table class="table table-bordered tablaSeccion table-hover"><thead ><tr><th style="width:40%">' + idioma_Texto + '</th><th style="width:35%">' + idioma_Respuesta + '</th><th colspan="2" style="width:15%">' + Idioma_Opciones + '</th><th  style="width:10%" >' + Idioma_Estatus + '</th></tr></thead><tbody id="tblSeccionRunning' + item.ID + '" style="font-size:15px"><tr><th colspan="7"><p class="text-center">' + $.CargarIdioma.Obtener_Texto("txt_Idioma_no_existen_registros") + '</p></th></tr></tbody></table></div></div>');
                     } else {
                         $("#ItemTemplateRunning_SeccionRunning").append('<div disabled="disabled" style="pointer-events: none; background: #dddddd;" class="form-group disabled divSeccion><div class="table-responsive tabla-md encabezados-fixed"><div class="section-title mt-0">' + item.Nombre + '</div><small>' + item.Descripcion + '</small><table class="table table-bordered tablaSeccion table-hover" disabled><thead ><tr><th scope="col">' + idioma_Texto + '</th><th scope="col">' + idioma_Respuesta + '</th><th colspan="2" style="width:30%">' + Idioma_Opciones + '</th><th  style="width:10%" >' + Idioma_Estatus + '</th></tr></thead><tbody id="tblSeccionRunning' + item.ID + '" style="font-size:15px"><tr><th colspan="7"><p class="text-center">' + $.CargarIdioma.Obtener_Texto("txt_Idioma_no_existen_registros") + '</p></th></tr></tbody></table></div></div>');
                     }
@@ -2398,6 +2463,10 @@
             var Idioma_Adjuntos = $.CargarIdioma.Obtener_Texto("txt_Idioma_Adjuntos");
             var Idioma_Cambiar = $.CargarIdioma.Obtener_Texto("txt_Idioma_CambiarRespuesta");
             var Idioma_Responder = $.CargarIdioma.Obtener_Texto("txt_Idioma_Responder");
+            let radio_si = "";
+            let radio_no = "";
+            let radio_na = "";
+            
             var Botones = '<button class="btn btn-primary btnResp" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + Idioma_Cambiar + '"><i class="far fa-edit"></i> ' + Idioma_Cambiar + '</button>';
             $.each(res, function (i, item) {
                 var Estatus = '<div class="badge badge-success">' + Idioma_Finalizado + '</div>';
@@ -2410,27 +2479,84 @@
                     Estatus = '<div class="badge badge-success">' + Idioma_Finalizado + '</div>';
                     Botones = '<button id="' + item.ID + '" name="ItemID" class="btn btn-primary btnResp" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + Idioma_Cambiar + '"><i class="far fa-edit"></i> ' + Idioma_Cambiar + '</button>';
                 }
+                var comentario = "";
+                var respuesta = item.Respuesta                
+                if (item.Tipo == 0) {
+
+                    if (respuesta != "Si" && respuesta != "No" && respuesta != "N/A" && respuesta != "") {
+                        var arrayResponse = respuesta.split(",");
+                        respuesta = arrayResponse[0].replace(" ", '');
+                        comentario = arrayResponse[1].replace(" ", '');
+                    } 
+                                    
+                    radio_si = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio1' + item.ID + '" value="Si">' +
+                        '<label class="form-check-label" for="inlineRadio1">Si</label>';
+                    radio_no = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio2' + item.ID + '" value="No">' +
+                        '<label class="form-check-label" for="inlineRadio2">No</label>';
+                    radio_na = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio3' + item.ID + '" value="N/A">' +
+                        '<label class="form-check-label" for="inlineRadio2">N/A</label>';
+                    if (respuesta == "Si") {
+                        radio_si = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio1' + item.ID + '" value="Si" checked>' +
+                            '<label class="form-check-label" for="inlineRadio1">Si</label>';
+                    } else if (respuesta == "No") {
+                        radio_no = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio2' + item.ID + '" value="No" checked>' +
+                            '<label class="form-check-label" for="inlineRadio2">No</label>';
+                    } else if (respuesta == "N/A") {
+                        radio_na = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio3' + item.ID + '" value="N/A" checked>' +
+                            '<label class="form-check-label" for="inlineRadio2">N/A</label>';
+                    }
+
+                    respuesta = '<div class="input-group">' +
+                        '<div class="input-group-text">' +
+                        '<div class="form-check form-check-inline">' +
+                        radio_si +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="input-group-text">' +
+                        '<div class="form-check form-check-inline">' +
+                        radio_no +
+                        ' </div>' +
+                        '</div>' +
+                        '<div class="input-group-text">' +
+                        '<div class="form-check form-check-inline">' +
+                        radio_na +
+                        '</div>' +
+                        '</div>' +
+                        '<input type="text" class="form-control" data-registro="comentarios" name="comentarios_respuesta" value="' + comentario +'" placeholder="Comentarios" aria-label="Text input with radio button">' +
+                        '</div>'
+                    Botones = '';
+                }
+
+                if (item.Tipo == 1) {
+                    respuesta = '<textarea class="form-control" data-registro="input_pregunta" style="resize:none;">' + item.Respuesta +'</textarea>';
+                    Botones = "";
+                }
+
                 if (Texto_Background.includes(item.Respuesta.trim())) {
                     $("#tblSeccionRunning" + id_seccion).append(
                         $('<tr style="background-color: #e9ecef !important;">')
-                            .append($('<td style="display:none;" class="idItem">').append(item.ID))
+                            .append($('<td style="display:none;" class="idItem" data-registro="Id_item">').append(item.ID))
+                            .append($('<td style="display:none;"  data-registro="Id_Elemento">').append(item.TabId))
                             .append($('<td style="display:none;" data-registro="Id_Seccion">').append(id_seccion))
+                            .append($('<td style="display:none;" data-registro="typeItem">').append(item.Tipo))
                             .append($('<td data-registro="texto">').append(item.Texto))
-                            .append($('<td data-registro="respuesta">').append(item.Respuesta))
-                            .append($('<td data-registro="botones">').append(Botones))
+                            .append($('<td data-registro="respuesta">').append(respuesta))
+                            .append($('<td data-registro="botones" style="text-align:center">').append(Botones))
                             .append($('<td>').append(Adjuntos))
-                            .append($('<td data-registro="estatus">').append(Estatus))
+                            .append($('<td data-registro="estatus" style="text-align:center">').append(Estatus))
                     );
                 } else {
                     $("#tblSeccionRunning" + id_seccion).append(
                         $('<tr>')
-                            .append($('<td style="display:none;" class="idItem">').append(item.ID))
+                            .append($('<td style="display:none;" class="idItem" data-registro="Id_item">').append(item.ID))
+                            .append($('<td style="display:none;"  data-registro="Id_Elemento">').append(item.TabId))
                             .append($('<td style="display:none;" data-registro="Id_Seccion">').append(id_seccion))
+                            .append($('<td style="display:none;" data-registro="typeItem">').append(item.Tipo))
                             .append($('<td data-registro="texto">').append(item.Texto))
-                            .append($('<td data-registro="respuesta">').append(item.Respuesta))
-                            .append($('<td data-registro="botones">').append(Botones))
+                            .append($('<td data-registro="respuesta">').append(respuesta))
+                            .append($('<td data-registro="botones" style="text-align:center">').append(Botones))
                             .append($('<td>').append(Adjuntos))
-                            .append($('<td data-registro="estatus">').append(Estatus))
+                            .append($('<td data-registro="estatus" style="text-align:center">').append(Estatus))
                     );
                 }               
             });
@@ -2585,12 +2711,15 @@
             let botones = $("#" + id_item + "").parents("tr").find("[data-registro=botones]")
             let Estatus_item = "";
             let Botones_item = "";
+            let radio_si = "";
+            let radio_no = "";
+            let radio_na = "";
+            var comentario = "";
             $(respuesta).empty()
             $(estatus).empty()
             $(botones).empty()
             $.each(data, function (i, item) {
-                console.log(item.Estatus);
-                $(respuesta).append(item.Respuesta);
+               
                 if (item.Estatus == 0) {
                     Estatus_item = '<div class="badge badge-danger">' + idioma_Pendiente + '</div>';
                     Botones_item = '<button id="' + item.ID + '" name="ItemID" class="btn btn-success btnResp" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + Idioma_Responder + '"><i class="far fa-edit"></i> ' + Idioma_Responder + '</button>';
@@ -2598,6 +2727,57 @@
                     Estatus_item = '<div class="badge badge-success">' + Idioma_Finalizado + '</div>';
                     Botones_item = '<button id="' + item.ID + '" name="ItemID" class="btn btn-primary btnResp" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + Idioma_Cambiar + '"><i class="far fa-edit"></i> ' + Idioma_Cambiar + '</button>';
                 }
+                var respuesta_item = item.Respuesta
+                if (item.Tipo == 0) {
+                    //console.log(respuesta_item);
+                    if (respuesta_item != "Si" && respuesta_item != "No" && respuesta_item != "N/A" && respuesta_item != "") {
+                        var arrayResponse = respuesta_item.split(",");
+                        respuesta_item = arrayResponse[0].replace(" ", '');
+                        comentario = arrayResponse[1].replace(" ", '');
+                    } 
+
+                    radio_si = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio1' + item.ID + '" value="Si">' +
+                        '<label class="form-check-label" for="inlineRadio1">Si</label>';
+                    radio_no = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio2' + item.ID + '" value="No">' +
+                        '<label class="form-check-label" for="inlineRadio2">No</label>';
+                    radio_na = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio3' + item.ID + '" value="N/A">' +
+                        '<label class="form-check-label" for="inlineRadio2">N/A</label>';
+                    if (respuesta_item == "Si") {
+                        radio_si = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio1' + item.ID + '" value="Si" checked>' +
+                            '<label class="form-check-label" for="inlineRadio1">Si</label>';
+                    } else if (respuesta_item == "No") {
+                        radio_no = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio2' + item.ID + '" value="No" checked>' +
+                            '<label class="form-check-label" for="inlineRadio2">No</label>';
+                    } else if (respuesta_item == "N/A") {
+                        radio_na = '<input class="form-check-input btnres_input" type="radio" name="inlineRadioOptions' + item.ID + '" id="inlineRadio3' + item.ID + '" value="N/A" checked>' +
+                            '<label class="form-check-label" for="inlineRadio2">N/A</label>';
+                    }
+
+                    respuesta_item = '<div class="input-group">' +
+                        '<div class="input-group-text">' +
+                        '<div class="form-check form-check-inline">' +
+                        radio_si +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="input-group-text">' +
+                        '<div class="form-check form-check-inline">' +
+                        radio_no +
+                        ' </div>' +
+                        '</div>' +
+                        '<div class="input-group-text">' +
+                        '<div class="form-check form-check-inline">' +
+                        radio_na +
+                        '</div>' +
+                        '</div>' +
+                        '<input type="text" class="form-control" data-registro="comentarios" name="comentarios_respuesta" value="' + comentario + '" placeholder="Comentarios" aria-label="Text input with radio button">' +
+                        '</div>'
+                    Botones_item = '';
+                }
+                if (item.Tipo == 1) {
+                    respuesta_item = '<textarea class="form-control" data-registro="input_pregunta" style="resize:none;">' + item.Respuesta + '</textarea>';
+                    Botones_item = "";
+                }
+                $(respuesta).append(respuesta_item);
                 $(estatus).append(Estatus_item)
                 $(botones).append(Botones_item)
             });
@@ -3437,8 +3617,6 @@
         var frmDatos = new FormData();
         frmDatos.append("ID", $("#txtAdjuntos_Item_ID").val());
         frmDatos.append("Archivo", ($("#txtAdjuntos_Item_Archivo"))[0].files[0]);
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
@@ -3469,8 +3647,6 @@
     function fn_omitirAdjunto(param) {
         var frmDatos = new FormData();
         frmDatos.append("ID", $("#txtAdjuntos_ID").val());
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
@@ -3503,35 +3679,14 @@
             if (info != "0") {
                 $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID);
                 $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
+                $("#btnTemplateRunning_Finalizar_investigacion").hide();
                 fn_obtener_cuadrante_runninID(ID);
                 fn_mostrarSeccionesRunning(ID, Nombre);
                 if (Nombre == "D") {
-                    //$("#divLoaderCuadranteD").show()
-                    setTimeout(function () {
-                        $("#divLoaderCuadranteD").hide()
-                        $("#pnlTemplateRunning_Cuadrante_D").show();
-                        var url2 = "/Sistema/verifica_tempate_wp";
-                        var data2 = { ID: ID };
-                        $.post(url2, data2).done(function (res) {
-                            if (res.Id == "1") {
-                                fn_obtener_result_wp(ID);
-                                fn_obtener_risk_cuadrante_id(ID);
-                                $("#pnlResults_TemplateWG").show();
-                                $("#pnlResults_CuadranteD").hide();
-                            } else {
-                                fn_obtener_result(ID);
-                                $("#pnlResults_TemplateWG").hide();
-                                $("#pnlResults_CuadranteD").show();
-                            }
-                        });
-                        fn_obtener_5w_ID_Cuadrante(ID);
-                        fn_obtener_Standard_ID_Cuadrante(ID);
-                        fn_obtener_Cost(ID);
-                        obtener_estatus_template();
-                    }, 1000);
-                } else {
-                    
+                    fn_verify_a3_type(ID, Nombre)
+                   
                 }
+               
             } else {
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_comenzar_cuadrante_A'), Tipo: "info", Error: null });
             }
@@ -3539,27 +3694,66 @@
             $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
         });
     }
+    function fn_verify_a3_type(id_cuadrante, nombre_cuadrante) {
+        url = "/Sistema/getA3_type";
+        data = { id_cuadrante: id_cuadrante };
+        $.post(url, data).done(function (result) {
+            if (result != "Problem Statement" && result != "A3 Lite") {
+                setTimeout(function () {
+                    $("#divLoaderCuadranteD").hide()
+                    $("#pnlTemplateRunning_Cuadrante_D").show();
+                    var url2 = "/Sistema/verifica_tempate_wp";
+                    var data2 = { ID: id_cuadrante };
+                    $.post(url2, data2).done(function (res) {
+                        if (res.Id == "1") {
+                            fn_obtener_result_wp(id_cuadrante);
+                            fn_obtener_risk_cuadrante_id(id_cuadrante);
+                            $("#pnlResults_TemplateWG").show();
+                            $("#pnlResults_CuadranteD").hide();
+                        } else {
+                            fn_obtener_result(id_cuadrante);
+                            $("#pnlResults_TemplateWG").hide();
+                            $("#pnlResults_CuadranteD").show();
+                        }
+                    });
+                    fn_obtener_5w_ID_Cuadrante(id_cuadrante);
+                    fn_obtener_Standard_ID_Cuadrante(id_cuadrante);
+                    fn_obtener_Cost(id_cuadrante);
+                    obtener_estatus_template();
+                }, 1000);
+            }
+            setTimeout(function () {
+                $("#btnTemplateRunning_Finalizar_investigacion").show();
+            }, 1000);
+            
+        }).fail(function (error) {
+
+        }); 
+    }
     function fn_obtener_cuadrante_runninID(Cuadrante_ID,Cuadrante_Nombre) {
         var btn_CuadranteB_C = $.CargarIdioma.Obtener_Texto("txt_Idioma_Continuar_Cuadrante_C");
         var btn_CuadranteC_D = $.CargarIdioma.Obtener_Texto("txt_Idioma_Continuar_Cuadrante_D");
+        var btn_continuar = "Continuar"
         if (Cuadrante_Nombre == "A") {
             fn_verifica_cuadrante_A(Cuadrante_ID);
         } else if (Cuadrante_Nombre == "B") {
-            $("#ItemTemplateRunning_SeccionRunning").append('<div id="" class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteB_C">' + btn_CuadranteB_C + '</button></div>');
+            $("#ItemTemplateRunning_SeccionRunning").append('<div  class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteB_C">' + btn_CuadranteB_C + '</button></div>');
         } else if (Cuadrante_Nombre == "C") {
-            $("#ItemTemplateRunning_SeccionRunning").append('<div id="" class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteC_D">' + btn_CuadranteC_D + '</button></div>');
+            $("#ItemTemplateRunning_SeccionRunning").append('<div class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteC_D">' + btn_CuadranteC_D + '</button></div>');
         }
     }
+    //MODIFICAR ESTA FUNCION PARA EL FUNCIONAMIENTO DINAMICO DE REDIRECCION DE CUADRANTES
     function fn_verifica_cuadrante_A(id) {
         var url = "/Sistema/Verificar_Cuadrante_A";
         var data = { ID: id };
         var btn_CuadranteA_D = $.CargarIdioma.Obtener_Texto("txt_Idioma_Continuar_Cuadrante_D");
         var btn_CuadranteA_B = $.CargarIdioma.Obtener_Texto("txt_Idioma_Continuar_Cuadrante_B");
-        $.post(url, data).done(function (info) {
-            if (info != "0") {
-                $("#ItemTemplateRunning_SeccionRunning").append('<div id="" class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteA_D">' + btn_CuadranteA_D + '</button></div>');
-            } else {
-                $("#ItemTemplateRunning_SeccionRunning").append('<div id="" class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteA_B">' + btn_CuadranteA_B + '</button></div>');
+        var btn_continuar = "Continuar"
+        $.post(url, data).done(function (result) {
+            if (result != "0") {
+                $("#ItemTemplateRunning_SeccionRunning").append('<div class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteA_D">' + btn_CuadranteA_D + '</button></div>');
+            } else {             
+                $("#ItemTemplateRunning_SeccionRunning").append('<div class="text-right"><button name="btnRedireccion" type="button" class="btn btn-success btnRedireccion" id="btn_CuadranteA_B">' + btn_CuadranteA_B + '</button></div>');
             }
         }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
     }
@@ -3619,8 +3813,8 @@
     function registrar_firma_templateRunning_finalizado(param) {
         var frmDatos = new FormData();
         frmDatos.append("id_template", $("#txtTemplatesRunningN_ID").val());
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
+        //frmDatos.append("BYTOST", param.BYTOST);
+        //frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
@@ -3662,6 +3856,9 @@
                     $("#mdlItemRunning_Panel").modal("hide");
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                    $("#pnlTemplateRunning_Cuadrante_D").hide();
+                    $("#tiposA3").hide();
+                    //get_configuration_panels(id)
                     fn_mostrar_Investigacion(ID_Template);
                     fn_mostrar_Cuadrantes_btn(ID_Template);
                 }
@@ -4441,6 +4638,54 @@
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
             }
         });
+    }
+    function fn_filter_typesA3() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("txtFilter_Type_A3");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("tblTemplatesActivos");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[3];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+    function fn_filter_topfallas_turnos() {
+        var input, filter,filter2,filter3, table, tr, td, i, txtValue;
+        input = document.getElementById("cbxFilter_turno1");
+        input2 = document.getElementById("cbxFilter_turno2");
+        input3 = document.getElementById("cbxFilter_turno3");
+        filter = input.value.toUpperCase();
+        filter2 = input2.value.toUpperCase();
+        filter3 = input3.value.toUpperCase();
+        table = document.getElementById("tbl_PmCardRunning");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[6];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (filter == "" && filter2 == "" && filter3 == "") {
+                    tr[i].style.display = "";
+                } else {
+
+                    if (txtValue.toUpperCase() == filter || txtValue.toUpperCase() == filter2 || txtValue.toUpperCase() == filter3) {
+                        tr[i].style.display = "";
+                    }
+                    else {
+                        tr[i].style.display = "none";
+                    }
+                }
+                
+            }
+
+        }
     }
     //async function fn_valida_cuadrante_estatus(Cuadrante_ID) {
     //    var Data = { Cuadrante_ID: Cuadrante_ID };

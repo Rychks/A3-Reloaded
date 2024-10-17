@@ -24,5 +24,6 @@ namespace A3_Reloaded.Models
         public string Idioma { get; set; }
         public int Estatus { get; set; }
         public string Status_Text {get;set;}
+        public string Lineas { get; set; }
     }
 }

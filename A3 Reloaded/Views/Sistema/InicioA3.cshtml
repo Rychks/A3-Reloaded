@@ -23,28 +23,45 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="table tabla-md encabezados-fixed">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th class="txt_Idioma_Imagen_Descriptiva" scope="col">Imagen Descriptiva</th>
-                                    <th class="txt_Idioma__Formato_de_A3" scope="col">Formato de A3</th>
-                                    <th class="txt_Idioma_Descripcion" scope="col">Descripción</th>
-                                    <th class="txt_Idioma_Version" scope="col" style="width:10%;">Version</th>
-                                    <th class="txt_Idioma_Opciones" scope="col" style="width:10%">Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblTemplatesActivos" style="font-size:15px">
-                                <tr><th colspan="7"><p class="text-center">No se encontraron registros</p></th></tr>
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <input type="text" style="display:none" id="txtFilter_Type_A3" name="name" value="" />
+                            <button id="btnTodos_filter" class="btn btn-lg btn-outline-primary">Mostrar Todo</button>
+                            <button id="btnA3R_filter" class="btn btn-lg btn-outline-primary">A3 Reloaded</button>
+                            <button id="btnA3Lite_filter" class="btn btn-lg btn-outline-primary">A3 Lite</button>
+                            <button id="btnPm_filter" class="btn btn-lg btn-outline-primary">Problem Statement</button>
+                        </div>
                     </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <div class="table tabla-md encabezados-fixed">
+                                <table class="table table-hover">
+                                    <thead style="font-size:15px !important;">
+                                        <tr>
+                                            <th class="txt_Idioma_Imagen_Descriptiva" scope="col">Imagen Descriptiva</th>
+                                            <th class="txt_Idioma__Formato_de_A3" scope="col">Formato de A3</th>
+                                            <th class="txt_Idioma_Descripcion" scope="col">Descripción</th>
+                                            <th class="txt_Idioma_Version" scope="col" style="width:10%;">Version</th>
+                                            <th class="txt_Idioma_Opciones" scope="col" style="width:10%">Opciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTemplatesActivos" style="font-size:15px">
+                                        <tr><th colspan="7"><p class="text-center">No se encontraron registros</p></th></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
 
     </div>
 </div>
+<script>
+    
+</script>
 
 <div id="pnlInicio_Formulario_Nueva_Investigacion">
     <div class="row">
@@ -62,6 +79,7 @@
                     <input type="text" id="txtBand_pmcard_templateRN" class="form-control" disabled style="display:none" value="" />
                     <div class="row">
                         <div class="col-lg-6" id="plnTemplate_PmCard">
+                            <label></label>
                             <div class="form-group d-grid gap-2 mt-2">
                                 <button id="btnTemplateRn_pmcard" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_pmcard">
                                     <i class="fa-solid fa-wrench"></i>
@@ -70,6 +88,7 @@
                             </div>
                         </div>
                         <div class="col-lg-6" id="pnlTemplate_failure_mode">
+                            <label>Opcional*</label>
                             <div class="form-group d-grid gap-2 mt-2">
                                 <button id="btnTemplateRn_failure_mode" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_failureMode">
                                     <i class="fa-solid fa-gears"></i>
@@ -80,6 +99,7 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-6" id="frmTemplatesRN_Pnl">
+                            <label></label>
                             <div class="form-group d-grid gap-2 mt-2">
                                 <button  id="btnTemplatesRN_info" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_info_template">
                                     <i class="fa-solid fa-clipboard-list"> </i>
@@ -88,8 +108,9 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
+                            <label>Opcional*</label>
                             <div class="form-group d-grid gap-2 mt-2">
-                                <button id="" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_complement">
+                                <button id="btnTemplate_Complementacion" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_complement">
                                     <i class="fa-solid fa-rectangle-list"></i>
                                     <span class=""></span>  Complementación A3
                                 </button>
@@ -115,16 +136,33 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="slc_PmCardRunning_linea">Linea</label>
-                            <select id="slc_PmCardRunning_linea" class="form-control form-control-sm">
+                        <div class="form-group col-md-2">
+                            <label for="slc_PmCardRunning_linea" style="font-size:15px !important">Linea</label>
+                            <select id="slc_PmCardRunning_linea" style="font-size:15px !important" class="form-control form-control-sm">
                                 <option value="-1">Seleccione</option>
                             </select>
                         </div>
+                        <div class="col-md-4" style="margin-top:2rem;">
+                            <div class="form-check form-check-inline" style="font-size:15px !important">
+                                <input class="form-check-input" type="checkbox" id="cbxFilter_turno1" value="">
+                                <label class="form-check-label" for="cbxFilter_turno1">Primer Turno</label>
+                            </div>
+                            <div class="form-check form-check-inline" style="font-size:15px !important">
+                                <input class="form-check-input" type="checkbox" id="cbxFilter_turno2" value="">
+                                <label class="form-check-label" for="cbxFilter_turno2">Segundo Turno</label>
+                            </div>
+                            <div class="form-check form-check-inline" style="font-size:15px !important">
+                                <input class="form-check-input" type="checkbox" id="cbxFilter_turno3" value="">
+                                <label class="form-check-label" for="cbxFilter_turno3">Tercer Turno</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        
                     </div>
                     <div class="row">
                         <div class="table tabla-md encabezados-fixed">
-                            <table class="table table-hover" id="tbl_PmCardRunning">
+                            <table class="table table-hover" style="font-size:15px !important;" id="tbl_PmCardRunning">
                                 <thead>
                                     <tr>
                                         <th>Fecha</th>
@@ -133,17 +171,19 @@
                                         <th>Motivo</th>
                                         <th>Minutos</th>
                                         <th>Clasificación</th>
+                                        <th>Turno</th>
                                         <th class="text-center">Eventos</th>
                                         <th class="text-center">Check</th>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
+                                <tbody>
+                               </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="btnContinuar_pmcard" data-dismiss="modal">Continuar</button>
                 </div>
             </div>
         </div>
@@ -157,6 +197,7 @@
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                   
                     <div class="row">
                         <div class="table tabla-md encabezados-fixed">
                             <table class="table table-hover" id="tbl_events_pmcard">
@@ -177,7 +218,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Continuar</button>
                 </div>
             </div>
         </div>
@@ -197,15 +238,15 @@
                                 <option selected disabled value="-1">Seleccione</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-3" style="display:none">
                             <label>Failure Mode ID</label>
                             <input type="text" class="form-control" id="txtTemplatesRunningN_failure_mode_id" name="name" value="" />
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-3" style="display:none">
                             <label>Failure Mode code</label>
                             <input type="text" class="form-control" id="txtTemplatesRunningN_failure_mode_code" name="name" value="" />
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-3" style="display:none">
                             <label>Failure Mode text</label>
                             <input type="text" class="form-control" id="txtTemplatesRunningN_failure_mode_text" name="name" value="" />
                         </div>
@@ -213,19 +254,19 @@
                     <div class="row">
                         <div class="table tabla-md encabezados-fixed">
                             <table class="table table-hover" id="tblTemplateRunningN_failure_mode">
-                                <thead>
+                                <thead style="font-size:16px !important">
                                     <tr>
                                         <th class="txt_Idioma_Modo_falla">Modo de Falla</th>
                                         <th style="width:10%">Check</th>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
+                                <tbody style="font-size:16px !important"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="btnContinuar_FailureMode" data-dismiss="modal">Continuar</button>
                 </div>
             </div>
         </div>
@@ -317,7 +358,7 @@
                                                             <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody id="tblTemplateRunningN_Evaluadores" style="font-size:10px">
+                                                    <tbody id="tblTemplateRunningN_Evaluadores" style="font-size:15px">
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -329,7 +370,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="btnContinuar_infoTemplate" data-dismiss="modal">Continuar</button>
                 </div>
             </div>
         </div>
@@ -355,7 +396,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table  tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
+                            <div class="table  tabla-md encabezados-fixed" style="height:200px !important; font-size:15px !important;">
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
@@ -363,7 +404,7 @@
                                             <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tblTemplateRunningN_Departamentos" style="font-size:10px">
+                                    <tbody id="tblTemplateRunningN_Departamentos" style="font-size:15px">
                                     </tbody>
                                 </table>
                             </div>
@@ -380,7 +421,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
+                            <div class="table tabla-md encabezados-fixed" style="height:200px !important; font-size:15px !important;">
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
@@ -388,7 +429,7 @@
                                             <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tblTemplateRunningN_Subareas" style="font-size:10px">
+                                    <tbody id="tblTemplateRunningN_Subareas" style="font-size:15px">
                                     </tbody>
                                 </table>
                             </div>
@@ -407,7 +448,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table tabla-md encabezados-fixed" style="height:200px !important; font-size:12px !important;">
+                            <div class="table tabla-md encabezados-fixed" style="height:200px !important; font-size:15px !important;">
                                 <table class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
@@ -415,7 +456,7 @@
                                             <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tblTemplateRunningN_Lineas" style="font-size:10px">
+                                    <tbody id="tblTemplateRunningN_Lineas" style="font-size:15px">
                                     </tbody>
                                 </table>
                             </div>
@@ -440,7 +481,7 @@
                                             <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tblTemplateRunningN_Equipos" style="font-size:10px">
+                                    <tbody id="tblTemplateRunningN_Equipos" style="font-size:15px">
                                     </tbody>
                                 </table>
                             </div>
@@ -448,7 +489,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="btnContinuar_complemento" data-dismiss="modal">Continuar</button>
                 </div>
             </div>
         </div>
@@ -522,7 +563,7 @@
                     <div class="form-group d-grid gap-2">
                         <button type="button" class="btn btn-primary btn-block txt_Idioma_Departamento_Afectado" id="btnTemplatesRunningN_Departamentos">Evaluadores</button>
                     </div>
-                    <div class="form-group d-grid gap-2">
+                    <div class="form-group d-grid gap-2" style="display:none !important">
                         <button type="button" class="btn btn-primary btn-block txt_Idioma_Subarea_Afectado" id="btnTemplatesRunningN_Subareas">Evaluadores</button>
                     </div>
                     <div class="form-group d-grid gap-2">
@@ -804,21 +845,23 @@
                         </p>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <div class="form-group">
-                            <button type="button" class="btn btn-primary btn-lg txt_Idioma_Finalizar_Investigacion" id="btnTemplateRunning_Finalizar_investigacion">Finalizar Investigación</button>
-                            <button type="button" class="btn btn-info btn-lg  txt_Idioma_Finalizar_Modificacion" style="display:none;" id="btnTemplateRunning_Finalizar_investigacion_Modificacion">Finalizar Modificación</button>
-                        </div>
-                    </div>
-                </div>
+
             </div>
+
             <div class="d-flex justify-content-center">
                 <div class="spinner-border" id="divLoaderSecciones" style="font-size:32px; height:300px; width:300px;">
                 </div>
             </div>
             <div id="ItemTemplateRunning_SeccionRunning">
 
+            </div>
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary btn-lg txt_Idioma_Finalizar_Investigacion" id="btnTemplateRunning_Finalizar_investigacion">Finalizar Investigación</button>
+                        <button type="button" class="btn btn-info btn-lg  txt_Idioma_Finalizar_Modificacion" style="display:none;" id="btnTemplateRunning_Finalizar_investigacion_Modificacion">Finalizar Modificación</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1331,13 +1374,10 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="form-group" id="frmTemplateR_Adjuntos">
-                            <label class="txt_Idioma_Archivo">Archivo:</label>
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="txtAdjuntos_Item_Archivo">
-                                <input type="text" style="display:none" id="txtAdjuntos_Item_ID">
-                                <input type="text" style="display:none" id="txtAdjuntos_ID">
-                                <label class="custom-file-label txt_Idioma_Seleccione_Archivo" for="txtAdjuntos_Item_Archivo">Seleccione un Archivo</label>
-                            </div>
+                            <input type="text" style="display:none" id="txtAdjuntos_Item_ID">
+                            <input type="text" style="display:none" id="txtAdjuntos_ID">
+                            <label for="txtAdjuntos_Item_Archivo" class="txt_Idioma_Archivo">Archivo:</label><br />
+                            <input type="file" class="form-control form-control-sm" id="txtAdjuntos_Item_Archivo" name="name" value="" />
                         </div>
                     </div>
                     <div class="col-lg-4" style="margin-top:30px">
@@ -1953,7 +1993,7 @@
                                         <th scope="col" width="10%" class="txt_Idioma_Omitir">Omitir</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tblTemplateRunningN_Departamentos_Datos">
+                                <tbody id="tblTemplateRunningN_Departamentos_Datos" style="font-size:16px;">
                                     <tr><th colspan="7"><p class="text-center txt_Idioma_no_existen_registros">No se encontraron registros</p></th></tr>
                                 </tbody>
                             </table>

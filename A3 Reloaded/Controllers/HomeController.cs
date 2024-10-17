@@ -69,7 +69,8 @@ namespace A3_Reloaded.Controllers
                         Descripcion = dr["Problem"].ToString(),
                         Rol = dr["Rol"].ToString(),
                         Estatus = Convert.ToInt32(dr["Estatus"]),
-                        Status_Text = dr["Status_Text"].ToString()
+                        Status_Text = dr["Status_Text"].ToString(),
+                        Lineas = dr["Lineas"].ToString()
                     });
                 }
             }

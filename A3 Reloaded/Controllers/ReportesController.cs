@@ -345,77 +345,69 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
+                string BYTOST = HttpContext.User.Identity.Name;
+                //string BYTOST = Request["BYTOST"];
+                //string ZNACKA = Request["ZNACKA"];
                 DateTime Registro = DateTime.Now;
-                bool firma = usuario.autenticacion(BYTOST, ZNACKA);
-                if (firma)
+
+                string datos = reporte.actualizar_registro_firma_template(BYTOST, id_template, "N/A", "3");
+                if (datos == "guardado")
                 {
-                    string datos = reporte.actualizar_registro_firma_template(BYTOST, id_template, "N/A", "3");
-                    if (datos == "guardado")
+                    template_running.Update_estatus_templateRunning(Convert.ToInt32(id_template), 6);
+                    int num_rev = Convert.ToInt32(template_running.verifica_firmas_template_num(id_template, "1"));
+                    int num_apr = Convert.ToInt32(template_running.verifica_firmas_template_num(id_template, "2"));
+                    if (num_rev > 0)
                     {
-                        template_running.Update_estatus_templateRunning(Convert.ToInt32(id_template), 6);
-                        int num_rev = Convert.ToInt32(template_running.verifica_firmas_template_num(id_template, "1"));
-                        int num_apr = Convert.ToInt32(template_running.verifica_firmas_template_num(id_template, "2"));
-                        if (num_rev > 0)
+                        DataTable dt = template_running.obtener_evaluadores_tipo_ID(Convert.ToInt32(id_template), 1);
+                        foreach (DataRow dr in dt.Rows)
                         {
-                            DataTable dt = template_running.obtener_evaluadores_tipo_ID(Convert.ToInt32(id_template), 1);
-                            foreach (DataRow dr in dt.Rows)
-                            {
-                                string Correo = dr["Correo"].ToString();
-                                string Nombre = dr["Nombre"].ToString();
-                                StringBuilder mailBody = new StringBuilder();
-                                mailBody.AppendFormat("<h1>A3 Revisión</h1>");
-                                mailBody.AppendFormat("Estimado(a) {0},", Nombre);
-                                mailBody.AppendFormat("<br />");
-                                mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue finalizada y se encuentra lista para su <b>Revisión</b> para lo cual debera seguir las siguientes instrucciones:</p>");
-                                mailBody.AppendFormat("1. Ingrese en la liga: http://mx-cloud-a3ler.aws.cnb/ <br />");
-                                mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
-                                mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
-                                mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
-                                mailBody.AppendFormat("5. Identifique la investigación en la Tabla y presione el botón verde ubicado en la columna 'Options' u 'Opciones'<br />");
-                                mailBody.AppendFormat("6. Valide su usuario y presione 'Firmar' o 'Sign'<br />");
-                                mailBody.AppendFormat("7. Cierre la página emergente<br />");
-                                mailBody.AppendFormat("8. Abra la investigación y confirme que ha sido firmado.<br />");
-                                template.enviarCorreo(Correo, "A3 Revisión", mailBody.ToString(), null, null, null);
-                            }
+                            string Correo = dr["Correo"].ToString();
+                            string Nombre = dr["Nombre"].ToString();
+                            StringBuilder mailBody = new StringBuilder();
+                            mailBody.AppendFormat("<h1>A3 Revisión</h1>");
+                            mailBody.AppendFormat("Estimado(a) {0},", Nombre);
+                            mailBody.AppendFormat("<br />");
+                            mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue finalizada y se encuentra lista para su <b>Revisión</b> para lo cual debera seguir las siguientes instrucciones:</p>");
+                            mailBody.AppendFormat("1. Ingrese en la liga: http://mx-cloud-a3ler.aws.cnb/ <br />");
+                            mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
+                            mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
+                            mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
+                            mailBody.AppendFormat("5. Identifique la investigación en la Tabla y presione el botón verde ubicado en la columna 'Options' u 'Opciones'<br />");
+                            mailBody.AppendFormat("6. Valide su usuario y presione 'Firmar' o 'Sign'<br />");
+                            mailBody.AppendFormat("7. Cierre la página emergente<br />");
+                            mailBody.AppendFormat("8. Abra la investigación y confirme que ha sido firmado.<br />");
+                            template.enviarCorreo(Correo, "A3 Revisión", mailBody.ToString(), null, null, null);
                         }
-                        else
-                        {
-                            DataTable dt = template_running.obtener_evaluadores_tipo_ID(Convert.ToInt32(id_template), 2);
-                            foreach (DataRow dr in dt.Rows)
-                            {
-                                string Correo = dr["Correo"].ToString();
-                                string Nombre = dr["Nombre"].ToString();
-                                StringBuilder mailBody = new StringBuilder();
-                                mailBody.AppendFormat("<h1>A3 Aprobación</h1>");
-                                mailBody.AppendFormat("Estimado(a) {0},", Nombre);
-                                mailBody.AppendFormat("<br />");
-                                mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue finalizada y se encuentra lista para su <b>Aprobación</b> para lo cual debera seguir las siguientes instrucciones:</p>");
-                                mailBody.AppendFormat("1. Ingrese en la liga: http://mx-cloud-a3ler.aws.cnb/ <br />");
-                                mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
-                                mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
-                                mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
-                                mailBody.AppendFormat("5. Identifique la investigación en la Tabla y presione el botón verde ubicado en la columna 'Options' u 'Opciones'<br />");
-                                mailBody.AppendFormat("6. Valide su usuario y presione 'Firmar' o 'Sign'<br />");
-                                mailBody.AppendFormat("7. Cierre la página emergente<br />");
-                                mailBody.AppendFormat("8. Abra la investigación y confirme que ha sido firmado.<br />");
-                                template.enviarCorreo(Correo, "A3 Aprobación", mailBody.ToString(), null, null, null);
-                            }
-                        }
-                        noti.Mensaje = Mensajes.Documento_firmado;
-                        noti.Tipo = "success";
                     }
                     else
                     {
-                        noti.Mensaje = Mensajes.Documento_firmado_error;
-                        noti.Tipo = "warning";
+                        DataTable dt = template_running.obtener_evaluadores_tipo_ID(Convert.ToInt32(id_template), 2);
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            string Correo = dr["Correo"].ToString();
+                            string Nombre = dr["Nombre"].ToString();
+                            StringBuilder mailBody = new StringBuilder();
+                            mailBody.AppendFormat("<h1>A3 Aprobación</h1>");
+                            mailBody.AppendFormat("Estimado(a) {0},", Nombre);
+                            mailBody.AppendFormat("<br />");
+                            mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue finalizada y se encuentra lista para su <b>Aprobación</b> para lo cual debera seguir las siguientes instrucciones:</p>");
+                            mailBody.AppendFormat("1. Ingrese en la liga: http://mx-cloud-a3ler.aws.cnb/ <br />");
+                            mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
+                            mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
+                            mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
+                            mailBody.AppendFormat("5. Identifique la investigación en la Tabla y presione el botón verde ubicado en la columna 'Options' u 'Opciones'<br />");
+                            mailBody.AppendFormat("6. Valide su usuario y presione 'Firmar' o 'Sign'<br />");
+                            mailBody.AppendFormat("7. Cierre la página emergente<br />");
+                            mailBody.AppendFormat("8. Abra la investigación y confirme que ha sido firmado.<br />");
+                            template.enviarCorreo(Correo, "A3 Aprobación", mailBody.ToString(), null, null, null);
+                        }
                     }
+                    noti.Mensaje = Mensajes.Documento_firmado;
+                    noti.Tipo = "success";
                 }
                 else
                 {
-                    auditTrail.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Documento_firmado_error;
                     noti.Tipo = "warning";
                 }
             }

@@ -66,79 +66,98 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string Usuario = Request["BYTOST"];
-                string Pass = Request["ZNACKA"];
-                string Justificacion = Request["ZMYSEL"];
+                //string Usuario = Request["BYTOST"];
+                string Usuario = HttpContext.User.Identity.Name;
+
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(Usuario, Pass);
-                if (firma)
+                DataTable datosAnterior = SE.obtener_SeccionID(ID);
+
+                string v = datosAnterior.Rows[0]["ID"].ToString();
+                string datos = SE.actualizar_Seccion(ID, Nombre, Descripcion, Convert.ToInt32(Posicion), Convert.ToInt32(Cuadrante), Convert.ToInt32(Template), Convert.ToInt32(Activo));
+                if (datos == "guardado")
                 {
-                    DataTable datosAnterior = SE.obtener_SeccionID(ID);
+                    noti.Mensaje = Mensajes.template_modificado;
+                    noti.Tipo = "success";
 
-                    string v = datosAnterior.Rows[0]["ID"].ToString();
-                    string datos = SE.actualizar_Seccion(ID, Nombre,Descripcion, Convert.ToInt32(Posicion), Convert.ToInt32(Cuadrante), Convert.ToInt32(Template), Convert.ToInt32(Activo));
-                    if (datos == "guardado")
+                    DataTable datosActual = SE.obtener_SeccionID(ID);
+                    string Actual = string.Empty;
+                    string Anterior = string.Empty;
+                    for (int i = 0; i < datosAnterior.Rows.Count; i++)
                     {
-                        noti.Mensaje =Mensajes.template_modificado;
-                        noti.Tipo = "success";
-
-                        DataTable datosActual = SE.obtener_SeccionID(ID);
-                        string Actual = string.Empty;
-                        string Anterior = string.Empty;
-                        for (int i = 0; i < datosAnterior.Rows.Count; i++)
+                        foreach (DataColumn dc_acterior in datosAnterior.Columns)
                         {
-                            foreach (DataColumn dc_acterior in datosAnterior.Columns)
+                            string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                            string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                            string Columna = dc_acterior.ColumnName.ToString();
+                            if (dato_anterior != dato_actual)
                             {
-                                string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
-                                string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
-                                string Columna = dc_acterior.ColumnName.ToString();
-                                if (dato_anterior != dato_actual)
+                                if (Columna == "Activo")
                                 {
-                                    if (Columna == "Activo")
+                                    string Activo_Anterior = string.Empty;
+                                    string Activo_Actual = string.Empty;
+                                    if (dato_anterior == "1") { Activo_Anterior = "Activo"; } else { Activo_Anterior = "Inactivo"; }
+                                    if (dato_actual == "1") { Activo_Actual = "Activo"; } else { Activo_Actual = "Inactivo"; }
+                                    if (string.IsNullOrEmpty(Anterior))
                                     {
-                                        string Activo_Anterior = string.Empty;
-                                        string Activo_Actual = string.Empty;
-                                        if (dato_anterior == "1") { Activo_Anterior = "Activo"; } else { Activo_Anterior = "Inactivo"; }
-                                        if (dato_actual == "1") { Activo_Actual = "Activo"; } else { Activo_Actual = "Inactivo"; }
-                                        if (string.IsNullOrEmpty(Anterior))
-                                        {
-                                            Anterior = Activo_Anterior;
-                                            Actual = Activo_Actual;
-                                        }
-                                        else
-                                        {
-                                            Anterior = Anterior + ", " + Activo_Anterior;
-                                            Actual = Actual + ", " + Activo_Actual;
-                                        }
+                                        Anterior = Activo_Anterior;
+                                        Actual = Activo_Actual;
                                     }
                                     else
                                     {
-                                        if (string.IsNullOrEmpty(Anterior))
-                                        {
-                                            Anterior = dato_anterior;
-                                            Actual = dato_actual;
-                                        }
-                                        else
-                                        {
-                                            Anterior = Anterior + ", " + dato_anterior;
-                                            Actual = Actual + ", " + dato_actual;
-                                        }
+                                        Anterior = Anterior + ", " + Activo_Anterior;
+                                        Actual = Actual + ", " + Activo_Actual;
+                                    }
+                                }
+                                else
+                                {
+                                    if (string.IsNullOrEmpty(Anterior))
+                                    {
+                                        Anterior = dato_anterior;
+                                        Actual = dato_actual;
+                                    }
+                                    else
+                                    {
+                                        Anterior = Anterior + ", " + dato_anterior;
+                                        Actual = Actual + ", " + dato_actual;
                                     }
                                 }
                             }
                         }
-                        AT.registrarAuditTrail(Registro, Usuario, "M", Anterior, Actual, Justificacion);
                     }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.Template_modificado_error;
-                        noti.Tipo = "warning";
-                    }
+                    AT.registrarAuditTrail(Registro, Usuario, "M", Anterior, Actual, "Section Update");
                 }
                 else
                 {
-                    AT.registrarAuditTrail(Registro, Usuario, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Template_modificado_error;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Template_modificado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult remove_section(int id_seccion)
+        {
+            try
+            {
+                //string Usuario = Request["BYTOST"];
+                string Usuario = HttpContext.User.Identity.Name;
+
+                DateTime Registro = DateTime.Now;
+                string datos = SE.remove_section(id_seccion);
+                if (datos == "guardado")
+                {
+                    noti.Mensaje = Mensajes.template_modificado;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, Usuario, "M", "Anterior", "Actual", "N/A");
+                }
+                else
+                {
+                    noti.Mensaje = Mensajes.Template_modificado_error;
                     noti.Tipo = "warning";
                 }
             }

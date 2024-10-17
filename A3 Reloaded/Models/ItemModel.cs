@@ -15,6 +15,7 @@ namespace A3_Reloaded.Models
         public int Posicion { get; set; }
         public string Tabla { get; set; }
         public string Texto { get; set; }
+        public string Tipo { get; set; }
         public int Seccion { get; set; }
         public int Firma { get; set; }
         public string Respuesta { get; set; }

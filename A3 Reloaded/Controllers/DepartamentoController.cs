@@ -1,5 +1,6 @@
 ﻿using A3_Reloaded.Clases;
 using A3_Reloaded.Models;
+using Org.BouncyCastle.Asn1.Esf;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -274,6 +275,84 @@ namespace A3_Reloaded.Controllers
                 Clases.ErrorLogger.Registrar(this, e.ToString());
             }
             return Json(list, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult registro_Departamento_Running(int id_template, int id_departamento)
+        {
+            try
+            {
+                string BYTOST = HttpContext.User.Identity.Name;
+                //string ZNACKA = Request["ZNACKA"];
+                DateTime Registro = DateTime.Now;
+                string datos = DE.registro_DepartamentosRunning(id_template, id_departamento);
+                if (datos == "guardado")
+                {
+                    noti.Mensaje = Mensajes.Departamento_guardado;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Departamento: " + DE.getNombre_departamento(id_departamento) + ". Agregado a investigación " + id_template.ToString(), "N/A");
+                }
+                else
+                {
+                    noti.Mensaje = Mensajes.Departamento_guardado_error;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Departamento_guardado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult obtener_registros_Departamentos_running(int id_template)
+        {
+            List<DepartamentoModel> list = new List<DepartamentoModel>();
+            try
+            {
+                DataTable datos = DE.obtener_registros_Departamentos_running(id_template);
+                foreach (DataRow data in datos.Rows)
+                {
+                    list.Add(new DepartamentoModel
+                    {
+                        ID = Convert.ToInt32(data["ID"]),
+                        Nombre = data["Nombre"].ToString()
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult omitir_departamento(int id_registro)
+        {
+            try
+            {
+                string BYTOST = HttpContext.User.Identity.Name;
+                //string ZNACKA = Request["ZNACKA"];
+                DateTime Registro = DateTime.Now;
+                string datos = DE.remover_DepartamentosRunning(id_registro);
+                if (datos == "guardado")
+                {
+                    noti.Mensaje = Mensajes.Registro_omitir;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Departamento: " + DE.getNombre_departamentoRunning(id_registro) + ". omitido de investigación " + DE.getId_template_departamentoRunning(id_registro).ToString(), "N/A");
+                }
+                else
+                {
+                    noti.Mensaje = Mensajes.Registro_omitir_error;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Registro_omitir_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
         }
     }
 }

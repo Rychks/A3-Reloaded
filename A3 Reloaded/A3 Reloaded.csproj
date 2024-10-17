@@ -237,6 +237,7 @@
     <Compile Include="Clases\OEE.cs" />
     <Compile Include="Clases\Preguntas.cs" />
     <Compile Include="Clases\ProfileUser.cs" />
+    <Compile Include="Clases\Reponses.cs" />
     <Compile Include="Clases\Reportes.cs" />
     <Compile Include="Clases\Rol.cs" />
     <Compile Include="Clases\Secciones.cs" />

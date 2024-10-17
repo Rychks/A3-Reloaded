@@ -1,5 +1,6 @@
 ﻿using A3_Reloaded.Clases;
 using A3_Reloaded.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -221,6 +222,81 @@ namespace A3_Reloaded.Controllers
                 Clases.ErrorLogger.Registrar(this, e.ToString());
             }
             return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult obtener_registros_Equipos_running(int id_template)
+        {
+            List<SubareaModel> list = new List<SubareaModel>();
+            try
+            {
+                DataTable datos = EQ.obtener_registros_equipos_running(id_template);
+                foreach (DataRow data in datos.Rows)
+                {
+                    list.Add(new SubareaModel
+                    {
+                        ID = Convert.ToInt32(data["ID"]),
+                        Nombre = data["Nombre"].ToString()
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult registro_Equipo_Running(int id_template, int id_equipo)
+        {
+            try
+            {
+                string BYTOST = HttpContext.User.Identity.Name;
+                DateTime Registro = DateTime.Now;
+                string datos = EQ.registro_EquiposRunning(id_template, id_equipo);
+                if (datos == "guardado")
+                {
+                    noti.Mensaje = Mensajes.Registro_Equipo;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Equipo: " + EQ.getNombre_equipoRunning(id_equipo) + " agragado a template " + id_template.ToString(), "N/A");
+                }
+                else
+                {
+                    noti.Mensaje = Mensajes.Registro_Equipo_Error;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Registro_Equipo_Error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult omitir_equipo(int id_registro)
+        {
+            try
+            {
+                string BYTOST = HttpContext.User.Identity.Name;
+                DateTime Registro = DateTime.Now;
+                string datos = EQ.remover_EquiposRunning(id_registro);
+                if (datos == "guardado")
+                {
+                    noti.Mensaje = Mensajes.Registro_omitir;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Equipo: " + EQ.getNombre_equipoRunning(id_registro) + " omitido de template " + EQ.getId_template_equipoRunning(id_registro), "N/A");
+                }
+                else
+                {
+                    noti.Mensaje = Mensajes.Registro_omitir_error;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Registro_omitir_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
         }
     }
 }

@@ -33,6 +33,10 @@ namespace A3_Reloaded.Controllers
                         Fecha = data["Fecha"].ToString(),
                         Maquina = data["Maquina"].ToString(),
                         Motivo = data["Motivo"].ToString(),
+                        Turno = data["Turno"].ToString(),
+                        Lote = data["Lote"].ToString(),
+                        SKU = data["CodigoProducto"].ToString(),
+                        Producto = data["NombreProducto"].ToString(),
                         Clasificacion = data["ClasificacionParo"].ToString(),
                     });
                 }

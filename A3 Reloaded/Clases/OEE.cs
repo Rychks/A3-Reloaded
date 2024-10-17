@@ -22,7 +22,10 @@ namespace A3_Reloaded.Clases
             {
                 using (con)
                 {
-                    SqlCommand com = new SqlCommand("select top(10) CONVERT (varchar(10), Fecha_reg, 103) as Fecha,Linea,Maquina,Motivo,SUM(Minutos) as 'Minutos', ClasificacionParo from OAEV3RegistroParos where Fecha_reg > DATEADD(Month,-2,getdate()) and CONVERT (varchar(10), Fecha_reg, 103) < CONVERT (varchar(10), GETDATE(), 103) \r\nand ClasificacionParo like('%\\Paro no Planeado\\Equipo (AKZ)%') and Linea = '"+Linea+"' group by CONVERT (varchar(10), Fecha_reg, 103),Motivo,Linea,Maquina,ClasificacionParo order by SUM(Minutos) desc", con);
+                    SqlCommand com = new SqlCommand("select CONVERT (varchar(10), Dia, 103) as Fecha,Linea,Maquina,Motivo,SUM(Minutos) as 'Minutos', ClasificacionParo,Turno,Lote, CodigoProducto, NombreProducto  " +
+                        "from OAEV3RegistroParos where Dia > DATEADD(Day,-1,getdate()) and CONVERT (varchar(10), Dia, 103) <= CONVERT (varchar(10), GETDATE(), 103) " +
+                        "and ClasificacionParo like('%\\Paro no Planeado\\Equipo (AKZ)%') and Linea = '"+Linea+"' " +
+                        "group by CONVERT (varchar(10), Dia, 103),Motivo,Linea,Maquina,ClasificacionParo,Turno,Lote,CodigoProducto,NombreProducto order by CONVERT(varchar(10), Dia, 103) desc,SUM(Minutos) desc", con);
                     SqlDataAdapter da = new SqlDataAdapter(com);
                     da.Fill(dt);
                 }

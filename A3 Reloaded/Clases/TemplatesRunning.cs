@@ -11,6 +11,76 @@ namespace A3_Reloaded.Clases
 {
     public class TemplatesRunning
     {
+        public string getA3_type(int id_cuadrante)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.getA3_type(" + id_cuadrante + ");";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        msg = reader[0].ToString();
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return msg;
+        }
+        public int getNum_CuadrantesRunning(int id_cuadrante)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
+            int res = 0;
+            string msg = "";
+            try
+            {
+                System.Data.SqlClient.SqlDataReader reader;
+                System.Data.SqlClient.SqlCommand sql;
+                con.Open();
+                sql = new System.Data.SqlClient.SqlCommand();
+                sql.CommandText = "select dbo.getNum_CuadrantesRunning(" + id_cuadrante + ");";
+                sql.Connection = con;
+                using (reader = sql.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        if (int.TryParse(reader[0].ToString(), out res))
+                        {
+                            res = Convert.ToInt32(reader[0]);
+                        }
+                        else
+                        {
+                            msg = "No devuelve un valor esperado. Revisar la función en la base de datos.";
+                        }
+                    }
+                    else
+                    {
+                        msg = "Error en ExecuteReader. Revisar la función en la base de datos.";
+                    }
+                }
+                con.Close();
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), msg);
+            }
+            return res;
+        }
         public string get_modo_falla_by_id_template(int id_template)
         {
             SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString);
@@ -113,7 +183,7 @@ namespace A3_Reloaded.Clases
         }
         //END FUNCTION
         //FUNCTION TO INSERT DATA IN insert_falla_running
-        public string insert_falla_running(int id_template, string linea, string maquina, string motivo,string fecha,float minutos,string clasificacion,string codigo)
+        public string insert_falla_running(int id_template, string linea, string maquina, string motivo,string fecha,float minutos,string clasificacion,string codigo, string lote, string sku, string producto)
         {
             var msg = "";
             try
@@ -132,6 +202,9 @@ namespace A3_Reloaded.Clases
                     cmd.Parameters.Add("@minutos", SqlDbType.Float).Value = minutos;
                     cmd.Parameters.Add("@clasificacion", SqlDbType.VarChar).Value = clasificacion;
                     cmd.Parameters.Add("@codigo", SqlDbType.VarChar).Value = codigo;
+                    cmd.Parameters.Add("@lote", SqlDbType.VarChar).Value = lote;
+                    cmd.Parameters.Add("@sku", SqlDbType.VarChar).Value = sku;
+                    cmd.Parameters.Add("@producto", SqlDbType.VarChar).Value = producto;
                     SqlDataAdapter adp = new SqlDataAdapter(cmd);
                     adp.Fill(dt);
                 }
@@ -372,7 +445,7 @@ namespace A3_Reloaded.Clases
                     cmd.Parameters.Add("@Estatus", SqlDbType.Int).Value = Estaus == "" || Estaus == null ? (object)DBNull.Value : Convert.ToSingle(Estaus, CultureInfo.CreateSpecificCulture("en-US"));
                     cmd.Parameters.Add("@Idioma", SqlDbType.Int).Value = Idioma;
                     cmd.Parameters.Add("@Band", SqlDbType.Int).Value = Band;
-                    cmd.Parameters.Add("@Linea", SqlDbType.Int).Value = Linea == "" || Linea == null ? (object)DBNull.Value : Convert.ToSingle(Linea, CultureInfo.CreateSpecificCulture("en-US")); ;
+                    cmd.Parameters.Add("@Linea", SqlDbType.VarChar).Value = Linea == "" || Linea == null ? (object)DBNull.Value : Linea;
                     cmd.Parameters.Add("@PageIndex", SqlDbType.Int).Value = PageIndex;
                     cmd.Parameters.Add("@PageSize", SqlDbType.Int).Value = PageSize;
                     cmd.CommandType = CommandType.StoredProcedure;

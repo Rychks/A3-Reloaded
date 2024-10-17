@@ -1,7 +1,9 @@
 ﻿using A3_Reloaded.Clases;
 using A3_Reloaded.Models;
+using Microsoft.Ajax.Utilities;
 using Microsoft.Reporting.WebForms;
 using Microsoft.SqlServer.Server;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -24,6 +26,7 @@ namespace A3_Reloaded.Controllers
         Usuarios US = new Usuarios();
         Notificaciones noti = new Notificaciones();
         AuditTrail AT = new AuditTrail();
+        Reponses responses = new Reponses();
         OEE oee= new OEE();
         public ActionResult Index()
         {
@@ -42,6 +45,10 @@ namespace A3_Reloaded.Controllers
         public ActionResult HistorialA3()
         {
             return View();
+        }
+        public JsonResult getA3_type(int id_cuadrante)
+        {
+            return Json(TER.getA3_type(id_cuadrante));
         }
         public JsonResult get_clasificacion_Falla_by_id_template(int id_template)
         {
@@ -65,11 +72,11 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult insert_falla_running(int id_template,string linea,string maquina,string motivo,string fecha,float minutos,string clasificacion)
+        public JsonResult insert_falla_running(int id_template,string linea,string maquina,string motivo,string lote,string sku,string producto,string fecha,float minutos,string clasificacion)
         {
             try
             {
-                templateR.insert_falla_running(id_template, linea, maquina, motivo, fecha, minutos, clasificacion,"" );
+                templateR.insert_falla_running(id_template, linea, maquina, motivo, fecha, minutos, clasificacion,"",lote,sku,producto );
             }
             catch (Exception e)
             {
@@ -114,53 +121,60 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(BYTOST, ZNACKA);
-                if (firma)
+                string id = TER.registrar_Template_Running(Folio, TipoA3, 1, Contact, Problem, Cost, 1);
+                noti.Mensaje = Mensajes.Investigacion_guardar;
+                noti.Tipo = "success";
+                noti.Id = id;
+                
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Investigacion_guardar_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult crear_estructuraInvestigacion(string template_id,string templateRunning_id)
+        {
+            try
+            {
+                string BYTOST = HttpContext.User.Identity.Name;
+                DateTime Registro = DateTime.Now;
+                DataTable cuadrantes = TE.obtener_cuadrantes_template_id(Convert.ToInt32(template_id));
+                foreach (DataRow drC in cuadrantes.Rows)
                 {
-                    string id = TER.registrar_Template_Running(Folio, TipoA3, 1, Contact, Problem, Cost,1);
-                    DataTable cuadrantes = TE.obtener_cuadrantes_template_id(Convert.ToInt32(ID));
-                    foreach(DataRow drC in cuadrantes.Rows)
-                    {
-                        string Ca_nombre = drC["Nombre"].ToString();
-                        string Ca_descripcion = drC["Descripcion"].ToString();
-                        TER.registrar_cuadrante_Running(Ca_nombre, Convert.ToInt32(id), 0, Ca_descripcion);
-                    }
-                    DataTable TabSecciones = SE.obtener_Seccion_TemplateID(Convert.ToInt32(ID));
-                    int i = 0;
-                    int j = TabSecciones.Rows.Count;
-                    foreach(DataRow dr in TabSecciones.Rows)
-                    {
-                        string idSeccion = dr["ID"].ToString();
-                        string nombre = dr["Nombre"].ToString();
-                        string descripcion = dr["Descripcion"].ToString();
-                        int posicion = Convert.ToInt32(dr["Posicion"]);
-                        int cuadranteID = Convert.ToInt32(dr["CuadranteID"]);
-                        string cuadranteNom = dr["Cuadrante"].ToString();
-                        string idCuandranteRunning = TER.obtener_id_cuadranteRunning(id, cuadranteNom);
-                        string idSeccionRunning = TER.registrar_Seccion_Running(nombre, descripcion, posicion, Convert.ToInt32(idCuandranteRunning), Convert.ToInt32(id), 0);
-                        obtenerElementos(idSeccion, idSeccionRunning);
-                        i++;
-                    }
-                    if (i == j)
-                    {
-                        noti.Mensaje = Mensajes.Investigacion_guardar;
-                        noti.Tipo = "success";
-                        noti.Id = id;
-                        AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nueva Investigación Folio: " + Folio + "", "N/A");
-                    }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.Investigacion_guardar_error;
-                        noti.Tipo = "warning";
-                    }
+                    string Ca_nombre = drC["Nombre"].ToString();
+                    string Ca_descripcion = drC["Descripcion"].ToString();
+                    TER.registrar_cuadrante_Running(Ca_nombre, Convert.ToInt32(templateRunning_id), 0, Ca_descripcion);
+                }
+                DataTable TabSecciones = SE.obtener_Seccion_TemplateID(Convert.ToInt32(template_id));
+                int i = 0;
+                int j = TabSecciones.Rows.Count;
+                foreach (DataRow dr in TabSecciones.Rows)
+                {
+                    string idSeccion = dr["ID"].ToString();
+                    string nombre = dr["Nombre"].ToString();
+                    string descripcion = dr["Descripcion"].ToString();
+                    int posicion = Convert.ToInt32(dr["Posicion"]);
+                    int cuadranteID = Convert.ToInt32(dr["CuadranteID"]);
+                    string cuadranteNom = dr["Cuadrante"].ToString();
+                    string idCuandranteRunning = TER.obtener_id_cuadranteRunning(templateRunning_id, cuadranteNom);
+                    string idSeccionRunning = TER.registrar_Seccion_Running(nombre, descripcion, posicion, Convert.ToInt32(idCuandranteRunning), Convert.ToInt32(templateRunning_id), 0);
+                    obtenerElementos(idSeccion, idSeccionRunning, templateRunning_id);
+                    i++;
+                }
+                if (i == j)
+                {
+                    noti.Mensaje = Mensajes.Investigacion_guardar;
+                    noti.Tipo = "success";
+                    noti.Id = templateRunning_id;
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nueva Investigación Folio: " + templateRunning_id + "", "N/A");
                 }
                 else
                 {
-                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Investigacion_guardar_error;
                     noti.Tipo = "warning";
                 }
             }
@@ -172,15 +186,32 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
-        private void obtenerElementos(string SeccionID, string SeccionRID)
+        private void obtenerElementos(string SeccionID, string SeccionRID, string id_template)
         {
             DataTable dt = IT.obtener_Items_Seccion_ID(SeccionID);
             foreach(DataRow dr in dt.Rows)
             {
                 string ID_ELEMENTO = dr["ID_ELEMENTO"].ToString();
+                string autofill = dr["autofill_enable"].ToString();
+                string table = dr["autofill_table"].ToString();
+                string column = dr["autofill_column"].ToString();
+                string identifier = dr["autofill_identifier"].ToString();
+                string response = string.Empty;
+                if(autofill == "1")
+                {
+                    if(table == "function")
+                    {
+                        response = responses.getResponse_function(column, identifier, id_template);
+                    }
+                    else
+                    {
+                        response = responses.getResponse_table(table, column, identifier, id_template);
+                    }
+                }
                 if (dr["Elemento"].ToString() == "Pregunta")
                 {                    
-                    ObtenerPregunta(SeccionID, SeccionRID, ID_ELEMENTO);
+                    ObtenerPregunta(SeccionID, SeccionRID, ID_ELEMENTO, response);
+
                 }else if (dr["Elemento"].ToString() == "Nota")
                 {
                     ObtenerNota(SeccionID, SeccionRID, ID_ELEMENTO);
@@ -202,7 +233,7 @@ namespace A3_Reloaded.Controllers
             }
             
         }
-        private void ObtenerPregunta(string SeccionID,string SeccionRID, string ID_ELEMENTO)
+        private void ObtenerPregunta(string SeccionID,string SeccionRID, string ID_ELEMENTO, string response)
         {
             DataTable TabPreguntas = TER.obtener_items_pregunta_seccionsID(Convert.ToInt32(SeccionID), Convert.ToInt32(ID_ELEMENTO));
             foreach(DataRow dr in TabPreguntas.Rows)
@@ -211,7 +242,8 @@ namespace A3_Reloaded.Controllers
                 string Descripcion = dr["Pr_descripcion"].ToString();
                 string tipo = dr["Pr_tipo"].ToString();
                 string firma = dr["It_firma"].ToString();
-                TER.registrar_Preguntas_Running(Nombre, Descripcion, Convert.ToInt32(tipo), "", 0, Convert.ToInt32(SeccionRID),Convert.ToInt32(firma));
+
+                TER.registrar_Preguntas_Running(Nombre, Descripcion, Convert.ToInt32(tipo), response, 0, Convert.ToInt32(SeccionRID),Convert.ToInt32(firma));
                 //TER.registrar_Item_Running("Pregunta", "TabPreguntas_Running", Convert.ToInt32(idPreguntaRunning), 0, Convert.ToInt32(SeccionRID), Nombre);
             }
         }
@@ -401,6 +433,7 @@ namespace A3_Reloaded.Controllers
                         Estatus = Convert.ToInt32(data["Estatus"]),
                         Seccion = Convert.ToInt32(data["Seccion"]),
                         Texto = data["Texto"].ToString(),
+                        Tipo = data["TypeItem"].ToString(),
 
                     });
                 }
@@ -430,6 +463,7 @@ namespace A3_Reloaded.Controllers
                         Seccion = Convert.ToInt32(data["Seccion"]),
                         Texto = data["Texto"].ToString(),
                         Respuesta = data["Respuesta"].ToString(),
+                        Tipo = data["TypeItem"].ToString(),
 
                     });
                 }
@@ -845,38 +879,30 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
+                string BYTOST = HttpContext.User.Identity.Name;
+                //string BYTOST = Request["BYTOST"];
+                //string ZNACKA = Request["ZNACKA"];
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(BYTOST, ZNACKA);
-                if (firma)
-                {                    
-                    if (Request.Files.Count > 0)
-                    {
-                        string filename = Guid.NewGuid() + Path.GetExtension(Archivo.FileName);
-                        string tipo = Path.GetExtension(Archivo.FileName);
-                        string filepath = "/Assets/Adjuntos/" + filename;
-                        Archivo.SaveAs(Path.Combine(Server.MapPath("/Assets/Adjuntos/"), filename));
-                        string datos = TER.registrar_Adjunto_Running(filename, tipo, Convert.ToInt32(ID));
-                        if (datos == "guardado")
-                        {
-                            noti.Mensaje = Mensajes.archivo_guardado;
-                            noti.Tipo = "success";
-                            AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Archivo Adjunto: " + filename + "", "N/A");
-                        }
-                        else
-                        {
-                            noti.Mensaje = Mensajes.archivo_guardado_error;
-                            noti.Tipo = "warning";
-                            noti.Error = datos;
-                        }
-                    }                    
-                }
-                else
+
+                if (Request.Files.Count > 0)
                 {
-                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
-                    noti.Tipo = "warning";
+                    string filename = Guid.NewGuid() + Path.GetExtension(Archivo.FileName);
+                    string tipo = Path.GetExtension(Archivo.FileName);
+                    string filepath = "/Assets/Adjuntos/" + filename;
+                    Archivo.SaveAs(Path.Combine(Server.MapPath("/Assets/Adjuntos/"), filename));
+                    string datos = TER.registrar_Adjunto_Running(filename, tipo, Convert.ToInt32(ID));
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.archivo_guardado;
+                        noti.Tipo = "success";
+                        AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Archivo Adjunto: " + filename + "", "N/A");
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.archivo_guardado_error;
+                        noti.Tipo = "warning";
+                        noti.Error = datos;
+                    }
                 }
             }
             catch (Exception e)
@@ -967,28 +993,20 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
+                //string BYTOST = Request["BYTOST"];
+                //string ZNACKA = Request["ZNACKA"];
+                string BYTOST = HttpContext.User.Identity.Name;
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(BYTOST, ZNACKA);
-                if (firma)
+                string datos = TER.omitir_Adjunto_Running(Convert.ToInt32(ID));
+                if (datos == "guardado")
                 {
-                    string datos = TER.omitir_Adjunto_Running(Convert.ToInt32(ID));
-                    if (datos == "guardado")
-                    {
-                        noti.Mensaje = Mensajes.archivo_omitido;
-                        noti.Tipo = "success";
-                        AT.registrarAuditTrail(Registro, BYTOST, "M", "N/A", "Archivo Adjunto Omitido", "N/A");
-                    }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.archivo_omitido_error;
-                        noti.Tipo = "warning";
-                    }
+                    noti.Mensaje = Mensajes.archivo_omitido;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "M", "N/A", "Archivo Adjunto Omitido", "N/A");
                 }
                 else
                 {
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.archivo_omitido_error;
                     noti.Tipo = "warning";
                 }
             }
@@ -1167,21 +1185,30 @@ namespace A3_Reloaded.Controllers
         {
             int i = 0;
             try
-            {               
-                noti.Id = "0";
-                DataTable dt = TER.Valida_Cuadrante_A(Convert.ToInt32(ID));
-                foreach(DataRow dr in dt.Rows)
-                {
-                    string Respuesta = dr["ItR_respuesta"].ToString();
-                    if(Respuesta == "NO" || Respuesta == "NOT" || Respuesta == "No")
-                    {
-                        i++;
-                    }
-                }
-                if(i > 0)
+            {
+                int numCuadrantes = TER.getNum_CuadrantesRunning(Convert.ToInt32(ID));
+                if(numCuadrantes > 0)
                 {
                     noti.Id = "1";
                 }
+                else
+                {
+                    noti.Id = "0";
+                    DataTable dt = TER.Valida_Cuadrante_A(Convert.ToInt32(ID));
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string Respuesta = dr["ItR_respuesta"].ToString();
+                        if (Respuesta == "NO" || Respuesta == "NOT" || Respuesta == "No")
+                        {
+                            i++;
+                        }
+                    }
+                    if (i > 0)
+                    {
+                        noti.Id = "1";
+                    }
+                }
+                
             }
             catch (Exception e)
             {
@@ -1189,7 +1216,7 @@ namespace A3_Reloaded.Controllers
                 noti.Tipo = "warning";
                 Clases.ErrorLogger.Registrar(this, e.ToString());
             }
-            return Json(i, JsonRequestBehavior.AllowGet);
+            return Json(noti.Id, JsonRequestBehavior.AllowGet);
         }
         public JsonResult obtener_info_cuadrante(string ID_Template, string Nombre)
         {

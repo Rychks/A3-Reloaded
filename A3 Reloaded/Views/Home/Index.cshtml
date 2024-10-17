@@ -23,6 +23,11 @@
             <!--HOME TAB-->
             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                 <div class="card-body">
+                    <div class="row">
+                        <div class=" col-lg-4">
+                            <textarea class="form-control" rows="6" style="resize:none;"></textarea>
+                        </div>
+                    </div>
                     <div class="row" id="frm_home_filter_div">
                         <div class="form-group col-lg-1">
                             <label for="txtHome_Folio">Folio</label>
@@ -70,7 +75,7 @@
                             <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_Search"><i class="fa fa-search"></i> <span class="txt_Idioma_Buscar">Buscar</span></button>
                             <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_clearFilter"><i class="fa fa-filter-circle-xmark"></i> <span class="txt_Idioma_Limpiar_filtros">Limpiar Filtros</span> </button>
                             <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_advanceSearch"><i class="fa fa-filter"></i> <span class="txt_Idioma_Busqueda_Avanzada">Busqueda Avanzada</span></button>
-                            <button type="button" class="btn btn-icon btn-light btn-sm" id="btnHome_new_investigation"> <i class="fa-solid fa-file-circle-plus"></i> <span class="txt_Idioma_Nueva_investigacion"> Nueva Investigación</span></button>                         
+                            <button class="btn btn-icon btn-sm btn-light" data-target="#mdlHome_visual_help" data-toggle="modal" id=""><i class="fa fa-question-circle"> </i> <span class="txt_Idioma_Ayuda"> Ayuda</span></button>
                         </div>
                     </div>
                 </div>
@@ -84,11 +89,11 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button class="btn btn-icon btn-sm btn-light" data-target="#mdlHome_visual_help" data-toggle="modal" id=""><i class="fa fa-question-circle"> </i> <span class="txt_Idioma_Ayuda"> Ayuda</span></button>
+                            <button type="button" class="btn btn-icon btn-outline-success btn-lg" id="btnHome_new_investigation"> <i class="fa-solid fa-file-circle-plus"></i> <span class="txt_Idioma_Nueva_investigacion"> Nueva Investigación</span></button>                            
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="card card-primary">
                             <div class="card-body">
@@ -103,6 +108,7 @@
                                                         <th class="txt_Idioma__Formato_de_A3" width="15%" scope="col">Tipo de A3</th>
                                                         <th class="txt_Idioma_Cual_es_el_problema" scope="col">Failure</th>
                                                         <th class="txt_Idioma_Responsable text-center" width="15%" scope="col">Responsable</th>
+                                                        <th class="text-center" width="15%" scope="col">Lineas</th>
                                                         @*<th class="txt_Idioma_Rol" scope="col">Rol</th>*@
                                                         <th class="txt_Idioma_Estatus text-center" width="8%" scope="col">Estatus</th>
                                                         <th class="txt_Idioma_Opciones text-center" scope="col" width="5%" colspan="2">Opciones</th>

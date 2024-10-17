@@ -109,6 +109,11 @@
             Version: 2,
             Funcion: fn_GetHistoryA3
         });
+        $("#tblAdjuntosTemplate_Running").on("click", ".btnVerAdjunto", function () {
+            var Archivo = $(this).parents("tr").find(".NomAdjunto").html();
+            window.open("/Assets/Adjuntos/" + Archivo, '_blank');
+            return false;
+        });
         $("#btnHome_new_investigation").click(function () {
             //var yourElement = document.getElementById('btnHome_new_investigation');
             //yourElement.setAttribute('href', '');
@@ -417,12 +422,12 @@
         var Contact = $("#txtHome_Contact").val();
         var Problem = $("#txtHome_KeyWord").val();
         var Estatus = $("#slcHome_status option:selected").text();
-        var Linea = $("#slcHome_Line option:selected").val();
+        var Linea = $("#slcHome_Line option:selected").text();
         var Band = 0;
         if (Estatus == $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione')) { Estatus = null; } else { Estatus = $("#slcHome_status option:selected").val(); }
         if (Folio == "") { Folio = null; }
         if (TipoA3 == $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione') || TipoA3 == "Seleccione") { TipoA3 = null; }
-        if (Linea === "-1") { Linea = null; }
+        if (Linea == $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione') || TipoA3 == "Seleccione") { Linea = null; }
         if (Contact == "") { Contact = null; }
         if (Problem == "") { Problem = null; }
         if ($("#cbxHome_Activities").prop("checked")) {
@@ -469,6 +474,7 @@
                         .append($('<td>').append(item.TipoA3))                 
                         .append($('<td>').append(item.Problem))
                         .append($('<td class="text-center">').append(item.Contact))
+                        .append($('<td class="text-center">').append(item.Lineas))
                         //.append($('<td>').append(Rol))
                         .append($('<td class="text-center">').append(badge_Status))
                         .append($('<td class="text-center">').append(btn_group_options))

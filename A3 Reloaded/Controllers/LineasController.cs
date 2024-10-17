@@ -1,5 +1,6 @@
 ﻿using A3_Reloaded.Clases;
 using A3_Reloaded.Models;
+using Antlr.Runtime.Misc;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -221,6 +222,81 @@ namespace A3_Reloaded.Controllers
                 Clases.ErrorLogger.Registrar(this, e.ToString());
             }
             return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult obtener_registros_Lineas_running(int id_template)
+        {
+            List<LineaModel> list = new List<LineaModel>();
+            try
+            {
+                DataTable datos = LI.obtener_registros_lineas_running(id_template);
+                foreach (DataRow data in datos.Rows)
+                {
+                    list.Add(new LineaModel
+                    {
+                        ID = Convert.ToInt32(data["ID"]),
+                        Nombre = data["Nombre"].ToString()
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult registro_Linea_Running(int id_template, int id_linea)
+        {
+            try
+            {
+                string BYTOST = HttpContext.User.Identity.Name;
+                DateTime Registro = DateTime.Now;
+                string datos = LI.registro_LineasRunning(id_template, id_linea);
+                if (datos == "guardado")
+                {
+                    noti.Mensaje = Mensajes.Registro_Linea;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nueva Linea: " + LI.getNombre_linea(id_linea) + " agregada a template" + id_template.ToString(), "N/A");
+                }
+                else
+                {
+                    noti.Mensaje = Mensajes.Registro_Linea_Error;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Registro_Linea_Error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult omitir_lineas(int id_registro)
+        {
+            try
+            {
+                string BYTOST = HttpContext.User.Identity.Name;
+                DateTime Registro = DateTime.Now;
+                string datos = LI.remover_LineasRunning(id_registro);
+                if (datos == "guardado")
+                {
+                    noti.Mensaje = Mensajes.Registro_omitir;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Linea: " + LI.getNombre_lineaRunning(id_registro) + " omitida en template" + LI.getId_template_lineaRunning(id_registro), "N/A");
+                }
+                else
+                {
+                    noti.Mensaje = Mensajes.Registro_omitir_error;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Registro_omitir_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
         }
     }
 }

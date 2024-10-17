@@ -66,7 +66,182 @@
                 }
             });
         });
+        $("#ItemTemplate_edition_section").on("click", ".btnEditar", function () {
+            var ID = $(this).parents("div").parents("div.col-md-6").find("input[data-registro=ID]").val();
+            var url = "/Secciones/obtenerSeccion";
+            var activado = $.CargarIdioma.Obtener_Texto('txt_Idioma_Activado');
+            var desactivado = $.CargarIdioma.Obtener_Texto('txt_Idioma_Desactivado');
+            $.post(url, data = { ID: ID }).done(function (res) {
+                if (res != "") {
+                    $.each(res, function (i, item) {
+                        $("#txtSeccionesM_ID").val(item.ID);
+                        $("#txtSeccionesM_Nombre").val(item.Nombre);
+                        $("#txtSeccionesM_Descripcion").val(item.Descripcion);
+                        var template_id = $("#txtTemplatesM_ID").val();
+                        var cuadrante = $("#slcSeccionesM_Cuadrante");
+                        fn_lista_cuadrantes_template_id({ Objeto: cuadrante, ID: template_id, Seleccion: item.Cuadrante });
+                        if (item.Activo == 1) {
+                            $("#cbxSeccionesM_Activo").prop("checked", true);
+                            $("label[for='cbxSeccionesM_Activo']").html(activado);
+                        } else {
+                            $("#cbxSeccionesM_Activo").prop("checked", false);
+                            $("label[for='cbxSeccionesM_Activo']").html(desactivado);
+                        }
+                    });
+                    $("#mdlSecciones_Modificar").modal("show");
+                } else {
+                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+                }
+            }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
+        });
+        $("#btnSeccionesM_Guardar").click(function () {
+            $.auxFormulario.camposVacios({
+                Seccion: $("#frmSeccionesM"),
+                NoVacio: function () {
+                    $.notiMsj.Confirmacion({
+                        Tipo: "MD",
+                        Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_modificar_title'),
+                        Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_modificar'),
+                        BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                        BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                        FuncionV: function () {
+                            fn_actualizar_Seccion()
+                        }
+                    });
+                }
+            });
+        });
+        $("#ItemTemplate_edition_section").on("click", ".btnOmitir", function () {
+            var ID = $(this).parents("div").parents("div.col-md-6").find("input[data-registro=ID]").val();           
+            $.notiMsj.Confirmacion({
+                Tipo: "MD",
+                Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir_title'),
+                Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Confirmacion_Omitir'),
+                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                FuncionV: function () {
+                    fn_remove_seccion(ID)
+                }
+            });
+        });
+        $("#ItemTemplate_edition_section").on("click", ".btnAdd_Item", function () {
+            var ID = $(this).parents("tr").find("[data-registro=ID]").html();
+            var nom = $(this).parents("tr").find(".NombreSeccion").html();
+            var idioma_seleccione = $.CargarIdioma.Obtener_Texto("txt_Idioma_Seleccione");
+            $("#txtItems_SeccionID").val(ID);
+            $("#txtItems_SeccionNom").val(nom);
+            fn_SetItem_PnlDefault();
+            $("#mdlPreguntas_Panel").modal("show");
+            fn_Items();
+            $("#slcPregunta_Respuesta").val(idioma_seleccione);
+        });
     });
+    function fn_Items(Pagina, id_seccion) {
+        //var seccion = $("#txtItems_SeccionID").val();
+        var seccion = id_seccion;
+        var Datos = { Seccion: id_seccion, Index: Pagina };
+        $.mostrarInfo({
+            URLindex: "/Items/obtenerTotalPagItems",
+            URLdatos: "/Items/mostrarItems",
+            Datos: Datos,
+            Version: 2,
+            Tabla: $("#tblSeccion" + id_seccion + ""),
+            Paginado: $("#pgdItems"),
+            Mostrar: function (i, item) {
+
+                var Activo = '<span class="tag tag-green">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Activo') + '</span>';
+                if (item.Activo == 0) {
+                    Activo = '<span class="tag tag-red">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Inactivo') + '</span>';
+                }
+
+                var Botones = '<button class="btn btn-icon btn-primary btnEditar" data-toggle="tooltip"  data-registro="Editar" data-placement="bottom" title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '"><i class="far fa-edit"></i></button>';
+                var Omitir = '<button class="btn btn-icon btn-danger btnOmitir" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Omitir') + '"><i class="fa fa-trash"></i></button>';
+                $("#tblSeccion" + id_seccion + "").append(
+                    $('<tr>')
+                        .append($('<td data-registro="ID" style="display:none; text-align:center">').append(item.ID))
+                        .append($('<td style="text-align:center">').append(item.RowNumber))
+                        .append($('<td>').append(item.Elemento))
+                        .append($('<td>').append(item.Texto))
+                        .append($('<td style="text-align:center">').append(Botones))
+                        .append($('<td style="text-align:center">').append(Omitir))
+                );
+            }
+        });
+    }
+    function fn_SetItem_PnlDefault() {
+        $("#pnlItem_Hipotesis").hide();
+        $("#pnlItem_Default").show();
+        $("#pnlItem_Pregunta").hide();
+        $("#pnlItem_Nota").hide();
+        $("#pnlItem_Instrucciones").hide();
+        $("#pnlItem_Ishikawua").hide();
+        $("#pnlItem_Factor").hide();
+        $("#pnlItem_Missing").hide();
+        $("#pnlItem_Acciones").hide();
+        $("#pnlItem_Analisis").hide();
+        $("#txtSeccionItem_ID").val(null);
+    }
+    function fn_remove_seccion(id_seccion) {
+        id_cuadrante = $("#txtTemplate_edition_section_id_cuadrante").val();
+        var frmDatos = new FormData();
+        frmDatos.append("id_seccion", id_seccion);
+        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        $.ajax({
+            type: "POST",
+            url: "/Secciones/remove_section",
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (res) {
+                if (res.Tipo == "success") {
+                    fn_get_secciones(id_cuadrante);
+                }
+                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+            },
+            error: function (error) {
+                $("#mdlSistema_FirmaElectronica").modal("hide");
+                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+    function fn_actualizar_Seccion(param) {
+        id_cuadrante = $("#txtTemplate_edition_section_id_cuadrante").val() 
+        var frmDatos = new FormData();
+        frmDatos.append("ID", $("#txtSeccionesM_ID").val());
+        frmDatos.append("Nombre", $("#txtSeccionesM_Nombre").val());
+        frmDatos.append("Descripcion", $("#txtSeccionesM_Descripcion").val());
+        frmDatos.append("Cuadrante", $("#slcSeccionesM_Cuadrante option:selected").val());
+        frmDatos.append("Template", $("#txtTemplatesM_ID").val());
+        if ($("#cbxSeccionesM_Activo").prop("checked")) {
+            frmDatos.append("Activo", 1);
+        } else {
+            frmDatos.append("Activo", 0);
+        }
+        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        $.ajax({
+            type: "POST",
+            url: "/Secciones/actualizarSeccion",
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (res) {
+                if (res.Tipo == "success") {
+                    $("#mdlSistema_FirmaElectronica").modal("hide");
+                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                    $("#mdlSecciones_Modificar").modal("hide");
+                    fn_get_secciones(id_cuadrante);
+                }
+                $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
+                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+            },
+            error: function (error) {
+                $("#mdlSistema_FirmaElectronica").modal("hide");
+                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
     function fn_registrar_Seccion(id_cuadrante) {
         var frmDatos = new FormData();
         frmDatos.append("ID", $("#txtSeccionesN_ID").val());
@@ -156,9 +331,10 @@
                         '</div>' +
                         '<div class="col-md-6">' +
                         '<div class="d-grid gap-2 d-md-flex justify-content-md-end">' +
-                        '<button type="button" class="btn btn-sm btn-icon btn-light tooltip1" data-text="Permite agregar elementos a la sección ejem. Preguntas, Notas Etc.." style="border-radius: 13px !important;"><i class="fa fa-plus"></i> Agregar Item</button>' +
-                        '<button type="button" class="btn btn-sm btn-icon btn-primary tooltip1" data-text="Permite editar nombre y descripción de la sección" style="border-radius: 13px !important;"><i class="fa fa-edit"></i> Editar Sección</button>' +
-                        '<button type="button" class="btn btn-sm btn-icon btn-danger tooltip1" data-text="Permite omitir la sección" style="border-radius: 13px !important;"><i class="fa fa-trash"></i> Omitir Sección</button>' +
+                        '<input style="display:none;" type="text" value="' + item.id_seccion + '"  data-registro="ID" />' +
+                        '<button type="button" class="btn btn-sm btn-icon btn-light tooltip1 btnAdd_Item" data-text="Permite agregar elementos a la sección ejem. Preguntas, Notas Etc.." style="border-radius: 13px !important;"><i class="fa fa-plus"></i> Agregar Item</button>' +
+                        '<button type="button" class="btn btn-sm btn-icon btn-primary tooltip1 btnEditar" data-text="Permite editar nombre y descripción de la sección" style="border-radius: 13px !important;"><i class="fa fa-edit"></i> Editar Sección</button>' +
+                        '<button type="button" class="btn btn-sm btn-icon btn-danger tooltip1 btnOmitir" data-text="Permite omitir la sección" style="border-radius: 13px !important;"><i class="fa fa-trash"></i> Omitir Sección</button>' +
                         '</div>' +
                         '</div>' +
                         '</div>' +
@@ -166,16 +342,19 @@
                         '<table class="table table-bordered mt-2 tablaSeccion table-hover">' +
                         '<thead>' +
                         '<tr>' +
+                        '<th scope="col" style="width:5%; text-align:center;">#</th>' +
+                        '<th scope="col" style="width:10%">Elemento</th>' +
                         '<th scope="col">' + idioma_Texto + '</th>' +
-                        '<th colspan="2" style="width:30%">' + Idioma_Opciones + '</th>' +
+                        '<th colspan="2" style="width:7%; text-align:center">' + Idioma_Opciones + '</th>' +
                         '</tr>' +
                         '</thead>' +
-                        '<tbody id="tblSeccionRunning' + item.ID + '" style="font-size:15px"></tbody>' +
+                        '<tbody id="tblSeccion' + item.id_seccion + '" style="font-size:15px"></tbody>' +
                         '</table>' +
                         '</div>' +
                         '</div>' +
                         '</div>'
                     );
+                    fn_Items(1,item.id_seccion);
                 })
                 $("#divTemplate_edition_section_loader").hide();              
             },
