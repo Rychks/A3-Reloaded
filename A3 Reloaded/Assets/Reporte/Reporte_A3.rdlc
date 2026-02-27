@@ -23,6 +23,13 @@
       </ConnectionProperties>
       <rd:DataSourceID>f800290f-a06a-4f7e-baec-330b687a901a</rd:DataSourceID>
     </DataSource>
+    <DataSource Name="A3_ReloadedDataSet_firmas">
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString>/* Local Connection */</ConnectString>
+      </ConnectionProperties>
+      <rd:DataSourceID>5e65cd03-9bbd-458f-9a07-c00d01bfc2fa</rd:DataSourceID>
+    </DataSource>
   </DataSources>
   <DataSets>
     <DataSet Name="Secciones_CA">
@@ -261,36 +268,40 @@
         <rd:TableAdapterName>get_standard_id_CuadranteTableAdapter</rd:TableAdapterName>
       </rd:DataSetInfo>
     </DataSet>
-    <DataSet Name="Evaluadores">
+    <DataSet Name="Firmas">
       <Query>
-        <DataSourceName>A3_DBDataSet3</DataSourceName>
+        <DataSourceName>A3_ReloadedDataSet_firmas</DataSourceName>
         <CommandText>/* Local Query */</CommandText>
       </Query>
       <Fields>
-        <Field Name="ID">
-          <DataField>ID</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
-        </Field>
-        <Field Name="Nombre">
-          <DataField>Nombre</DataField>
+        <Field Name="Usuario">
+          <DataField>Usuario</DataField>
           <rd:TypeName>System.String</rd:TypeName>
-        </Field>
-        <Field Name="Tipo">
-          <DataField>Tipo</DataField>
-          <rd:TypeName>System.Int32</rd:TypeName>
         </Field>
         <Field Name="Fecha">
           <DataField>Fecha</DataField>
           <rd:TypeName>System.DateTime</rd:TypeName>
         </Field>
+        <Field Name="Estatus">
+          <DataField>Estatus</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+        <Field Name="Comentarios">
+          <DataField>Comentarios</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="Razon">
+          <DataField>Razon</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
       </Fields>
       <rd:DataSetInfo>
-        <rd:DataSetName>A3_DBDataSet3</rd:DataSetName>
-        <rd:SchemaPath>C:\Users\EUENY\Source\Workspaces\A3 Reloaded\A3 Reloaded\A3_DBDataSet3.xsd</rd:SchemaPath>
-        <rd:TableName>get_evaluadores_template_ID</rd:TableName>
+        <rd:DataSetName>A3_ReloadedDataSet_firmas</rd:DataSetName>
+        <rd:SchemaPath>C:\Users\eueny\source\repos\DevOps\A3\A3 Reloaded\A3_ReloadedDataSet_firmas.xsd</rd:SchemaPath>
+        <rd:TableName>obtener_firmas_reporte_a3</rd:TableName>
         <rd:TableAdapterFillMethod>Fill</rd:TableAdapterFillMethod>
         <rd:TableAdapterGetDataMethod>GetData</rd:TableAdapterGetDataMethod>
-        <rd:TableAdapterName>get_evaluadores_template_IDTableAdapter</rd:TableAdapterName>
+        <rd:TableAdapterName>obtener_firmas_reporte_a3TableAdapter</rd:TableAdapterName>
       </rd:DataSetInfo>
     </DataSet>
   </DataSets>
@@ -2704,21 +2715,21 @@ Improve the standards by clarification, reducing complexity and efficency. No to
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Nombre1">
+                        <Textbox Name="Usuario">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Nombre.Value</Value>
+                                  <Value>=Fields!Usuario.Value</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Nombre1</rd:DefaultName>
+                          <rd:DefaultName>Usuario</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -2741,7 +2752,7 @@ Improve the standards by clarification, reducing complexity and efficency. No to
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=IIf(Fields!Tipo.Value = 1,Parameters!Idioma_Revisor.Value,Parameters!Idioma_Aprobador.Value)</Value>
+                                  <Value>=IIf(Fields!Razon.Value = 2,Parameters!Idioma_Revisor.Value,Parameters!Idioma_Aprobador.Value)</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -2771,7 +2782,7 @@ Improve the standards by clarification, reducing complexity and efficency. No to
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Fecha.Value</Value>
+                                  <Value>=IIf(Fields!Estatus.Value = 0,"------",Fields!Fecha.Value)</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -2792,6 +2803,7 @@ Improve the standards by clarification, reducing complexity and efficency. No to
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                   </TablixCells>
@@ -2815,7 +2827,7 @@ Improve the standards by clarification, reducing complexity and efficency. No to
                 </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>
-            <DataSetName>Evaluadores</DataSetName>
+            <DataSetName>Firmas</DataSetName>
             <Top>2.18833in</Top>
             <Left>2.13526in</Left>
             <Height>0.5in</Height>

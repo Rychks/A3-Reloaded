@@ -9,7 +9,7 @@
 
 <div class="loader"></div>
 <div id="tiposA3">
-    <h2 class="section-title">A3-Reloaded</h2>
+    <!--<h2 class="section-title">A3-Reloaded</h2>-->
     <input type="text" id="txt_id_a3_running" style="display:none" name="name" value="@ViewBag.Id" />
     <div class="row">
         <div class="col-lg-12">
@@ -26,10 +26,10 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <input type="text" style="display:none" id="txtFilter_Type_A3" name="name" value="" />
-                            <button id="btnTodos_filter" class="btn btn-lg btn-outline-primary">Mostrar Todo</button>
-                            <button id="btnA3R_filter" class="btn btn-lg btn-outline-primary">A3 Reloaded</button>
-                            <button id="btnA3Lite_filter" class="btn btn-lg btn-outline-primary">A3 Lite</button>
-                            <button id="btnPm_filter" class="btn btn-lg btn-outline-primary">Problem Statement</button>
+                            <button id="btnTodos_filter" class="btn btn-sm btn-outline-primary">Mostrar Todo</button>
+                            <button id="btnA3R_filter" class="btn btn-sm btn-outline-primary">A3 Reloaded</button>
+                            <button id="btnA3Lite_filter" class="btn btn-sm btn-outline-primary">A3 Lite</button>
+                            <button id="btnPm_filter" class="btn btn-sm btn-outline-primary">Problem Statement</button>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -52,7 +52,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -60,7 +60,7 @@
     </div>
 </div>
 <script>
-    
+
 </script>
 
 <div id="pnlInicio_Formulario_Nueva_Investigacion">
@@ -79,20 +79,20 @@
                     <input type="text" id="txtBand_pmcard_templateRN" class="form-control" disabled style="display:none" value="" />
                     <div class="row">
                         <div class="col-lg-6" id="plnTemplate_PmCard">
-                            <label></label>
+                            <label>Opcional*</label>
                             <div class="form-group d-grid gap-2 mt-2">
-                                <button id="btnTemplateRn_pmcard" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_pmcard">
-                                    <i class="fa-solid fa-wrench"></i>
-                                    <span class="txt_Idioma_Top_fallas"></span>
+                                <button id="btnTemplateRn_pmcard" name="" data-registro="cuadrant_info" style="font-size: 30px; font-weight: bold; height: 15rem !important;" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_pmcard">
+                                    <i style="font-size:3vh" class="fa-solid fa-wrench"></i>
+                                    <span style="font-size:3vh" class="txt_Idioma_Top_fallas"></span>
                                 </button>
                             </div>
                         </div>
                         <div class="col-lg-6" id="pnlTemplate_failure_mode">
                             <label>Opcional*</label>
                             <div class="form-group d-grid gap-2 mt-2">
-                                <button id="btnTemplateRn_failure_mode" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_failureMode">
-                                    <i class="fa-solid fa-gears"></i>
-                                    <span class="txt_Idioma_Modo_falla"></span>
+                                <button id="btnTemplateRn_failure_mode" name="" data-registro="cuadrant_info" style="font-size: 30px; font-weight: bold; height: 15rem !important;" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_failureMode">
+                                    <i style="font-size:3vh" class="fa-solid fa-gears"></i>
+                                    <span style="font-size:3vh" class="txt_Idioma_Modo_falla"></span>
                                 </button>
                             </div>
                         </div>
@@ -101,25 +101,25 @@
                         <div class="col-lg-6" id="frmTemplatesRN_Pnl">
                             <label></label>
                             <div class="form-group d-grid gap-2 mt-2">
-                                <button  id="btnTemplatesRN_info" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_info_template">
-                                    <i class="fa-solid fa-clipboard-list"> </i>
-                                    <span class="txt_Idioma_Administracion_Informacion_Template"></span>
+                                <button id="btnTemplatesRN_info" name="" data-registro="cuadrant_info" style="font-size:5vh !important; font-weight:bold; height:15rem!important;" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_info_template">
+                                    <i style="font-size:3vh" class="fa-solid fa-clipboard-list"> </i>
+                                    <span style="font-size:3vh" class="txt_Idioma_Administracion_Informacion_Template"></span>
                                 </button>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <label>Opcional*</label>
                             <div class="form-group d-grid gap-2 mt-2">
-                                <button id="btnTemplate_Complementacion" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:200px" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_complement">
-                                    <i class="fa-solid fa-rectangle-list"></i>
-                                    <span class=""></span>  Complementación A3
+                                <button id="btnTemplate_Complementacion" name="" data-registro="cuadrant_info" style="font-size:30px; font-weight:bold; height:15rem !important" class="btn btn-block btn-light btn-lg" data-toggle="modal" data-target="#mdlTemplate_complement">
+                                    <i style="font-size:3vh" class="fa-solid fa-rectangle-list"></i>
+                                    <span style="font-size:3vh" class="">Complementación A3</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-12 d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button id="btnTemplatesRunningN_Guardar" class="btn btn-lg btn-light"><i class="fa-solid fa-play"></i> <span class="font-weight-bold txt_Idioma_Comenzar_A3"></span> </button>
+                            <button id="btnTemplatesRunningN_Guardar" style="font-size:0.8vw !important; height:3rem !important; width:10%" class="btn btn-lg btn-primary"><i class="fa-solid fa-file-pen"> </i> <span class="font-weight-bold txt_Idioma_Comenzar_A3">Comenzar</span>  </button>
                         </div>
                     </div>
                 </div>
@@ -127,7 +127,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="mdlTemplate_pmcard" tabindex="-1"  aria-hidden="true">
+    <div class="modal fade" id="mdlTemplate_pmcard" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
@@ -137,32 +137,46 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="form-group col-md-2">
-                            <label for="slc_PmCardRunning_linea" style="font-size:15px !important">Linea</label>
-                            <select id="slc_PmCardRunning_linea" style="font-size:15px !important" class="form-control form-control-sm">
+                            <label for="slc_PmCardRunning_origin">Origen</label>
+                            <select id="slc_PmCardRunning_origin" class="form-control form-control-sm">
+                                <option value="1">IRIS</option>
+                                <option value="2">Local</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="slc_PmCardRunning_linea">Linea</label>
+                            <select id="slc_PmCardRunning_linea" class="form-control form-control-sm">
                                 <option value="-1">Seleccione</option>
                             </select>
                         </div>
-                        <div class="col-md-4" style="margin-top:2rem;">
-                            <div class="form-check form-check-inline" style="font-size:15px !important">
+                        <div class="form-group col-md-2">
+                            <label for="slc_PmCardRunning_tipoParo">Tipo de Paro</label>
+                            <select id="slc_PmCardRunning_tipoParo" class="form-control form-control-sm">
+                                <option value="Paro no Planeado" selected>Paro no Planeado</option>
+                                <option value="Paro Planeado">Paro Planeado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" style="margin-top:2rem;">
+                            <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="cbxFilter_turno1" value="">
                                 <label class="form-check-label" for="cbxFilter_turno1">Primer Turno</label>
                             </div>
-                            <div class="form-check form-check-inline" style="font-size:15px !important">
+                            <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="cbxFilter_turno2" value="">
                                 <label class="form-check-label" for="cbxFilter_turno2">Segundo Turno</label>
                             </div>
-                            <div class="form-check form-check-inline" style="font-size:15px !important">
+                            <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="cbxFilter_turno3" value="">
                                 <label class="form-check-label" for="cbxFilter_turno3">Tercer Turno</label>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        
+
                     </div>
                     <div class="row">
-                        <div class="table tabla-md encabezados-fixed">
-                            <table class="table table-hover" style="font-size:15px !important;" id="tbl_PmCardRunning">
+                        <div class="table tabla-md encabezados-fixed" style="height: 40rem !important">
+                            <table class="table table-hover" style="font-size: 0.7vw !important;" id="tbl_PmCardRunning">
                                 <thead>
                                     <tr>
                                         <th>Fecha</th>
@@ -176,8 +190,8 @@
                                         <th class="text-center">Check</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                               </tbody>
+                                <tbody style="font-size: 0.7vw">
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -193,11 +207,11 @@
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title txt_Idioma_Eventos fs-5" >Eventos</h1>
+                    <h1 class="modal-title txt_Idioma_Eventos fs-5">Eventos</h1>
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                   
+
                     <div class="row">
                         <div class="table tabla-md encabezados-fixed">
                             <table class="table table-hover" id="tbl_events_pmcard">
@@ -209,7 +223,7 @@
                                         <th>Motivo</th>
                                         <th>Minutos</th>
                                         <th>Clasificación</th>
-                                        <th>Comentario</th>                                       
+                                        <th>Comentario</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -254,13 +268,13 @@
                     <div class="row">
                         <div class="table tabla-md encabezados-fixed">
                             <table class="table table-hover" id="tblTemplateRunningN_failure_mode">
-                                <thead style="font-size:16px !important">
+                                <thead>
                                     <tr>
                                         <th class="txt_Idioma_Modo_falla">Modo de Falla</th>
                                         <th style="width:10%">Check</th>
                                     </tr>
                                 </thead>
-                                <tbody style="font-size:16px !important"></tbody>
+                                <tbody style="font-size:0.7vw !important"></tbody>
                             </table>
                         </div>
                     </div>
@@ -271,7 +285,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="mdlTemplate_info_template" tabindex="-1"  aria-hidden="true">
+    <div class="modal fade" id="mdlTemplate_info_template" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
@@ -288,6 +302,9 @@
                                             <label for="txtTemplatesRunningN_Folio" class="txt_Idioma_Folio">Folio:</label>
                                             <input type="text" class="form-control" id="txtTemplatesRunningN_Folio" disabled>
                                             <input type="text" id="txtTemplatesRunningN_ID" style="display:none">
+                                            <input type="text" id="txtTemplatesRunningN_description" style="display:none">
+                                            <input type="text" id="txtTemplareRunning_band_new_a3" value="0" style="display:none">
+
                                         </div>
                                         <div class="form-group col-md-4">
                                             <label for="slcTemplatesRunningN_TipoA3" class="txt_Idioma__Formato_de_A3">Tipo A3:</label>
@@ -303,64 +320,56 @@
                                     <div class="row">
                                         <div class="form-group col-md-6">
                                             <label for="txtTemplatesRunningN_Problem" class="txt_Idioma_Cual_es_el_problema">¿Cual es el Problema?:</label>
-                                            <textarea class="form-control" style="resize:none; height:150px !important; overflow:auto" id="txtTemplatesRunningN_Problem" placeholder=""></textarea>
+                                            <textarea class="form-control" style="resize:none; height:10rem !important; overflow:auto" id="txtTemplatesRunningN_Problem" placeholder=""></textarea>
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label for="txtTemplatesRunningN_Cost" class="txt_Idioma_CostoPerdida">costo / pérdida debido al problema:</label>
-                                            <textarea class="form-control" style="resize:none; height:150px !important; overflow:auto" id="txtTemplatesRunningN_Cost" placeholder=""></textarea>
+                                            <textarea class="form-control" style="resize:none; height:10rem !important; overflow:auto" id="txtTemplatesRunningN_Cost" placeholder=""></textarea>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <hr />
+                                    <h5>Evaluadores</h5>
+                                    <div class="" id="frmTemplateR_Evaluadores_Body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="slcTemplatesRunningN_Usuarios" class="txt_Idioma_Usuario">Usuario:</label>
+                                                    <select id="slcTemplatesRunningN_Usuarios" style="width:100% !important" class="form-control">
+                                                        <option value="value">text</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="slcTemplatesRunningN_TiposFirma" class="txt_Idioma_Tipo_Evaluador">Tipo:</label>
+                                                    <select id="slcTemplatesRunningN_TiposFirma" style="width:100% !important" class="form-control">
+                                                        <option value="1" class="txt_Idioma_Revisor">Revisor</option>
+                                                        <option value="2" class="txt_Idioma_Aprovador">Aprovador</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group" style="margin-top: 1.5rem;">
+                                                    <button type="button" class="btn btn-success txt_Idioma_Agregar" tabindex="3" id="btnTemplateRunningN_Evaluador_Agregar">Añadir Evaluador</button>
+                                                </div>
 
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="card card-primary" id="frmTemplateR_Evaluadores">
-                                <div class="card-header">
-                                    <h4 class="card-title txt_Idioma_Evaluadores">Evaluadores</h4>
-                                </div>
-                                <div class="card-body" id="frmTemplateR_Evaluadores_Body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="slcTemplatesRunningN_Usuarios" class="txt_Idioma_Usuario">Usuario:</label>
-                                                <select id="slcTemplatesRunningN_Usuarios" style="width:100% !important" class="form-control">
-                                                    <option value="value">text</option>
-                                                </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="slcTemplatesRunningN_TiposFirma" class="txt_Idioma_Tipo_Evaluador">Tipo:</label>
-                                                <select id="slcTemplatesRunningN_TiposFirma" style="width:100% !important" class="form-control">
-                                                    <option value="1" class="txt_Idioma_Revisor">Revisor</option>
-                                                    <option value="2" class="txt_Idioma_Aprovador">Aprovador</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <div class="form-group" style="margin-top: 1.3rem;">
-                                                <button type="button" class="btn btn-success txt_Idioma_Agregar" tabindex="3" id="btnTemplateRunningN_Evaluador_Agregar">Añadir Evaluador</button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="table tabla-md encabezados-fixed" style="height:200px !important;">
-                                                <table class="table table-bordered table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="txt_Idioma_Usuario" scope="col">Usuario</th>
-                                                            <th scope="col" class="txt_Idioma_Tipo_Evaluador">Tipo</th>
-                                                            <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="tblTemplateRunningN_Evaluadores" style="font-size:15px">
-                                                    </tbody>
-                                                </table>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="table tabla-md encabezados-fixed" style="height:20rem !important;">
+                                                    <table class="table table-bordered table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="txt_Idioma_Usuario" scope="col">Usuario</th>
+                                                                <th scope="col" class="txt_Idioma_Tipo_Evaluador">Tipo</th>
+                                                                <th class="txt_Idioma_Omitir" scope="col" width="10%">Omitir</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="tblTemplateRunningN_Evaluadores" style="font-size:0.7vw">
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -368,6 +377,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" id="btnContinuar_infoTemplate" data-dismiss="modal">Continuar</button>
@@ -375,7 +385,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="mdlTemplate_complement" tabindex="-1"  aria-hidden="true">
+    <div class="modal fade" id="mdlTemplate_complement" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
@@ -496,7 +506,6 @@
     </div>
 </div>
 <div id="pnlTemplatesRunning_Investigacion">
-
     <div class="row">
         <div class="col-lg-9">
             <div class="card card-primary" id="">
@@ -504,6 +513,7 @@
                     <h4 id="txtTemplateRunngin_Titulo">Card Header</h4>
                 </div>
                 <div class="card-body">
+                    <input type="text" id="txtTemplatesRunningN_Estatus" style="display:none">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group">
@@ -558,19 +568,49 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group d-grid gap-2">
-                        <button type="button" class="btn btn-primary btn-block txt_Idioma_Evaluadores" id="btnTemplatesRunningN_Evaluadores">Evaluadores</button>
+                        <button type="button" class="btn btn-light btn-block" id="btnTemplatesRunningN_Evaluadores">
+                            <i class="fa fa-user-friends"></i>
+                            <span class="txt_Idioma_Evaluadores">Evaluadores</span>
+                        </button>
+                        <button type="button" class="btn btn-light btn-block" id="btnTemplatesRunningN_Departamentos">
+                            <i class="fa fa-building"></i>
+                            <span class="txt_Idioma_Departamento_Afectado">Departamentos</span>
+                        </button>
+                        <button type="button" style="display:none" class="btn btn-primary btn-block " id="btnTemplatesRunningN_Subareas">
+                            <span class="txt_Idioma_Subarea_Afectado"> Subarea</span>
+                        </button>
+                        <button type="button" class="btn btn-light btn-block " id="btnTemplatesRunningN_Equipos">
+                            <img width="15" height="15" src="https://img.icons8.com/metro/26/robot.png" alt="robot" />
+                            <span class="txt_Idioma_Equipo_Afectado">Equipos</span>
+                        </button>
+                        <button type="button" class="btn btn-light btn-block " id="btnTemplatesRunningN_Lineas">
+                            <img width="20" height="20" src="https://img.icons8.com/windows/32/Assembly-Line.png" alt="Assembly-Line" />
+                            <span class="txt_Idioma_Linea_Afectado"> Lineas</span>
+                        </button>
+                        <button type="button" class="btn btn-success btn-block" id="btnTemplatesRunningN_AccionesPreventivas">
+                            <i class="fa fa-file-lines"></i>
+                            <span>Acciones</span>
+                        </button>
                     </div>
-                    <div class="form-group d-grid gap-2">
-                        <button type="button" class="btn btn-primary btn-block txt_Idioma_Departamento_Afectado" id="btnTemplatesRunningN_Departamentos">Evaluadores</button>
-                    </div>
-                    <div class="form-group d-grid gap-2" style="display:none !important">
-                        <button type="button" class="btn btn-primary btn-block txt_Idioma_Subarea_Afectado" id="btnTemplatesRunningN_Subareas">Evaluadores</button>
-                    </div>
-                    <div class="form-group d-grid gap-2">
-                        <button type="button" class="btn btn-primary btn-block txt_Idioma_Equipo_Afectado" id="btnTemplatesRunningN_Equipos">Evaluadores</button>
-                    </div>
-                    <div class="form-group d-grid gap-2">
-                        <button type="button" class="btn btn-primary btn-block txt_Idioma_Linea_Afectado" id="btnTemplatesRunningN_Lineas">Evaluadores</button>
+                    <div class="form-group" id="pnlTemplateRunning_signPanel">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-outline-success btn-block" id="btnTemplatesRunning_aprobe">
+                                        <i class="fa fa-file-pen"></i>
+                                        <span>Fimar</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-danger btn-block" id="btnTemplatesRunning_reject">
+                                        <i class="fa fa-circle-xmark"></i>
+                                        <span>Rechazar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -607,7 +647,7 @@
                 </div>
             </div>
             <div id="pnlTemplateRunning_Cuadrante_D">
-                <div class="card card-primary" id="">
+                <div class="card card-primary pnlTemplateRunning_Cuadrante_D" id="pnlCuadranteD_5Porque">
                     <div class="card-body">
                         <div class="section-title mt-0 ">
                             <p class="txt_Idioma_CuadranteD_PRSucedio">Why did it happen?</p>
@@ -658,43 +698,46 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <div class="section-title mt-0">
-                                <p class="txt_Idioma_CuadranteD_Estandar"> Standard simplification</p>
+                <div id="pnlCuadranteD_standard" class="pnlTemplateRunning_Cuadrante_D">
+                    <div class="row" id="">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="section-title mt-0">
+                                    <p class="txt_Idioma_CuadranteD_Estandar"> Standard simplification</p>
+                                </div>
+                                <p class="txt_Idioma_CuadranteD_ST_Muestra"> Shows the combination of settings and tasks to control the proven, validated conditions and to prevent the error mode from reoccurring.</p>
+                                <p class="txt_Idioma_CuadranteD_ST_Mejore"> Improve the standards by clarification, reducing complexity and efficency. No tools, no time, no talents!</p>
                             </div>
-                            <p class="txt_Idioma_CuadranteD_ST_Muestra"> Shows the combination of settings and tasks to control the proven, validated conditions and to prevent the error mode from reoccurring.</p>
-                            <p class="txt_Idioma_CuadranteD_ST_Mejore"> Improve the standards by clarification, reducing complexity and efficency. No tools, no time, no talents!</p>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="table-responsive tabla-md encabezados-fixed">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" class="txt_Idioma_CuadranteD_ST_Nuevo">Update/New Standards</th>
-                                        <th scope="col" class="txt_Idioma_CuadranteD_ST_Initial">Initial (Total)</th>
-                                        <th scope="col" class="txt_Idioma_CuadranteD_ST_Simplify">Simplified Stardard (Total)</th>
-                                        <th scope="col" colspan="2" class="txt_Idioma_Opciones">Options</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblStandardCuadranteD_Tabla" style="font-size:10px">
-                                    <tr><th colspan="7"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
-                                </tbody>
-                            </table>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive tabla-md encabezados-fixed">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="txt_Idioma_CuadranteD_ST_Nuevo">Update/New Standards</th>
+                                            <th scope="col" class="txt_Idioma_CuadranteD_ST_Initial">Initial (Total)</th>
+                                            <th scope="col" class="txt_Idioma_CuadranteD_ST_Simplify">Simplified Stardard (Total)</th>
+                                            <th scope="col" colspan="2" class="txt_Idioma_Opciones">Options</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblStandardCuadranteD_Tabla" style="font-size:10px">
+                                        <tr><th colspan="7"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-lg-12">
-                        <div class="form-group" style="text-align:right !important;">
-                            <button type="button" class="btn btn-info btn-lg txt_Idioma_Agregar" id="btnStandarsCuadranteD_Agregar"><span class="fa fa-plus"></span> Agregar Estandar</button>
+                        <div class="col-lg-12">
+                            <div class="form-group" style="text-align:right !important;">
+                                <button type="button" class="btn btn-info btn-lg txt_Idioma_Agregar" id="btnStandarsCuadranteD_Agregar"><span class="fa fa-plus"></span> Agregar Estandar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="pnlResults_CuadranteD" class="row">
+
+                <div id="pnlResults_CuadranteD" class="row pnlTemplateRunning_Cuadrante_D">
                     <div class="col-lg-6">
                         <div class="form-group">
                             <div class="section-title mt-0">
@@ -736,7 +779,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="pnlResults_TemplateWG">
+                <div id="pnlResults_TemplateWG" class="pnlTemplateRunning_Cuadrante_D">
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="form-group">
@@ -798,7 +841,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row pnlTemplateRunning_Cuadrante_D">
                     <div class="col-lg-12">
                         <div class="form-group">
                             <div class="section-title mt-0">
@@ -809,7 +852,7 @@
 
                     </div>
                 </div>
-                <div class="row">
+                <div class="row pnlTemplateRunning_Cuadrante_D">
                     <div class="form-group col-lg-4">
                         <label class="txt_Idioma_CuadranteD_CE_Cost"> Costs around the new work to manage ($/ month)</label>
                         <input type="text" class="form-control" id="txtCost_cost_CuadranteD">
@@ -827,7 +870,7 @@
                         <button type="button" class="btn btn-success btn-sm txt_Idioma_Guardar" id="btnCuadranteD_Guardar_Cost">Guardar</button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row pnlTemplateRunning_Cuadrante_D">
                     <div class="form-group col-lg-12 text-center">
                         <label class="d-block txt_Idioma_CuadranteD_CE_Solution">
                             Solution confirmed? (zero losses were achieved)
@@ -879,9 +922,9 @@
                     <div class="col-md-12">
                         <div style="position: relative; overflow:hidden !important; width:100%; padding-top:56.25%">
                             <iframe src="~/Assets/Visual_help/ModosdeFallo.pdf" style="position:absolute; top:0; left: 0;bottom:0;right:0;width:100%;height:100%"></iframe>
-                        </div>                       
+                        </div>
                     </div>
-                </div>              
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger txt_Idioma_Cerrar" data-dismiss="modal">Close</button>
@@ -1251,96 +1294,6 @@
 </div>
 
 
-
-<!--<div class="modal fade" role="dialog" id="mdlReporteA3_Panel" style="display: none;">
-    <div class="modal-dialog modal-xl full_modal-dialog" role="document">
-        <div class="modal-content full_modal-content">
-            <div class="modal-header modal-header-info" data-type="info">
-                <h4 class="modal-title txt_Idioma_ReporteA3">Reporte A3</h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-4" id="pnl_usuario_reporte_firma">
-                        <div class="form-group">
-                            <label class="txt_Idioma_Usuario"></label>
-                            <input type="text" disabled class="form-control" value="@Usuario" />
-                        </div>
-                    </div>
-                    <div class="col-md-4" id="pnl_firma_reporte_firma">
-                        <div class="form-group">
-                            <label class="txt_idioma_Ingrese_Tipo_Firma">Firmar Como:</label>
-                            <input type="text" disabled class="form-control" id="txtTemplateRunning_Reporte_Tipo_Firma" name="name" value="" />
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="slcTemplateRunning_Reporte_Versiones" class="txt_Idioma_Reporte_Version_Documento" style="font-size:15px">Versión de Documento</label>
-                        <select class="form-control" id="slcTemplateRunning_Reporte_Versiones">
-                            <option value="value">Version Actual</option>
-                            <option value="value">Version 2</option>
-                            <option value="value">Version 1</option>
-                        </select>
-                    </div>
-                </div>-->
-@*<div class="row">
-        <div class="col-md-4">
-            <h6 class="title txt_Idioma_Opciones">Opciones</h6>
-            <div class="form-group">
-                <button type="button" class="btn btn-danger txt_Idioma_Reporte_Rechazar" id="btnReporteRunning_Rechazar">Rechazar</button>
-                <button type="button" class="btn btn-success txt_idioma_Firmar" id="btnReporteRunning_Firmar">Firmar</button>
-                <input type="text" class="form-control" id="txtTemplateRunning_Reporte_ID" style="display:none" />
-            </div>
-            <h6 class="title txt_Idioma_Reporte_Flujo_Aprobacion">Flujo de Aprovación</h6>
-            <div class="table-responsive tabla-md encabezados-fixed">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
-                            <th scope="col" class="txt_Idioma_Tipo_Evaluador">Rol</th>
-                            <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
-                            <th scope="col" class="txt_Idioma_Comentarios">Comentarios</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblTemplateR_Estatus_Revisores" style="font-size:10px;">
-                        <tr><th colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-5" id="pnlReporte_tbl_AdjuntosRunning">
-            <h6 class="title txt_Idioma_Reporte_Archivos_Adjuntos">Adjuntos</h6>
-            <div class="table-responsive tabla-md encabezados-fixed">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
-                            <th scope="col" class="txt_Idioma_Tipo_Archivo">Tipo de Archivo</th>
-                            <th scope="col" class="txt_Idioma_Elemento">Item</th>
-                            <th scope="col" class="txt_Idioma_Seccion">Sección</th>
-                            <th scope="col" class="txt_Idioma_Cuadrante" width="20%">Cuadrante</th>
-                            <th scope="col" class="txt_Idioma_Imprimir">Imprimir</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblAdjuntosTemplate_Running" style="font-size:10px">
-                        <tr><th colspan="7"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></th></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-3" id="pnlReporte_tbl_ReporteRunning">
-            <iframe class="embed-responsive-item" height="100%" width="100%" id="ReporteRunning_url"></iframe>
-        </div>
-    </div>*@
-
-<!--</div>
-            <div class="modal-footer bg-whitesmoke br">
-                <button type="button" class="btn btn-danger txt_Idioma_Cerrar" tabindex="4" data-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>-->
-
-
-
 <div class="modal fade" role="dialog" id="mdlReporte_RechazoPnl" style="display: none;">
     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -1412,7 +1365,7 @@
     </div>
 </div>
 <div class="modal fade" role="dialog" id="mdlInvestigtion5why_CuadranteD" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
-    <div class="modal-dialog modal-lg modal-dialog" role="document">
+    <div class="modal-dialog modal-xl modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-info" data-type="info">
                 <h4 class="modal-title txt_Idioma_CuadranteD_PRInvestigacion" id="">Investigaton Why – Why</h4>
@@ -1425,19 +1378,11 @@
                             <textarea id="txt5wCuadranteD_What" style="resize:none;font-size:12px" class="form-control"></textarea>
                             <input id="txt5wCuadranteD_ID" type="text" style="display:none" name="name" value="" />
                         </div>
-                        <div class="form-group">
-                            <label class="txt_Idioma_CuadranteD_PR_Inv_PQ3">WHY(3) (it showed up?)</label>
-                            <textarea id="txt5wCuadranteD_Why3" style="resize:none;font-size:12px" class="form-control"></textarea>
-                        </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_CuadranteD_PR_Inv_PQ1">WHY(1) (it showed up?)</label>
                             <textarea id="txt5wCuadranteD_Why1" style="resize:none;font-size:12px" class="form-control"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="txt_Idioma_CuadranteD_PR_Inv_PQ4">WHY(4) (it showed up?)</label>
-                            <textarea id="txt5wCuadranteD_Why4" style="resize:none;font-size:12px" class="form-control"></textarea>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -1445,50 +1390,61 @@
                             <label class="txt_Idioma_CuadranteD_PR_Inv_PQ2">WHY(2) (it showed up?)</label>
                             <textarea id="txt5wCuadranteD_Why2" style="resize:none;font-size:12px" class="form-control"></textarea>
                         </div>
+                    </div>                  
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="txt_Idioma_CuadranteD_PR_Inv_PQ3">WHY(3) (it showed up?)</label>
+                            <textarea id="txt5wCuadranteD_Why3" style="resize:none;font-size:12px" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="txt_Idioma_CuadranteD_PR_Inv_PQ4">WHY(4) (it showed up?)</label>
+                            <textarea id="txt5wCuadranteD_Why4" style="resize:none;font-size:12px" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_CuadranteD_PR_Inv_PQ5">WHY(5) (it showed up?)</label>
                             <textarea id="txt5wCuadranteD_Why5" style="resize:none;font-size:12px" class="form-control"></textarea>
                         </div>
-
                     </div>
-                    <br />
+                </div>
+                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_CuadranteD_PR_Inv_Causa">Cause</label>
                             <textarea id="txt5wCuadranteD_Cause" style="resize:none;font-size:12px" class="form-control"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>Responsable</label>
-                            <select class="form-control">
-                                <option value="value">text</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <div class="">
-                                <table class="table table-bordered table-striped">
-                                    <tbody style="font-size: 10px; margin:5px; padding:5px;">
-                                        <tr>
-                                            <td>J. Rodriguez</td>
-                                        </tr>
-                                        <tr>
-                                            <td>E. Anaya</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
-
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="txt_Idioma_CuadranteD_PR_Inv_Accion">Action</label>
                             <textarea id="txt5wCuadranteD_Step" style="resize:none;font-size:12px" class="form-control"></textarea>
                         </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="txt5wCuadranteD_NameResponsable" class="txt_Idioma_Responsable">Responsible</label>
+                            <select class="form-control form-control-sm" style="width:100%" id="txt5wCuadranteD_NameResponsable">
+                                <option value="-1">Select</option>
+                            </select>
+                        </div>
+                        <div class="form-group" hidden>
+                            <label class="txt_Idioma_Responsable">Responsible</label>
+                            <input id="txt5wCuadranteD_Name" hidden readonly style="resize:none;font-size:12px" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+
                         <div class="form-group">
                             <label class="txt_Idioma_Estatus">Status</label>
-                            <select id="txt5wCuadranteD_Status" class="form-control">
-                                <option value="1">Started</option>
+                            <select id="txt5wCuadranteD_Status" disabled class="form-control">
+                                <option selected value="1">Started</option>
                                 <option value="2">In Progress</option>
                                 <option value="3">Largly Completed</option>
                                 <option value="4">Completed</option>
@@ -1497,14 +1453,12 @@
 
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="txt_Idioma_Responsable">Responsible</label>
-                            <textarea id="txt5wCuadranteD_Name" style="resize:none;font-size:12px" class="form-control"></textarea>
-                        </div>
+
                         <div class="form-group">
                             <label class="txt_Idioma_Missing_DueDate">Due Date</label>
                             <input type="date" id="txt5wCuadranteD_Date" class="form-control" name="name" value="" />
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -2148,4 +2102,68 @@
         </div>
     </div>
 </div>
-<script>require(['InicioA3']);</script>
+
+<div class="modal fade" role="dialog" id="mdl_accionesPreventivas" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info" data-type="info">
+                <h4 class="modal-title" id="">Acciones</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="frmAccionPreventivaN">
+                    <div class="col-lg-6">
+                        <label>Acción</label>
+                        <input type="text" class="form-control" name="name" id="txtTemplatesRunningN_AccionesPreventivas_accion" placeholder="Describa la accion a realizar" value="" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Fecha Entrega</label>
+                        <input type="date" class="form-control" id="txtTemplatesRunningN_AccionesPreventivas_fecha" name="name" value="" />
+                    </div>
+                    <div class="col-lg-3">
+                        <label>Responsable</label>
+                        <select class="form-control form-control-sm" id="slcTemplatesRunningN_AccionesPreventivas_Usuario">
+                            <option value="value">text</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-lg-12">
+                        <div class="form-group d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-success txt_Idioma_Agregar" id="btnTemplateRunningN_AccionesPreventivas_Agregar"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive tabla-md encabezados-fixed">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="">Acción</th>
+                                        <th scope="col" class="">Fecha Entrega</th>
+                                        <th scope="col" class="">Responsable</th>
+                                        <th scope="col" class="">Estatus</th>
+                                        <th scope="col" width="10%" class="txt_Idioma_Omitir">Omitir</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblTemplateRunningN_acciones_prevetivas_Datos">
+                                    <tr><th colspan="7"><p class="text-center txt_Idioma_no_existen_registros">No se encontraron registros</p></th></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <button type="button" class="btn btn-danger txt_Idioma_Cerrar" tabindex="4" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    window.onload = function (e) {
+        require(['InicioA3'])
+    }
+</script>

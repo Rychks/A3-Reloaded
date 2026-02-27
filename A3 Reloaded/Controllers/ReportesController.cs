@@ -26,10 +26,181 @@ namespace A3_Reloaded.Controllers
         Usuarios usuario = new Usuarios();
         TemplatesRunning template_running = new TemplatesRunning();
         Templates template = new Templates();
+        Acciones acciones = new Acciones();
         // GET: Reportes
         public ActionResult Index()
         {
             return View();
+        }
+        public JsonResult registrar_firma_cancelar_A3(int id_template)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                string ZMYSEL = Request["ZMYSEL"];
+                DateTime Registro = DateTime.Now;
+                bool firma = usuario.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    int status_template = 10;
+                    //reporte.actualizar_registro_firma_template(BYTOST, id_template.ToString(), ZMYSEL, "2");
+                    int actual_version_template = template_running.get_actual_version_template(id_template);
+                    //int is_aproval_flow_complete = template_running.is_aproval_flow_complete(id_template, actual_version_template);
+                    string datos = template_running.Update_estatus_templateRunning(Convert.ToInt32(id_template), status_template);
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Documento_firmado;
+                        noti.Tipo = "success";
+                        auditTrail.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Investigación folio: " +id_template.ToString() + " cancelada", ZMYSEL);
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Documento_firmado_error;
+                        noti.Tipo = "warning";
+                    }
+                    noti.Id = actual_version_template.ToString();
+                }
+                else
+                {
+                    auditTrail.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Documento_firmado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult registrar_firma_rechazar_A3(int id_template)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                string ZMYSEL = Request["ZMYSEL"];
+                DateTime Registro = DateTime.Now;
+                bool firma = usuario.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    int status_template = 8;
+                    reporte.actualizar_registro_firma_template(BYTOST, id_template.ToString(), ZMYSEL, "2");
+                    int actual_version_template = template_running.get_actual_version_template(id_template);
+                    //int is_aproval_flow_complete = template_running.is_aproval_flow_complete(id_template, actual_version_template);
+                    DataTable dt = template_running.obtener_responsable_a3(Convert.ToInt32(id_template));
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string Correo = dr["Correo"].ToString();
+                        string Nombre = dr["Nombre"].ToString();
+                        StringBuilder mailBody = new StringBuilder();
+                        mailBody.AppendFormat("<h1>A3 Rechazado</h1>");
+                        mailBody.AppendFormat("Estimado(a) {0},", Nombre);
+                        mailBody.AppendFormat("<br />");
+                        mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue rechazada y se encuentra lista para su consulta para lo cual debera seguir las siguientes instrucciones:</p>");
+                        mailBody.AppendFormat("1. Ingrese en la liga: https://mx-a3-problem-solving-ler.la.bayer.cnb/ <br />");
+                        mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
+                        mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
+                        mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
+                        mailBody.AppendFormat("5. Identifique la investigación en la Tabla y seleccione A3 Report ubicado en la columna 'Options' u 'Opciones'<br />");
+                        mailBody.AppendFormat("Comentarios:'<br />");
+                        mailBody.AppendFormat(ZMYSEL);
+                        template.enviarCorreo(Correo, "A3 Rechazado", mailBody.ToString(), null, null, null);
+                    }
+                    string datos = template_running.Update_estatus_templateRunning(Convert.ToInt32(id_template), status_template);
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Documento_firmado;
+                        noti.Tipo = "success";
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Documento_firmado_error;
+                        noti.Tipo = "warning";
+                    }
+                    noti.Id = actual_version_template.ToString();
+                }
+                else
+                {
+                    auditTrail.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Documento_firmado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult registrar_firma_aprobar_A3(int id_template)
+        {
+            try
+            {
+                string BYTOST = Request["BYTOST"];
+                string ZNACKA = Request["ZNACKA"];
+                DateTime Registro = DateTime.Now;
+                bool firma = usuario.autenticacion(BYTOST, ZNACKA);
+                if (firma)
+                {
+                    int status_template = 6;
+                    reporte.actualizar_registro_firma_template(BYTOST, id_template.ToString(), "N/A", "3");
+                    int actual_version_template = template_running.get_actual_version_template(id_template);
+                    int is_aproval_flow_complete = template_running.is_aproval_flow_complete(id_template, actual_version_template);                  
+                    if (is_aproval_flow_complete > 0)
+                    {
+                        status_template = 7;
+                        DataTable dt = template_running.obtener_responsable_a3(Convert.ToInt32(id_template));
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            string Correo = dr["Correo"].ToString();
+                            string Nombre = dr["Nombre"].ToString();
+                            StringBuilder mailBody = new StringBuilder();
+                            mailBody.AppendFormat("<h1>A3 Aprobado</h1>");
+                            mailBody.AppendFormat("Estimado(a) {0},", Nombre);
+                            mailBody.AppendFormat("<br />");
+                            mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue aprobada y se encuentra lista para su consulta para lo cual debera seguir las siguientes instrucciones:</p>");
+                            mailBody.AppendFormat("1. Ingrese en la liga: https://mx-a3-problem-solving-ler.la.bayer.cnb/ <br />");
+                            mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
+                            mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
+                            mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
+                            mailBody.AppendFormat("5. Identifique la investigación en la Tabla y seleccione A3 Report ubicado en la columna 'Options' u 'Opciones'<br />");
+                            template.enviarCorreo(Correo, "A3 Aprobado", mailBody.ToString(), null, null, null);
+                        }
+
+                    }
+                    string datos = template_running.Update_estatus_templateRunning(Convert.ToInt32(id_template), status_template);
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Documento_firmado;
+                        noti.Tipo = "success";                       
+                    }
+                    else
+                    {
+                        noti.Mensaje = Mensajes.Documento_firmado_error;
+                        noti.Tipo = "warning";
+                    }
+                    noti.Id = actual_version_template.ToString();
+                }
+                else
+                {
+                    auditTrail.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
+                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Tipo = "warning";
+                }
+            }
+            catch (Exception e)
+            {
+                noti.Mensaje = Mensajes.Documento_firmado_error;
+                noti.Tipo = "warning";
+                Clases.ErrorLogger.Registrar(this, e.ToString());
+            }
+            return Json(noti, JsonRequestBehavior.AllowGet);
         }
         public JsonResult registrar_firma_reabrir_A3(int id_template)
         {
@@ -368,7 +539,7 @@ namespace A3_Reloaded.Controllers
                             mailBody.AppendFormat("Estimado(a) {0},", Nombre);
                             mailBody.AppendFormat("<br />");
                             mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue finalizada y se encuentra lista para su <b>Revisión</b> para lo cual debera seguir las siguientes instrucciones:</p>");
-                            mailBody.AppendFormat("1. Ingrese en la liga: http://mx-cloud-a3ler.aws.cnb/ <br />");
+                            mailBody.AppendFormat("1. Ingrese en la liga: https://mx-a3-problem-solving-ler.la.bayer.cnb/ <br />");
                             mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
                             mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
                             mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
@@ -391,7 +562,7 @@ namespace A3_Reloaded.Controllers
                             mailBody.AppendFormat("Estimado(a) {0},", Nombre);
                             mailBody.AppendFormat("<br />");
                             mailBody.AppendFormat("<p>La investigación A3 con folio: <b>" + id_template + "</b> fue finalizada y se encuentra lista para su <b>Aprobación</b> para lo cual debera seguir las siguientes instrucciones:</p>");
-                            mailBody.AppendFormat("1. Ingrese en la liga: http://mx-cloud-a3ler.aws.cnb/ <br />");
+                            mailBody.AppendFormat("1. Ingrese en la liga: https://mx-a3-problem-solving-ler.la.bayer.cnb/ <br />");
                             mailBody.AppendFormat("2. Dirijase a apartado 'Home' o 'Inicio' <br />");
                             mailBody.AppendFormat("3. Ingrese el folio de la investigación en la caja de texto 'Folio' dentro del área de Filtros de Información <br />");
                             mailBody.AppendFormat("4. Presione el botón 'Search' o 'Buscar' <br />");
@@ -495,6 +666,7 @@ namespace A3_Reloaded.Controllers
             //string Responsable = US.obtener_Nombre_Usuario(HttpContext.User.Identity.Name, "A");
             string Impresion = Convert.ToDateTime(DateTime.Now).ToString("MM/dd/yyyy HH:mm:ss");
             DataTable dt = template_running.obtener_Template_RunningID(Convert.ToInt32(ID_Template));
+            DataTable dtAcciones = acciones.get_registros_accion_preventiva_by_id_template(Convert.ToInt32(ID_Template), 2);
             string Responsable = dt.Rows[0]["Responsable"].ToString();
             string Folio = dt.Rows[0]["Folio"].ToString();
             string TipoA3 = dt.Rows[0]["TipoA3"].ToString();
@@ -537,7 +709,7 @@ namespace A3_Reloaded.Controllers
             DataTable dt_CC = template_running.obtener_secciones_CuadranteRunning_ID_for_report(Id_CC);
             DataTable dt_why = template_running.obtener_5w_ID_Cuadrante(Convert.ToInt32(Id_CD));
             DataTable dt_standard = template_running.obtener_Standard_ID_Cuadrante(Convert.ToInt32(Id_CD));
-            DataTable dt_evaluadores = template_running.obtener_evaluadores_template_ID(Convert.ToInt32(ID_Template));
+            DataTable dt_evaluadores = reporte.obtener_firmas_reporte_a3(ID_Template,"1");
 
             // Setup DataSet
             //DataTable datos = CM.reporte_CodigosMaestros(Codigo, Producto, MPI, Activo, Fecha1, Fecha2, Usuario);
@@ -547,7 +719,7 @@ namespace A3_Reloaded.Controllers
             ReportDataSource Secciones_CC = new ReportDataSource("Secciones_CC", dt_CC);
             ReportDataSource why = new ReportDataSource("Why", dt_why);
             ReportDataSource standard = new ReportDataSource("standar", dt_standard);
-            ReportDataSource evaluadores = new ReportDataSource("Evaluadores", dt_evaluadores);
+            ReportDataSource evaluadores = new ReportDataSource("Firmas", dt_evaluadores);
 
             // Variables
             Warning[] warnings;
@@ -677,7 +849,8 @@ namespace A3_Reloaded.Controllers
             DataTable dt_why = template_running.obtener_5w_ID_Cuadrante(Convert.ToInt32(Id_CD));
             DataTable dt_Risk = template_running.obtener_risk_cuadrante_id(Convert.ToInt32(Id_CD));
             DataTable dt_standard = template_running.obtener_Standard_ID_Cuadrante(Convert.ToInt32(Id_CD));
-            DataTable dt_evaluadores = template_running.obtener_evaluadores_template_ID(Convert.ToInt32(ID_Template));
+            DataTable dt_evaluadores = reporte.obtener_firmas_reporte_a3(ID_Template, "1");
+            //DataTable dt_evaluadores = template_running.obtener_evaluadores_template_ID(Convert.ToInt32(ID_Template));
 
             // Setup DataSet
             //DataTable datos = CM.reporte_CodigosMaestros(Codigo, Producto, MPI, Activo, Fecha1, Fecha2, Usuario);
@@ -687,7 +860,7 @@ namespace A3_Reloaded.Controllers
             ReportDataSource Secciones_CC = new ReportDataSource("Secciones_CC", dt_CC);
             ReportDataSource why = new ReportDataSource("Why", dt_why);
             ReportDataSource standard = new ReportDataSource("standar", dt_standard);
-            ReportDataSource evaluadores = new ReportDataSource("Evaluadores", dt_evaluadores);
+            ReportDataSource evaluadores = new ReportDataSource("Firmas", dt_evaluadores);
             ReportDataSource Risk = new ReportDataSource("Risk", dt_Risk);
             // Variables
             Warning[] warnings;

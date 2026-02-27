@@ -12,28 +12,37 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <link rel='icon' href='favicon.ico' type='image/x-icon' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="msapplication-TileColor" content="#2d89ef">
-    <meta name="theme-color" content="#4188c9">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
-    <title>A3-Reloaded</title>
+    <title>A3 Problem Solving</title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Assets/fontawesome-free-6.6.0-web/css/all.css" rel="stylesheet" />
-    <link href="~/Assets/css/style.css" rel="stylesheet" />
+    <link href="~/Assets/css/style.css?v=1.0.2" rel="stylesheet" />
     <link href="~/Assets/modules/select2/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="icon" href="~/Assets/Bayer_Brand/Bayer-Logo2.png" type="image/x-icon" />
-    <link rel="shortcut icon" type="image/x-icon" href="~/Assets/Bayer_Brand/Bayer-Logo2.png" />
-    <link href="~/Assets/css/components.css" rel="stylesheet" />
+    <link rel="icon" href="~/Assets/Bayer_Brand/Bayer-Logo.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="~/Assets/Bayer_Brand/Bayer-Logo.png" />
+    @*<link href="~/Assets/css/components.css" rel="stylesheet" />*@
     <link href="~/Assets/css/custom.css" rel="stylesheet" />
     <link href="~/Assets/css/Custom/TableSyle.css" rel="stylesheet" />
     <link href="~/Assets/modules/izitoast/css/iziToast.min.css" rel="stylesheet" />
     <link href="~/Assets/modules/datepicker/datepicker.min.css" rel="stylesheet" />
-    <script src="~/Assets/V2/js/require.min.js"></script>
+    <!--FIN MODAL ACTIVIDADES PREVENTIVAS-->
+    @*<script src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script>
+        window.mgaChatbotConfig = {
+            baseUrl: "https://mx-a3-problem-solving-ler.la.bayer.cnb/", // Your redirect URL - ask mGA team to get added to Azure AD
+            assistantId: "fc966206-2132-4b75-b585-db329d5447d3", // Your assistant ID you would like to use in chatbot
+            dynamicScript: true
+        };
+    </script>
+    <script src="https://chat.int.bayer.com/embed.min.js" defer></script>*@
+    <script src="~/Assets/V2/js/require.min.js?v=1.0.6"></script>
 </head>
 <body>
 
@@ -74,13 +83,19 @@
                             Audit Trail
                         </a>
                     </li>
+                    @*<li class="ml-1" style="margin: 0,5px,0,5px;">
+                            <a href="#" class="btn btn-sm btn-light btn-lg btn-block btn-icon-split">
+                                Nivel de Entrenamiento: Avanzado
+                            </a>
+                        </li>*@
                     <li class="dropdown">
                         <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                             <img alt="image" src="/Assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
-                            <div class="d-sm-none d-lg-inline-block"><span class="txt_Idioma_Hola"></span>, @Usuario</div>
+                            <div class="d-sm-none d-lg-inline-block">@Usuario</div>
+                            <input type="text" id="txtGbl_rol_id" disabled readonly style="display:none" name="name" value="@rol_id" />
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" style="">
-                            <div class="dropdown-title">@Usuario</div>
+
                             <div class="dropdown-divider"></div>
                             <a href="@Url.Action("CerrarSesion","Login")" class="dropdown-item has-icon text-danger">
                                 <i class="fas fa-sign-out-alt"></i> <span class="txt_Idioma_Salir">Sign Out</span>
@@ -92,7 +107,8 @@
             <div class="main-sidebar sidebar-style-2 w3-animate-left" style="display:none;" id="leftMenu">
                 <aside id="sidebar-wrapper">
                     <div class="sidebar-brand">
-                        <a href="index.html">A3 Reloaded</a>
+                        <img src="~/Assets/img/LogoApp/IMG_1202.PNG" width="80%" alt="Alternate Text" />
+                        <!--<a href="index.html">A3 - Problem Solving</a>-->
                     </div>
                     <div class="sidebar-brand sidebar-brand-sm">
                         <a href="index.html">A3</a>
@@ -115,7 +131,7 @@
                         @if (_rol.verificarAcceso(rol_id, 4) > 0)
                         {
                             <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Rol" ? "active" : "")">
-                                <a class="nav-link" href="@Url.Action("Rol_Index", "Rol")"><i class="fa fa-users"></i> <span class="">Roles</span></a>
+                                <a class="nav-link " href="@Url.Action("Rol_Index", "Rol")"><i class="fa fa-user-lock"></i> <span class="">Roles y Accesos</span></a>
                             </li>
                         }
                         @if (_rol.verificarAcceso(rol_id, 4) > 0)
@@ -127,7 +143,7 @@
                         @if (_rol.verificarAcceso(rol_id, 23) > 0)
                         {
                             <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Templates" ? "active" : "")">
-                                <a class="nav-link" href="@Url.Action("Index", "Templates")"><i class="fa fa-cogs"></i> <span class="txt_Idioma_Administracion_de_templares">A3 Templates</span></a>
+                                <a class="nav-link" href="@Url.Action("Index", "Templates")"><i class="fa fa-clipboard"></i> <span class="txt_Idioma_Administracion_de_templares">A3 Templates</span></a>
                             </li>
                         }
                         @if (_rol.verificarAcceso(rol_id, 19) > 0)
@@ -145,274 +161,26 @@
                         @if (_rol.verificarAcceso(rol_id, 16) > 0)
                         {
                             <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Equipos" ? "active" : "")">
-                                <a class="nav-link" href="@Url.Action("EquipoIndex", "Equipos")"><i class="fa fa-industry"></i> <span class="txt_Idioma_Administracion_Equipos">Equipos</span></a>
+                                <a class="nav-link" href="@Url.Action("EquipoIndex", "Equipos")">
+                                    <i class="fa fa-cogs"></i> <span class="txt_Idioma_Administracion_Equipos">Equipos</span>
+                                </a>
                             </li>
                         }
-                        </ul>
-                        <div class="mt-4 mb-4 p-3  hide-sidebar-mini">
-                            <a href="#" class="btn btn-danger d-grid gap-2 btn-icon-split txt_Idioma_Cerrar" onclick="closeLeftMenu()">
-                                <i class="fas fa-rocket"></i> Cerrar
-                            </a>
-                        </div>
+                    </ul>
+                    <div class="mt-4 mb-4 p-3  hide-sidebar-mini">
+                        <a href="#" class="btn btn-outline-info d-grid gap-2 btn-icon-split" onclick="closeLeftMenu()">
+                            <i class="fas fa-close"></i>
+                            <span class="txt_Idioma_Cerrar_Menu"></span>
+                        </a>
+                    </div>
                 </aside>
             </div>
             <div class="main-content" style="width:100%">
                 <section class="section" id="Sistema_A3_body">
                     @RenderBody()
                 </section>
-                <div class="modal fade" role="dialog" id="mdlPreguntas_Panel" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
-                    <div class="modal-dialog modal-xl full_modal-dialog" role="document">
-                        <div class="modal-content full_modal-content" style="height:650px">
-                            <div class="modal-header modal-header-info" data-type="info">
-                                <h4 class="modal-title txt_Idioma_Agregar_Items">Agregar elementos a Sección</h4>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-lg-5">
-                                        <div class="form-group">
-                                            <label for="slcImtes_Elemento" class="txt_Idioma_Elemento">Elemento</label>
-                                            <select class="form-control" id="slcItems_Elemento">
-                                                <option value="-1" class="txt_Idioma_Seleccione" selected disabled>Seleccione</option>
-                                                <option value="0" class="txt_Idioma_Pregunta">Pregunta</option>
-                                                <option value="1" class="txt_Idioma_ishikawa">Ishikawa</option>
-                                                <option value="2" class="txt_Idioma_Notas">Notas</option>
-                                                <option value="3" class="txt_Idioma_Instrucciones">Instrucciones</option>
-                                                <option value="4" class="txt_Idioma_Hipotesis">Hipotesis</option>
-                                                <option value="5" class="txt_Idioma_Factor_causal">Causa Raiz</option>
-                                                <option value="6" class="">Missing Base Condition</option>
-                                                <option value="7" class="txt_Idioma_Acciones_Preventivas">Missing Base Condition</option>
-                                                <option value="8" class="txt_Idioma_Analisis_porque">Missing Base Condition</option>
-                                            </select>
-                                        </div>
-                                        <div id="pnlItem_Default">
-                                            <div class="form-group">
-                                                <center><h3 class="txt_Idioma_seleccione_elemento"></h3></center>
-                                                <input type="text" class="form-control-plaintext" readonly id="txtSeccionItem_ID">
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Pregunta">
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Titulo">Texto</label>
-                                                <input type="text" id="txtPregunta_Texto" class="form-control" value="" />
-                                                <input type="text" id="txtPregunta_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Descripcion">Descripción</label>
-                                                <textarea id="txtPregunta_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="slcPregunta_Respuesta" class="txt_Idioma_Tipo_de_pregunta">Tipo de Pregunta</label>
-                                                <select class="form-control" id="slcPregunta_Respuesta">
-                                                    <option class="txt_Idioma_Seleccione" value="-1" selected disabled>Seleccione</option>
-                                                    <option class="txt_Idioma_Tipo_de_Abiera" value="1">Abierta</option>
-                                                    <option class="txt_Idioma_SiNo" value="0">Si / No</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_firma_electronica"> Firma Electronica </label>
-                                                <input type="checkbox" id="txtPregunta_firma" name="name" value="" />
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItem_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Nota">
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Titulo_de_nota">Titulo de Nota</label>
-                                                <input type="text" id="txtNota_titulo" class="form-control" value="" />
-                                                <input type="text" id="txtNota_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Descipcion_nota">Descripción de Nota</label>
-                                                <textarea id="txtNota_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemNota_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Instrucciones">
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Titulo">Titulo</label>
-                                                <input type="text" id="txtInstrucciones_titulo" class="form-control" value="" />
-                                                <input type="text" id="txtInstrucciones_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Instrucciones">Instrucciones</label>
-                                                <textarea id="txtInstrucciones_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemInstruccion_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Ishikawua">
-                                            <div id="pnlItem_Ishikawua_Item">
-                                                <div class="form-group" style="margin-top:-20px">
-                                                    <label class="txt_Idioma_Titulo">Titulo</label>
-                                                    <input type="text" id="txtIshikawua_titulo" class="form-control" value="" />
-                                                    <input type="text" id="txtIshikawua_ID" style="display:none" class="form-control" value="" />
-                                                </div>
-                                                <div class="form-group" style="margin-top:-20px">
-                                                    <label class="txt_Idioma_Descipcion">Descripción</label>
-                                                    <textarea id="txtIshikawua_Descripcion" style="resize:none; height:200px !important;" class="form-control"></textarea>
-                                                </div>
-                                                <div class="form-group text-right" style="margin-top:-20px">
-                                                    <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                    <button type="button" class="btn btn-info txt_Idioma_Ramas" id="btnItemIshikawua_Ramas">Ramas</button>
-                                                    <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemIshikawua_Guardar">Guardar</button>
-                                                </div>
-                                            </div>
-                                            <div id="pnlItem_Ishikawua_Rama">
-                                                <div class="form-group" style="margin-top:-20px">
-                                                    <label class="txt_Idioma_Rama">Rama</label>
-                                                    <select class="form-control" id="slcIshikawua_Rama">
-                                                        <option class="txt_Idioma_Seleccione" value="-1" selected disabled>Seleccione</option>
-                                                        <option value="0">Enviroment</option>
-                                                        <option value="1">Equipment</option>
-                                                        <option value="2">Material</option>
-                                                        <option value="3">Method</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group" style="margin-top:-20px">
-                                                    <label class="txt_Idioma_Preguntas">Preguntas</label>
-                                                    <textarea id="txtIshikawua_Descripcion_Rama" style="resize:none; height:200px !important;" class="form-control"></textarea>
-                                                    <input type="text" id="txtIshikawua_Rama_ID" style="display:none" class="form-control" value="" />
-                                                </div>
-                                                <div class="form-group text-right" style="margin-top:-20px">
-                                                    <button type="button" class="btn btn-danger txt_Idioma_Regresar" id="btnItemIshikawua_Regresar_Rama">Regresar</button>
-                                                    <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemIshikawua_Guardar_Rama">Guardar</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Hipotesis">
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Titulo_de_Hipotesis">Titulo de Nota</label>
-                                                <input type="text" id="txtHipotesis_titulo" class="form-control" value="" />
-                                                <input type="text" id="txtHipotesis_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Descipcion_Hipotesis">Descripción de Nota</label>
-                                                <textarea id="txtHipotesis_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemHipotesis_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Factor">
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Titulo_de_Factor">Titulo de Nota</label>
-                                                <input type="text" id="txtFactor_titulo" class="form-control" value="" />
-                                                <input type="text" id="txtFactor_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="txt_Idioma_Descipcion_Factor">Descripción de Nota</label>
-                                                <textarea id="txtFactor_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemFactor_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Missing">
-                                            <div class="form-group">
-                                                <label class="">Titulo de Bloque</label>
-                                                <input type="text" id="txtMissing_titulo" class="form-control" value="Missing Base Conditions" />
-                                                <input type="text" id="txtMissing_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">Descripción de Bloque</label>
-                                                <textarea id="txtMissing_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemMissing_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Acciones">
-                                            <div class="form-group">
-                                                <label class="">Titulo de Bloque</label>
-                                                <input type="text" id="txtAcciones_titulo" class="form-control" value="" />
-                                                <input type="text" id="txtAcciones_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">Descripción de Bloque</label>
-                                                <textarea id="txtAcciones_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemAcciones_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                        <div id="pnlItem_Analisis">
-                                            <div class="form-group">
-                                                <label class="">Titulo de Bloque</label>
-                                                <input type="text" id="txtAnalisis_titulo" class="form-control" value="" />
-                                                <input type="text" id="txtAnalisis_ID" style="display:none" class="form-control" value="" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">Descripción de Bloque</label>
-                                                <textarea id="txtAnalisis_Descripcion" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group text-right">
-                                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
-                                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemAnalisis_Guardar">Guardar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-7">
-                                        <div class="form-group">
-                                            <label for="txtSeccionesM_Nombre" class="txt_Idioma_Seccion">Sección:</label>
-                                            <input type="text" class="form-control-plaintext" id="txtItems_SeccionNom" readonly>
-                                            <input type="text" id="txtItems_SeccionID" hidden disabled>
-                                            <input type="text" id="txtItems_OmitirID" hidden disabled>
-                                            <input type="text" id="txtItems_ItemOmitirID" hidden disabled>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="dimmer" id="tblItems">
-                                                <div class="dimmer-content">
-                                                    <div class="table-responsive tabla-md encabezados-fixed">
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th scope="col" style="width:10px;">#</th>
-                                                                    <th scope="col" class="txt_Idioma_Elemento">Elemento</th>
-                                                                    <th scope="col" class="txt_Idioma_Texto">Texto</th>
-                                                                    <th scope="col" class="txt_Idioma_Posicion" colspan="2">Opciones</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr><td colspan="100%"><p class="text-center txt_Idioma_No_Encontraron_Registros">No se encontraron registros</p></td></tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div id="pgdItems">
-                                                <div class="btn-group">
-                                                    <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
-                                                    <div class="btn-group">
-                                                        <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
-                                                            <option selected disabled value="-1">Página</option>
-                                                        </select>
-                                                    </div>
-                                                    <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                </div>
-                            </div>
-                            <div class="modal-footer bg-whitesmoke br">
-                                <button type="button" class="btn btn-danger txt_Idioma_Cerrar" tabindex="4" data-dismiss="modal">Cerrar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal fade" role="dialog" id="mdlSistema_FirmaElectronica" style="display: none;"  data-backdrop="false" data-keyboard="false">
+                <div class="modal fade" role="dialog" id="mdlSistema_FirmaElectronica" style="display: none;" data-backdrop="false" data-keyboard="false">
                     <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header modal-header-info" data-type="info">
@@ -425,8 +193,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="txtFirmaElectronica_ZNACKA" class="control-label txt_idioma_contrasena">Contraseña</label>
-                                    <input id="txtFirmaElectronica_ZNACKA" name="ZNACKA" type="password" value="AnaI$ab3l29079712" class="form-control text-center txt_idioma_Ingrese_contraseña" tabindex="1" autofocus="autofocus" placeholder="Ingrese su Contraseña">
-                                    <input id="txtFirmaElectronica_SADA" name="SADA" value="AnaI$ab3l29079712" type="password" hidden disabled>
+                                    <input id="txtFirmaElectronica_ZNACKA" name="ZNACKA" type="password" value="" class="form-control text-center txt_idioma_Ingrese_contraseña" tabindex="1" autofocus="autofocus" placeholder="Ingrese su Contraseña">
+                                    <input id="txtFirmaElectronica_SADA" name="SADA" value="" type="password" hidden disabled>
                                 </div>
                                 <div class="form-group" id="scnFirmaElectronica_Justificacion" hidden>
                                     <label for="txtFirmaElectronica_ZMYSEL" class="control-label txt_Idioma_Justificacion">Justificación</label>
@@ -447,28 +215,32 @@
                                 <h4 class="modal-title txt_Idioma_Session_expirar">Sesión a punto de expirar</h4>
                             </div>
                             <div class="modal-body">
-                                <p class="txt_Idioma_Session_Cerrar">Su sesión se cerrara en </p><label id="txtSistema_MinRestantes">0</label>
+                                <p class="txt_Idioma_Session_Cerrar">Su sesión se cerrara en </p><label id="txtSistema_MinRestantes">31</label>
                                 <br /><p class="txt_Idioma_Session_Renovar">¿Desea renovar la sesión?</p>
                             </div>
                             <div class="modal-footer bg-whitesmoke br">
-                                <button type="button" class="btn btn-danger txt_idioma_No" tabindex="4" data-dismiss="modal">No</button>
-                                <button type="button" class="btn btn-success txt_Idioma_Session_Renovar_sesion" tabindex="3" id="" onclick="ResetSession()">Permanecer</button>
+                                <button type="button" class="btn btn-danger txt_idioma_No" tabindex="4" data-dismiss="modal" onclick="cerrar_sesion()">No</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Session_Renovar_sesion" tabindex="3" id="" onclick="renovar_sesion()">Permanecer</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <footer class="main-footer">
+                <footer class="main-footer" style="margin-top:-1rem !important;">
                     <div class="footer-left">
-                        @*Copyright &copy; 2018 <div class="bullet"></div> Design By <a href="https://nauval.in/">Muhamad Nauval Azhar</a>*@
                     </div>
                     <div class="footer-right">
-                        Copyright &copy; @DateTime.Now.Year  All rights reserved. Bayer Lerma
+                        Powered by CH PS Enterprise Americas Engineering & Lerma Site Engineering v2.0.3
+                        <br />
+                        <div class="align-content-end">
+                            Contact Support:  Jesus Martinez(EJBOM) & Ricardo Hernandez(EUENY)
+                        </div>
+                      
                     </div>
                 </footer>
             </div>
         </div>
     </div>
-    <script src="~/Assets/V2/js/dashboard.js"></script>
+    <script src="~/Assets/V2/js/dashboard.js?v=1.0.4"></script>
     <script>
         function openLeftMenu() {
             document.getElementById("leftMenu").style.display = "block";
@@ -484,6 +256,8 @@
         class Temporizador {
             constructor() {
                 this.tiempo = 0;
+                this.restante = 30;
+                this.count = 0;
                 this.interval;
             }
             getTime() {
@@ -499,7 +273,7 @@
                     processData: false,
                     data: null,
                     success: function (res) {
-                        alert("Cierre de sesión por inactividad")
+                        //alert("Cierre de sesión por inactividad")
                         window.location.replace("/Login/Index");
                     },
                     error: function (error) {
@@ -507,12 +281,25 @@
                     }
                 });
             }
+
             init() {
                 this.interval = setInterval(() => {
                     this.tiempo++;
                     //document.getElementById('countdown').innerHTML = this.tiempo;
-                    //console.log(this.tiempo)
+                    //console.log(this.tiempo)//900
+
+                    if (this.tiempo == 870) {
+                        var isShown = $('.modal').hasClass('in') || $('.modal').hasClass('show')
+                        if (!isShown) {
+                            $("#txtSistema_MinRestantes").text(30);
+                            $("#mdlSistema_Sesion").modal("show")
+                        }
+                    }
+                    if (this.tiempo >= 870) {
+                        $("#txtSistema_MinRestantes").text(900 - this.tiempo);
+                    }
                     if (this.tiempo == 900) {
+                        //alert("se acabo el tiempo");
                         this.cerrar_sesion();
                     }
                 }, 1000);
@@ -526,9 +313,41 @@
         function reiniciar_tiempo_sesion() {
             timer.stop();
             timer.tiempo = 0;
+            timer.restante = 30;
             timer.init();
         }
+        function renovar_sesion() {
+            timer.stop();
+            timer.tiempo = 0;
+            timer.restante = 30;
+            timer.init();
+            $("#mdlSistema_Sesion").modal("hide")
+            window.location.reload();
+        }
+        function finalizar_sesion() {
+            timer.stop();
+            timer.tiempo = 0;
+            timer.restante = 30;
+            $.ajax({
+                type: "POST",
+                url: "/Login/CerrarSesionInactividad",
+                contentType: false,
+                processData: false,
+                data: null,
+                success: function (res) {
+                    //alert("Cierre de sesión por inactividad")
+                    window.location.replace("/Login/Index");
+                },
+                error: function (error) {
+                    //$("#mdlSistema_FirmaElectronica").modal("hide");
+                }
+            });
+        }
+
         require(["jquery"], function () {
+            $("#Sistema_A3_body").click(function () {
+                closeLeftMenu();
+            })
             $("table,input,button,textarea,div,modal").focus(function () {
                 reiniciar_tiempo_sesion();
             });

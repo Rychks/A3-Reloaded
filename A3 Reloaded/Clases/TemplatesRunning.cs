@@ -1214,7 +1214,7 @@ namespace A3_Reloaded.Clases
             }
             return msg;
         }
-        public string registrar_Template_Running(string Folio, string TipoA3, int Version, string Contact,string Problem,string Cost,int Estatus)
+        public string registrar_Template_Running(string Folio, string TipoA3, int Version, string Contact,string Problem,string Cost,int Estatus,string Descripcion)
         {
             var msg = "";
             try
@@ -1223,9 +1223,10 @@ namespace A3_Reloaded.Clases
                 var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
                 using (var conn = new SqlConnection(constr))
                 {
-                    SqlCommand cmd = new SqlCommand("insert_Template_Running", conn);
+                    SqlCommand cmd = new SqlCommand("insert_Template_Running_v2", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("@Folio", SqlDbType.VarChar).Value = Folio;
+                    cmd.Parameters.Add("@Descripcion", SqlDbType.VarChar).Value = Descripcion;
                     cmd.Parameters.Add("@TipoA3", SqlDbType.VarChar).Value = TipoA3;
                     cmd.Parameters.Add("@Version", SqlDbType.Int).Value = Version;
                     cmd.Parameters.Add("@Contact", SqlDbType.VarChar).Value = Contact;
@@ -1451,7 +1452,7 @@ namespace A3_Reloaded.Clases
                 System.Data.SqlClient.SqlCommand sql;
                 con.Open();
                 sql = new System.Data.SqlClient.SqlCommand();
-                sql.CommandText = "select dbo.obtener_fecha_ultima_modificacion(" + ID + ");";
+                sql.CommandText = "select dbo.obtener_fecha_ultima_modificacion('" + ID + "');";
                 sql.Connection = con;
                 using (reader = sql.ExecuteReader())
                 {
@@ -1779,7 +1780,7 @@ namespace A3_Reloaded.Clases
             }
             return dt;
         }
-        public string registrar_Preguntas_Running(string Nombre, string Descripcion, int Tipo, string Respuesta, int Estatus, int Seccion,int Firma)
+        public string registrar_Preguntas_Running(string Nombre, string Descripcion, int Tipo, string Respuesta, int Estatus, int Seccion,int Firma, int flow)
         {
             var msg = "";
             try
@@ -1797,6 +1798,7 @@ namespace A3_Reloaded.Clases
                     cmd.Parameters.Add("@Estatus", SqlDbType.Int).Value = Estatus;
                     cmd.Parameters.Add("@Seccion", SqlDbType.Int).Value = Seccion;
                     cmd.Parameters.Add("@Firma", SqlDbType.Int).Value = Firma;
+                    cmd.Parameters.Add("@Flow", SqlDbType.Int).Value = flow;
                     SqlDataAdapter adp = new SqlDataAdapter(cmd);
                     adp.Fill(dt);
                 }
@@ -2827,7 +2829,7 @@ namespace A3_Reloaded.Clases
             return msg;
         }
         
-        public string actualizar_5w(string ID,string What, string Why1, string Why2, string Why3, string Why4, string Cause, string Date, string Step, string Name, string estatus, string Cuadrante)
+        public string actualizar_5w(string ID,string What, string Why1, string Why2, string Why3, string Why4,string Why5, string Cause, string Date, string Step, string Name, string estatus, string Cuadrante)
         {
             var msg = "";
             try
@@ -2843,6 +2845,7 @@ namespace A3_Reloaded.Clases
                     cmd.Parameters.Add("@Why2", SqlDbType.VarChar).Value = Why2;
                     cmd.Parameters.Add("@Why3", SqlDbType.VarChar).Value = Why3;
                     cmd.Parameters.Add("@Why4", SqlDbType.VarChar).Value = Why4;
+                    cmd.Parameters.Add("@Why5", SqlDbType.VarChar).Value = Why5;
                     cmd.Parameters.Add("@Cause", SqlDbType.VarChar).Value = Cause;
                     cmd.Parameters.Add("@Date", SqlDbType.Date).Value = Convert.ToDateTime(Date).ToShortDateString();
                     cmd.Parameters.Add("@Step", SqlDbType.VarChar).Value = Step;
@@ -3137,6 +3140,36 @@ namespace A3_Reloaded.Clases
                 {
                     SqlCommand cmd = new SqlCommand("get_evaluadores_template_ID", conn);
                     cmd.Parameters.Add("@ID", SqlDbType.Int).Value = ID;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                if (dt.Columns[0].ToString() == "ErrorNumber")
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                                ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return dt;
+        }
+        public DataTable obtener_responsable_a3(int id_template)
+        {
+            var msg = "";
+            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+            DataTable dt = new DataTable();
+            try
+            {
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("obtener_responsable_a3", conn);
+                    cmd.Parameters.Add("@id_template", SqlDbType.Int).Value = id_template;
                     cmd.CommandType = CommandType.StoredProcedure;
                     SqlDataAdapter adp = new SqlDataAdapter(cmd);
                     adp.Fill(dt);

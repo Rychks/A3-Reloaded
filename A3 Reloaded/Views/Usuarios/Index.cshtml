@@ -6,51 +6,46 @@
 
     <div class="loader"></div>
     <div class="section-body">
-        <h2 class="section-title txt_Idioma_Administracion_Usuarios">Administración de Usuarios</h2>
+        <!--<h2 class="section-title txt_Idioma_Administracion_Usuarios">Administración de Usuarios</h2>-->
         <div class="row">
             <div class="col-lg-12">
                 <div class="card card-primary">
                     <div class="card-body">
                         <div id="frmUsuarios">
-                            <div class="row">
-                                <div class="form-group col-md-2">
+                            <div class="row mb-4">
+                                <div class="col-md-2">
                                     <label for="txtUsuarios_CWID" class="txt_Idioma_CWID">CWID</label>
                                     <input type="text" class="form-control txt_Idioma_Ingese_un_CWID" id="txtUsuarios_CWID" placeholder="Ingrese un CWID">
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="col-md-3">
                                     <label for="txtUsuarios_Nombre" class="txt_Idioma_Nombre">Nombre</label>
                                     <input type="text" class="form-control txt_Idioma_Ingrese_un_nombre" id="txtUsuarios_Nombre" placeholder="Ingrese un Nombre">
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="col-md-3">
                                     <label for="txtUsuarios_Correo" class="txt_Idioma_Correo">Correo</label>
                                     <input type="text" class="form-control txt_Idioma_Ingrese_correo" id="txtUsuarios_Correo" placeholder="">
                                 </div>
-                                <div class="form-group col-md-2">
-                                    <label for="slcUsuarios_Rol" class="txt_Idioma_Rol">Rol</label>
-                                    <select class="form-control" id="slcUsuarios_Rol">
+                                <div class="col-md-2">
+                                    <label for="slcUsuarios_Rol" style="width: 100%" class="txt_Idioma_Rol">Rol</label>
+                                    <select class="form-control" style="width: 100%" id="slcUsuarios_Rol">
                                         <option value="-1" selected disabled>Seleccione</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-2">
+                                <div class="col-md-2">
                                     <label for="slcUsuarios_Rol" class="txt_Idioma_Departamento">Departamento</label>
-                                    <select class="form-control" id="slcUsuarios_Departamento">
+                                    <select class="form-control" style="width: 100%" id="slcUsuarios_Departamento">
                                         <option value="-1" selected disabled>Seleccione</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="form-group col-md-2">
-
-                                    <div class="form-check form-switch">
+                            <div class="row ">
+                                <div class="col-md-10 d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <div class="form-check form-switch mt-2">
                                         <input class="form-check-input" type="checkbox" role="switch" id="cbxUsuarios_Activo" checked>
-                                        <label class="form-check-label txt_Idioma_Solo_ver_activos" for="cbxUsuarios_Activo">Solo ver activos</label>
+                                        <label class="form-check-label txt_Idioma_Solo_ver_activos" style="margin-top:0.2rem;" for="cbxUsuarios_Activo">Solo ver activos</label>
                                     </div>
-                                    @*<div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="cbxUsuarios_Activo">
-            <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxUsuarios_Activo">Solo ver activos</label>
-        </div>*@
                                 </div>
-                                <div class="form-group col-md-10 text-right">
+                                <div class="col-md-2 text-right d-grid gap-2 d-md-flex justify-content-md-end">
                                     <button type="button" class="btn btn-sm btn-icon btn-info btn-left txt_Idioma_Buscar" id="btnUsuarios_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
                                     <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left txt_Idioma_Limpiar_filtros" id="btnUsuarios_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
                                     <button type="button" class="btn btn-sm btn-icon btn-success btn-left txt_Idioma_Agregar" id="btnUsuarios_Agregar" data-toggle="modal" data-target="#mdlUsuarios_Agregar">
@@ -70,17 +65,17 @@
                         <div class="dimmer" id="tblUsuarios">
                             <div class="dimmer-content">
                                 <div class="table-responsive tabla-md encabezados-fixed">
-                                    <table class="table table-hover text-center">
+                                    <table class="table table-hover text-center tablaCss">
                                         <thead>
                                             <tr>
-                                                <th scope="col" style="width:15px;">#</th>
+                                                <th scope="col" style="width:5%;" >#</th>
                                                 <th scope="col" class="txt_Idioma_CWID" style="width:25px;">CWID</th>
                                                 <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
                                                 <th scope="col" class="txt_Idioma_Correo">Correo</th>
                                                 <th scope="col" class="txt_Idioma_Rol">Rol</th>
                                                 <th scope="col" class="txt_Idioma_Departamento">Departamento</th>
-                                                <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
-                                                <th scope="col" class="txt_Idioma_Opciones">Opciones</th>
+                                                <th scope="col" style="width:5%;"  class="txt_Idioma_Estatus">Estatus</th>
+                                                <th scope="col" style="width:5%;"  class="txt_Idioma_Opciones">Opciones</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -92,15 +87,15 @@
                         </div>
                     </div>
                     <div class="card-footer text-right">
-                        <div id="pgdUsuarios">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                        <div id="pgdUsuarios" class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-sm btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
                                 <div class="btn-group">
-                                    <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                                    <select class="form-control form-control-sm text-center" style="width:80px !important" data-paginado="Paginas">
                                         <option selected disabled value="-1">Página</option>
                                     </select>
                                 </div>
-                                <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                                <button type="button" class="btn btn-sm btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
                             </div>
                         </div>
                     </div>

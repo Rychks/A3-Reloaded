@@ -1,5 +1,57 @@
 ﻿define(["jquery"], function ($) {
     $(document).ready(function () {
+        $("#tblTemplateRunningN_acciones_prevetivas_Datos").on('click', ".btnRemoverRegistro", function () {
+            var id_accion = $(this).parents("tr").find("[data-registro=id_accion]").html();
+            $.notiMsj.Confirmacion({
+                Tipo: "MD",
+                Titulo: "Omitir Registro",
+                Mensaje: "¿Desea omitir la acción?",
+                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                FuncionV: function () {
+                    fn_remover_accion_preventiva(id_accion);
+                }
+            });
+            
+        });
+        $("#btnTemplateRunningN_AccionesPreventivas_Agregar").click(function () {
+            $.auxFormulario.camposVacios({
+                Seccion: $("#frmAccionPreventivaN"),
+                NoVacio: function () {
+                    fn_agregar_acciones_preventivas();
+                }
+            });
+            
+        });
+        $("#btnTemplatesRunningN_AccionesPreventivas").click(function () {
+            $("#mdl_accionesPreventivas").modal("show");
+            $("#slcTemplatesRunningN_AccionesPreventivas_Usuario").generarLista({ URL: "/Usuarios/Lista_Usuarios" });
+            $("#slcTemplatesRunningN_AccionesPreventivas_Usuario").select2({
+                dropdownParent: $('#mdl_accionesPreventivas .modal-content')
+            });
+            fn_obtener_acciones_preventivas_running();
+        });
+        $("#btnTemplatesRunning_aprobe").click(function () {
+            $.notiMsj.Confirmacion({
+                Tipo: "MD",
+                Titulo: "Recordatorio",
+                Mensaje: "¿Has registrado acciones preventivas?",
+                BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                FuncionV: function () {
+                    $.firmaElectronica.MostrarFirma({
+                        Funcion: registrar_firma_Aprobacion_A3
+                    });
+                }
+            });
+           
+        });
+        $("#btnTemplatesRunning_reject").click(function () {
+            $.firmaElectronica.MostrarFirma({
+                Justificacion: true,
+                Funcion: registrar_firma_Rechazar_Aprobacion_A3
+            });
+        });
         $("#cbxFilter_turno2").click(function () {
             if ($("#cbxFilter_turno2").prop("checked")) {
                 $("#cbxFilter_turno2").val("SEGUNDO")
@@ -50,7 +102,6 @@
         $.CargarIdioma.Textos({
             Funcion: fn_cargaTiposA3
         });
-
         $("#btnMenuPrin").click(function () {
             $("#tiposA3").slideDown(1000);
             $("#pnlTemplatesRunning_Investigacion").hide();
@@ -60,13 +111,6 @@
             $("#tiposA3").slideDown();
             $("#pnlHistorial").hide();
         });
-        //$("#btnTipoA3_Historial_mostrar").click(function () {
-        //    $("#slcTemplatesRunning_History_TipoA3").generarLista({ URL: "/Templates/Lista_Formatos_A3" });
-        //    $("#tiposA3").slideUp();
-        //    $("#pnlHistorial").show();
-        //    $("#pnlInicio_Formulario_Nueva_Investigacion").hide();
-        //    fn_TemplatesRunning_History();
-        //});
         $("#btnReporteRunning_Ver_Adjuntos").click(function () {
             $("#pnlReporte_tbl_AdjuntosRunning").show();
             $("#pnlReporte_tbl_ReporteRunning").hide();
@@ -83,11 +127,13 @@
             $("#btnTemplate_Complementacion").css("border", "none");
             var id = $(this).parents("tr").find(".idTemplate").html();
             var PmCard = $(this).parents("tr").find("[data-registro=PmCard]").html();
+            var description = $(this).parents("tr").find("[data-registro=description]").html();
             var url = "/Templates/obtenerTemplate";
             $.post(url, data = { ID: id }).done(function (res) {
                 if (res != "") {
                     $.each(res, function (i, item) {
                         $("#txtTemplatesRunningN_ID").val(item.ID);
+                        $("#txtTemplatesRunningN_description").val(description);
                         $("#slcTemplatesRunningN_TipoA3").generarLista({ URL: "/Templates/Lista_Formatos_A3", Seleccion: item.TipoA3 });
                         $("#slcTemplatesRunningN_Usuarios").generarLista({ URL: "/Usuarios/Lista_Usuarios" });
                         $("#slcTemplatesRunningN_Usuarios").select2({
@@ -98,22 +144,28 @@
                         $("#slcTemplatesRunningN_Linea").generarLista({ URL: "/Lineas/Lista_Lineas" });
                         $("#slcTemplatesRunningN_Equipo").generarLista({ URL: "/Equipos/Lista_Equipos" });
                         fn_obtener_folio_nueva_investigacion();
-                        $("#pnlTemplateRunning_Cuadrante_D").hide();
+                        $(".pnlTemplateRunning_Cuadrante_D").hide();
                         $("#tiposA3").hide();
+                        $("#pnlTemplateRunning_signPanel").hide();
+                        $("#btnTemplatesRunningN_AccionesPreventivas").hide();
+
                         get_configuration_panels(id)
                        
                         if (PmCard != "0") {
                             $("#txtBand_pmcard_templateRN").val(1);
                             $("#slc_PmCardRunning_linea").generarLista({ URL: "/Lineas/Lista_Lineas" });
+                            $("#btnTemplatesRunningN_AccionesPreventivas").show();
                             get_list_failure_mode_category();
                             $("#plnTemplate_PmCard").show();
 
                         } else {
                             $("#plnTemplate_PmCard").hide();
+                            $("#btnTemplatesRunningN_AccionesPreventivas").show();
                             $("#txtBand_pmcard_templateRN").val(0);
                         }
                         $("#pnlInicio_Formulario_Nueva_Investigacion").show();
                         $("#tblTemplateRunningN_Evaluadores").empty();
+
                     });
                 } else {
                     $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: null });
@@ -122,9 +174,17 @@
             
         });
         /* FUNCTION TO GET TOP 5 FAILURES*/
-        $("#slc_PmCardRunning_linea").change(function () {
+        $("#slc_PmCardRunning_linea,#slc_PmCardRunning_tipoParo").change(function () {
+
+            let source = $("#slc_PmCardRunning_origin option:selected").val();
             let Linea_text = $("#slc_PmCardRunning_linea option:selected").text();
-            fn_getTop5_faiulres(Linea_text);
+            if (source == "2") {
+                fn_getTop5_faiulres(Linea_text);
+            }
+            if (source == "1") {
+                getIrisEvents_dataAll(Linea_text);
+            }
+           
         })
         $("#btnContinuar_pmcard").click(function () {
             var num_failure_pm_card = $('#tbl_PmCardRunning tbody').find('input[type="checkbox"]:checked').length;
@@ -148,77 +208,39 @@
             $("#btnTemplate_Complementacion").css({ "border": "solid", "border-color": "#abc32f" });
         });
         /* **************************  */
+        /* FUNCTION TO GET DATA FROM IRIS*/
+
+
+
+        /******************************** */
         $("#btnTemplatesRunningN_Guardar").click(function () {           
             var num_failure_pm_card = $('#tbl_PmCardRunning tbody').find('input[type="checkbox"]:checked').length;
           
             var rows = $('#tblTemplateRunningN_Evaluadores tr').length;
             var pmcard_band = $("#txtBand_pmcard_templateRN").val();
             console.log(pmcard_band);
-            if (pmcard_band == 1) {
-                if (rows > 0 && num_failure_pm_card > 0) {
-                    $.auxFormulario.camposVacios({
-                        Seccion: $("#frmTemplatesRN"),
-                        NoVacio: function () {
-                            fn_comenzar_Investigacion()
-                        },
-                        EsVacio: function () {
-                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
-                            //$("#btnTemplatesRN_info").addClass("validate-div");
-                        }
-                    });
-                } else {
-                    if (rows == 0 && num_failure_pm_card == 0) {
-                        $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "red" });
-                        setInterval(function () {
-                            $("#btnTemplatesRN_info").css("border", "none");
-                        }, 4000);
-
-                        $("#btnTemplateRn_pmcard").css({ "border": "solid", "border-color": "red" });
-                        setInterval(function () {
-                            $("#btnTemplateRn_pmcard").css("border", "none");
-                        }, 4000);
-                    } else {
-                        if (num_failure_pm_card == 0) {
-                            $("#btnTemplateRn_pmcard").css({ "border": "solid", "border-color": "red" });
-                            setInterval(function () {
-                                $("#btnTemplateRn_pmcard").css("border", "none");
-                            }, 4000);
-                        } else {
-                            $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "red" });
-                            setInterval(function () {
-                                $("#btnTemplatesRN_info").css("border", "none");
-                            }, 4000);
-
-                        }
+            if (rows > 0) {
+                $.auxFormulario.camposVacios({
+                    Seccion: $("#frmTemplatesRN"),
+                    NoVacio: function () {
+                        fn_comenzar_Investigacion();
+                    },
+                    EsVacio: function () {
+                        $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
+                        $("#btnTemplatesRN_info").addClass("validate-div");
                     }
-                    
-                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
-                }
+                });
             } else {
-                if (rows > 0) {
-                    $.auxFormulario.camposVacios({
-                        Seccion: $("#frmTemplatesRN"),
-                        NoVacio: function () {
-                            fn_comenzar_Investigacion();
-                        },
-                        EsVacio: function () {
-                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
-                            $("#btnTemplatesRN_info").addClass("validate-div");
-                        }
-                    });
-                } else {
-                    if (rows == 0) {
-                        $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "red" });
-                        setInterval(function () {
-                            $("#btnTemplatesRN_info").css("border", "none");
-                        }, 4000);
-                    }
-                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
+                if (rows == 0) {
+                    $("#btnTemplatesRN_info").css({ "border": "solid", "border-color": "red" });
+                    setInterval(function () {
+                        $("#btnTemplatesRN_info").css("border", "none");
+                    }, 4000);
                 }
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_ingrese_informacion_requerida'), Tipo: "info", Error: null });
             }
             
         });
-        //
         $("#btnTemplateRunningN_Evaluador_Agregar").click(function () {
             fn_agregar_evaluadores();
         });
@@ -446,10 +468,6 @@
             return false;
         });
         //Funciones Reporte A3
-        $("#tblTemplatesRunning_History").on("click", ".btnPdf", function () {
-            var ID = $(this).parents("tr").find("[data-registro=ID]").html();
-            fn_validar_Evaluador(ID);
-        });
         $("#tblAdjuntosTemplate_Running").on("click", ".btnVerAdjunto", function () {
             var Archivo = $(this).parents("tr").find(".NomAdjunto").html();
             window.open("/Assets/Adjuntos/" + Archivo, '_blank');
@@ -533,7 +551,7 @@
                         $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
                     }
                 });
-            }, 2000);
+            }, 5000);
         });
         $("#ItemTemplateRunning_SeccionRunning").on("keyup", "input[data-registro=comentarios]", function () {
             var input = $(this);
@@ -555,9 +573,11 @@
                     processData: false,
                     data: frmDatos,
                     success: function (res) {
+                        
                         if (res.Tipo == "success") {
                             $("#mdlItemRunning_Panel").modal("hide");
                             $("#txtPreguntaRunning_Comentarios").val(null);
+                           
                         }
                         $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
                         fn_obtener_itemRunning_ID(id_item);
@@ -569,7 +589,7 @@
                         $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
                     }
                 });
-            }, 2000);
+            }, 5000);
         });
         $("#ItemTemplateRunning_SeccionRunning").on("click", "input", function () {
             var value = $(this).val()
@@ -595,8 +615,15 @@
                     data: frmDatos,
                     success: function (res) {
                         if (res.Tipo == "success") {
+                            
                             $("#mdlItemRunning_Panel").modal("hide");
                             $("#txtPreguntaRunning_Comentarios").val(null);
+                            $("#btnTemplateRunning_Finalizar_investigacion").hide();
+                            $("#btn_CuadranteA_D").show();
+                            if (res.Id == "1" && value == "Si") {
+                                $("#btnTemplateRunning_Finalizar_investigacion").show();
+                                $("#btn_CuadranteA_D").hide();
+                            }
                         }
                         $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
                         fn_obtener_itemRunning_ID(id_item);
@@ -641,7 +668,7 @@
 
             $("#pnlTemplatesRunning_Investigacion").slideDown();
             $("#pnlTemplatesRunning_secciones").hide();
-            $("#pnlTemplateRunning_Cuadrante_D").hide();
+            $(".pnlTemplateRunning_Cuadrante_D").hide();
             var ID = $("#txtTemplatesRunningN_ID").val();
             fn_mostrar_Investigacion(ID);
             fn_mostrar_Cuadrantes_btn(ID);
@@ -810,6 +837,11 @@
             //});
         });
         //
+        $("#txt5wCuadranteD_NameResponsable").change(function () {
+
+            var valor = $("#txt5wCuadranteD_NameResponsable option:selected").text();
+            $("#txt5wCuadranteD_Name").val(valor);
+        })
         $("#btnInvestigation5why_Agregar").click(function () {
             $("#txt5wCuadranteD_What").val(null);
             $("#txt5wCuadranteD_Why1").val(null);
@@ -821,8 +853,12 @@
             $("#txt5wCuadranteD_Step").val(null);
             $("#txt5wCuadranteD_Name").val(null);
             $("#txt5wCuadranteD_Date").val(null);
-            $("#txt5wCuadranteD_Status").val(null);
+            $("#txt5wCuadranteD_Status").val(1);
             $("#txt5wCuadranteD_ID").val(null);
+            $("#txt5wCuadranteD_NameResponsable").generarLista({ URL: "/Usuarios/Lista_Usuarios" });
+            $("#txt5wCuadranteD_NameResponsable").select2({
+                dropdownParent: $('#mdlInvestigtion5why_CuadranteD .modal-content')
+            });
             $("#mdlInvestigtion5why_CuadranteD").modal("show");
         });
         $("#btnStandarsCuadranteD_Agregar").click(function () {
@@ -1146,6 +1182,218 @@
             }
         })
     });
+    function getIrisEvents_dataAll(line) {
+        let tipoParo = $("#slc_PmCardRunning_tipoParo").val();
+        const tbody = $("#tbl_PmCardRunning tbody");
+        tbody.empty();
+        const row1 = $('<tr>');
+        row1.append($('<td style="text-align:center" colspan="100%">').append('<div class="spinner-border" style="height:12rem; width:12rem;" role="status"><span class="visually-hidden"></span></div>'));
+        tbody.append(row1);
+
+        let pagina = 0; // Inicializa la página
+        let allRecords = []; // Array para almacenar todos los registros
+
+
+
+        function fetchPage(pagina) {
+
+            fetch('https://ler-bayer.tulip.co/api/v3/tables/vPR73XaGSZJhnju82/records?limit=100&offset=' + pagina * 100 + '&sortBy=_updatedAt&sortDir=desc&includeTotalCount=true&filters=[' +
+                    '{"field":"\_updatedAt","arg":"2025-03-15T00:00:00Z","functionType":"greaterThan"},' +
+                    '{"field":"siheq\_line\_akz\_level\_2","arg":"' + line + '","functionType":"equal"}' +
+                ']',
+            {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Basic YXBpa2V5LjJfZkpNN1dHbWhMd2I3bk13QzY6ZGN1SzZlRUh1MHQ0LWM0MXg2UWZnMUxxRkhmVzY3TFNpWTdDenlIeDg2Sw==",
+                }
+            })
+                .then(response => {
+                    for (const [key, value] of response.headers.entries()) {
+                        //console.log(`${key}: ${value}`);
+                    }
+                    /* console.log(parseInt(limite / 100));*/
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    //console.log("Datos recibidos:", data);
+                    allRecords = allRecords.concat(data); // Agrega los registros de la página actual
+
+                    // Si hay menos de 100 registros, hemos llegado al final
+                    if (data.length < 100 || pagina == 20) {
+                        mostrarDatos_iris(allRecords); // Muestra todos los registros
+                    } else {
+                        pagina++; // Incrementa la página
+                        fetchPage(pagina); // Llama a la siguiente página
+                    }
+                })
+                .catch(error => {
+                    console.error("Error en la solicitud:", error);
+                });
+        }
+
+        fetchPage(pagina); // Inicia la primera solicitud
+    }
+    function mostrarDatos_iris(data) {
+        console.log(data);
+
+        const tbody = $("#tbl_PmCardRunning tbody");
+        tbody.empty(); // Limpia la tabla antes de mostrar nuevos datos
+        const groupedData = {};
+
+        data.forEach((datos) => {
+            if (datos.elslw_reason_tree_level_4 != "") {
+
+                if (1 == 1) {
+                    const fechaOriginal = datos.ttoyl_start_activity_utc;
+                    const fecha = new Date(fechaOriginal);
+                    const dia = String(fecha.getDate()).padStart(2, '0');
+                    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                    const anio = fecha.getFullYear();
+                    const fechaFormateada = dia + '.' + mes + '.' + anio; // Formato de fecha
+                    const equipo = datos.ysmgy_equipment; // Equipo
+                    const duration = (parseFloat(datos.oqnrl_duration) / 60).toFixed(2);
+                    const clasificacion = '\\' + datos.wrplo_reason_tree_level_0 + '\\' + datos.dowjp_reason_tree_level_1 + '\\' + datos.neaud_reason_tree_level_2 + '\\' + datos.ndmyr_reason_tree_level_3 + '\\';
+
+                    // Crear una clave única para la combinación de fecha, equipo y clasificación
+                    const key = `${fechaFormateada}-${equipo}-${clasificacion}`;
+
+                    // Si la clave no existe en el objeto, la inicializamos
+                    if (!groupedData[key]) {
+                        groupedData[key] = {
+                            fecha: fechaFormateada,
+                            equipo: equipo,
+                            clasificacion: clasificacion,
+                            count: 0,
+                            totalDuration: 0,
+                            rows: [] // Para almacenar las filas originales
+                        };
+                    }
+
+                    // Actualizar el objeto con los datos
+                    groupedData[key].count += 1;
+                    groupedData[key].totalDuration += parseFloat(datos.oqnrl_duration);
+                    groupedData[key].rows.push({
+                        linea: datos.siheq_line_akz_level_2,
+                        lote: datos.ogedi_batch_id,
+                        sku: datos.pnxgy_product_id,
+                        producto: datos.ijgin_product_description,
+                        minutos: duration
+                    });
+                }
+
+                
+            }
+        });
+
+        for (const key in groupedData) {
+            const group = groupedData[key];
+            const row = $('<tr>');
+            // Suponiendo que quieres mostrar la fecha de la primera fila del grupo
+            const primeraFila = group.rows[0]; // Obtener la primera fila del grupo
+            row.append($('<td data-registro="fecha">').append(group.fecha)); // Fecha de la primera fila
+            row.append($('<td data-registro="linea">').append(primeraFila.linea)); // Linea de la primera fila
+            row.append($('<td data-registro="maquina">').append(group.equipo)); // Máquina de la primera fila
+            row.append($('<td data-registro="motivo">').append('')); // Línea de la primera fila
+            row.append($('<td data-registro="minutos">').append((group.totalDuration / 60).toFixed(2))); // Total en horas
+            row.append($('<td data-registro="clasificacion">').append(group.clasificacion)); // Total en horas
+            row.append($('<td data-registro="turno">').append('')); // Total en horas
+            row.append($('<td data-registro="Lote" style="display:none">').append(primeraFila.lote))
+            row.append($('<td data-registro="SKU" style="display:none">').append(primeraFila.sku))
+            row.append($('<td data-registro="Producto" style="display:none">').append(primeraFila.producto))
+            row.append($('<td class="text-center" style="font-size:18px !important"> ').append('<button type="button" class="btn btn-sm btn-light disabled btnEvents"><i class="fa-solid fa-eye"></i></button>'))
+            row.append($('<td class="text-center" style="font-size:18px !important"> ').append('<input type="checkbox" style="height:1.5rem; width:1.5rem;" class="form-check-input checkbox_topFailures" name="name" value="" />'))
+            tbody.append(row);
+        }   
+        //fn_saveData(iris_events_tbl);
+    }
+    function fn_remover_accion_preventiva(id_accion) {
+        var ID_Template = $("#txtTemplatesRunningN_ID").val();
+        var frmDatos = new FormData();
+        frmDatos.append("id_accion", id_accion);
+        $.ajax({
+            type: "POST",
+            url: "/Acciones/delete_accion_preventiva",
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (res) {
+                if (res.Tipo == "success") {
+                    fn_obtener_acciones_preventivas_running(ID_Template);
+                }
+                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+            },
+            error: function (error) {
+                $("#txtTemplatesRunningN_Departamentos_ID").val(null);
+                $("#mdlSistema_FirmaElectronica").modal("hide");
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+    function fn_agregar_acciones_preventivas() {
+        var id_template = $("#txtTemplatesRunningN_ID").val();
+        var accion = $("#txtTemplatesRunningN_AccionesPreventivas_accion").val();
+        var fecha = $("#txtTemplatesRunningN_AccionesPreventivas_fecha").val();
+        var responsable = $("#slcTemplatesRunningN_AccionesPreventivas_Usuario option:selected").val();
+        var usuario_text = $("#slcTemplatesRunningN_AccionesPreventivas_Usuario option:selected").text();
+        var elaborador = $("#pnlTemplatesRunningM_Contact").val();
+        var frmDatos = new FormData();
+        frmDatos.append("id_template", id_template);
+        frmDatos.append("accion_text", accion);
+        frmDatos.append("fecha", fecha);
+        frmDatos.append("resposable", responsable);
+        $.ajax({
+            type: "POST",
+            url: "/Acciones/insert_accion_preventiva",
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (res) {
+                if (res.Tipo == "success") {
+
+
+                }
+                $.auxFormulario.limpiarCampos({
+                    Seccion: $("#frmAccionPreventivaN")
+                });
+                fn_obtener_acciones_preventivas_running(id_template)
+                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+            },
+            error: function (error) {
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+            }
+        });      
+    }
+    function fn_obtener_acciones_preventivas_running() {
+        var id_template = $("#txtTemplatesRunningN_ID").val();
+        var url = "/Acciones/get_registros_accion_preventiva_by_id_template";
+        var data = { id_template: id_template };
+        $.post(url, data).done(function (info) {
+            $("#tblTemplateRunningN_acciones_prevetivas_Datos").empty();
+            var Omitir = '<button class="btn btn-icon btn-danger btnRemoverRegistro" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Omitir Registro"><i class="fa fa-times"></i></button>';
+            if (info != "") {
+                $.each(info, function (i, item) {
+                    var badge_Status = '<span class="badge text-bg-secondary">' + item.Estatus + '</span>';
+                    $("#tblTemplateRunningN_acciones_prevetivas_Datos").append(
+                        $('<tr>')
+                            .append($('<td data-registro="id_accion" style="display:none;">').append(item.id_accion))
+                            .append($('<td data-registro="id_template" style="display:none;">').append(item.id_template))
+                            .append($('<td>').append(item.Descripcion))
+                            .append($('<td>').append(item.Fecha))
+                            .append($('<td>').append(item.Responsable))
+                            .append($('<td>').append(badge_Status))
+                            .append($('<td>').append(Omitir))
+                    );
+                });
+            } else {
+                $("#tblTemplateRunningN_acciones_prevetivas_Datos").append("<tr><th colspan='7'><p class='text-center'>" + $.CargarIdioma.Obtener_Texto("txt_Idioma_no_existen_registros") + "</p></th></tr>");
+            }
+
+        });
+    }
     function get_configuration_panels(id_template) {
         var url = "/Templates/get_configuration_panels";
         var frmDatos = new FormData();
@@ -1157,7 +1405,7 @@
             processData: false,
             data: frmDatos,
             success: function (result) {
-                $("#pnlTemplateRunning_Cuadrante_D").hide();
+                $(".pnlTemplateRunning_Cuadrante_D").hide();
                 $("#tiposA3").hide();
                 //$("#pnlInicio_Formulario_Nueva_Investigacion").hide();
                 $("#pnlTemplate_failure_mode").hide();
@@ -1194,8 +1442,8 @@
                         $('<tr>')
                             .append($('<td data-registro="failure_mode_id" style="display:none">').append(item.id_failure))
                             .append($('<td data-registro="failure_mode_text" style="display:none">').append(item.name_failure))
-                            .append($('<td style="font-size:15px">').append(item.name_failure))
-                            .append($('<td style="font-size:15px">').append(' <input type="checkbox" style="height:1.5rem; width:1.5rem;" class="form-check-input checkbox_failureMode" name="name" value="" />'))
+                            .append($('<td >').append(item.name_failure))
+                            .append($('<td >').append(' <input type="checkbox" style="height:1.5rem; width:1.5rem;" class="form-check-input checkbox_failureMode" name="name" value="" />'))
                     );
                 })
             },
@@ -1239,13 +1487,13 @@
                 $.each(result, function (i, item) {
                     $("#tbl_PmCardRunning tbody").append(
                         $('<tr>')
-                            .append($('<td data-registro="fecha" style="font-size:15px !important">').append(item.Fecha))
-                            .append($('<td data-registro="linea" style="font-size:15px !important">').append(item.Linea))
-                            .append($('<td data-registro="maquina" style="font-size:15px !important">').append(item.Maquina))
-                            .append($('<td data-registro="motivo" style="font-size:15px !important"> ').append(item.Motivo))
-                            .append($('<td data-registro="minutos" style="font-size:15px !important"> ').append(item.Minutos))
-                            .append($('<td data-registro="clasificacion" style="font-size:15px !important"> ').append(item.Clasificacion))
-                            .append($('<td data-registro="turno" style="font-size:15px !important">').append(item.Turno))
+                            .append($('<td data-registro="fecha" >').append(item.Fecha))
+                            .append($('<td data-registro="linea" >').append(item.Linea))
+                            .append($('<td data-registro="maquina" >').append(item.Maquina))
+                            .append($('<td data-registro="motivo" > ').append(item.Motivo))
+                            .append($('<td data-registro="minutos" > ').append(item.Minutos))
+                            .append($('<td data-registro="clasificacion" > ').append(item.Clasificacion))
+                            .append($('<td data-registro="turno" >').append(item.Turno))
                             .append($('<td data-registro="Lote" style="display:none">').append(item.Lote))
                             .append($('<td data-registro="SKU" style="display:none">').append(item.SKU))
                             .append($('<td data-registro="Producto" style="display:none">').append(item.Producto))
@@ -1276,13 +1524,13 @@
                 $.each(result, function (i, item) {
                     $("#tbl_events_pmcard tbody").append(
                         $('<tr>')
-                            .append($('<td style="font-size:15px" data-registro="fecha">').append(item.Fecha))
-                            .append($('<td style="font-size:15px" data-registro="linea">').append(item.Linea))
-                            .append($('<td style="font-size:15px" data-registro="maquina">').append(item.Maquina))
-                            .append($('<td style="font-size:15px" data-registro="motivo">').append(item.Motivo))
-                            .append($('<td style="font-size:15px" data-registro="minutos">').append(item.Minutos))
-                            .append($('<td style="font-size:15px" data-registro="clasificacion">').append(item.Clasificacion))
-                            .append($('<td style="font-size:15px" data-registro="comentario">').append(item.Comentario))
+                            .append($('<td  data-registro="fecha">').append(item.Fecha))
+                            .append($('<td  data-registro="linea">').append(item.Linea))
+                            .append($('<td  data-registro="maquina">').append(item.Maquina))
+                            .append($('<td data-registro="motivo">').append(item.Motivo))
+                            .append($('<td data-registro="minutos">').append(item.Minutos))
+                            .append($('<td data-registro="clasificacion">').append(item.Clasificacion))
+                            .append($('<td data-registro="comentario">').append(item.Comentario))
                     );
                 })
                 
@@ -1297,48 +1545,110 @@
     function fn_continue_a3() {
         let ID = $("#txt_id_a3_running").val()
         $("#txtTemplatesRunningN_ID").val(ID);
+        $("#pnlTemplateRunning_signPanel").hide();
+        let gbl_rol_id = $("#txtGbl_rol_id").val();
         var url = "/Sistema/obtener_estatus_template";
         var data = { ID: ID };
         $.post(url, data).done(function (info) {
+            var status_template = info.Id;
             var res = "0";
             var url1 = "/Sistema/valida_responsable_usuario";
             var data1 = { ID: ID };
             $.post(url1, data1).done(function (info1) {
                 res = info1.Id;
-                if (info.Id == "6" || info.Id == "7" || info.Id == "8") {
+                if (status_template == "6" || status_template == "7" || status_template == "8") {
                     var texto_alert;
-                    if (info.Id == "7") {
+                    if (status_template == "7") {
                         texto_alert = $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion_mensaje_completo');
                     } else {
                         texto_alert = $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion_mensaje_mitad');
                     }
-                    if (res == "1") {
-                        $.notiMsj.Confirmacion({
-                            Tipo: "MD",
-                            Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion'),
-                            Mensaje: texto_alert,
-                            BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
-                            BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
-                            FuncionV: function () {
-                                $.firmaElectronica.MostrarFirma({
-                                    Justificacion: true,
-                                    Funcion: registrar_firma_reabrir_A3
+                    switch (res) {
+                        case "1":
+                            //$.notiMsj.Confirmacion({
+                            //        Tipo: "MD",
+                            //        Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion'),
+                            //        Mensaje: texto_alert,
+                            //        BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                            //        BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                            //        FuncionV: function () {
+                            //            $.firmaElectronica.MostrarFirma({
+                            //                Justificacion: true,
+                            //                Funcion: registrar_firma_reabrir_A3
+                            //            });
+                            //        },
+                            //        FuncionF: function () {
+                            //            window.location.replace("/Home")
+                            //        }
+                            //    });
+                            if (gbl_rol_id == "1") {
+                                var ID_Template = $("#txtTemplatesRunningN_ID").val();
+                                $("#mdlItemRunning_Panel").modal("hide");
+                                $("#mdlSistema_FirmaElectronica").modal("hide");
+                                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                                $(".pnlTemplateRunning_Cuadrante_D").hide();
+                                $("#tiposA3").hide();
+                                $("#pnlTemplateRunning_signPanel").hide();
+                                $("#btnTemplateRunning_Finalizar_investigacion").show();
+                                //get_configuration_panels(id)
+                                fn_mostrar_Investigacion(ID_Template);
+                                fn_mostrar_Cuadrantes_btn(ID_Template);
+                            } else {
+                                $.notiMsj.Confirmacion({
+                                    Tipo: "MD",
+                                    Titulo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Reabrir_investigacion'),
+                                    Mensaje: texto_alert,
+                                    BotonSi: $.CargarIdioma.Obtener_Texto('txt_Idioma_Notificacion_SI'),
+                                    BotonNo: $.CargarIdioma.Obtener_Texto('txt_Idioma_Cancelar'),
+                                    FuncionV: function () {
+                                        $.firmaElectronica.MostrarFirma({
+                                            Justificacion: true,
+                                            Funcion: registrar_firma_reabrir_A3
+                                        });
+                                    },
+                                    FuncionF: function () {
+                                        window.location.replace("/Home")
+                                    }
                                 });
-                            },
-                            FuncionF: function () {
-                                window.location.replace("/Home")
                             }
-                        });
-                    } else {
-                        $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Error_Reabrir_Investigacion'), Tipo: "danger", Error: null });
+                            
+                        break;
+                        case "2":
+                            $("#pnlTemplateRunning_signPanel").show();
+                            $("#btnTemplateRunning_Finalizar_investigacion").hide();
+                            $("#txtTemplareRunning_band_new_a3").val("0");
+                            fn_mostrar_Investigacion(ID);
+                            fn_mostrar_Cuadrantes_btn(ID);
+                            $(".pnlTemplateRunning_Cuadrante_D").hide();
+                            break;
+                        default:
+                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Error_Reabrir_Investigacion'), Tipo: "danger", Error: null });
                     }
                 } else {
                     if (res == "1") {
+                        $("#pnlTemplateRunning_signPanel").hide();
+                        $("#btnTemplateRunning_Finalizar_investigacion").show();
+                        $("#txtTemplareRunning_band_new_a3").val("0");
                         fn_mostrar_Investigacion(ID);
                         fn_mostrar_Cuadrantes_btn(ID);
-                        $("#pnlTemplateRunning_Cuadrante_D").hide();
+                        $(".pnlTemplateRunning_Cuadrante_D").hide();
                     } else {
-                        $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Error_Reabrir_Investigacion'), Tipo: "danger", Error: null });
+                        if (gbl_rol_id == "1") {
+                            var ID_Template = $("#txtTemplatesRunningN_ID").val();
+                            $("#mdlItemRunning_Panel").modal("hide");
+                            $("#mdlSistema_FirmaElectronica").modal("hide");
+                            $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                            $(".pnlTemplateRunning_Cuadrante_D").hide();
+                            $("#tiposA3").hide();
+                            $("#pnlTemplateRunning_signPanel").hide();
+                            $("#btnTemplateRunning_Finalizar_investigacion").show();
+                            //get_configuration_panels(id)
+                            fn_mostrar_Investigacion(ID_Template);
+                            fn_mostrar_Cuadrantes_btn(ID_Template);
+                        } else {
+                            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Error_Reabrir_Investigacion'), Tipo: "danger", Error: null });
+                        }
+                       
                     }
                 }
             });
@@ -1684,7 +1994,7 @@
                             .append($('<td data-registro="PmCard" style="display:none">').append(item.PmCard))
                             .append($('<td style="text-align:center;">').append('<img height="50" width="50" src="/Assets/img/Templates/' + item.Imagen + '"/>'))
                             .append($('<td>').append(item.TipoA3))
-                            .append($('<td>').append(item.Descripcion))
+                            .append($('<td data-registro="description">').append(item.Descripcion))
                             .append($('<td>').append(item.Version))
                             .append($('<td>').append(Botones))
                     );
@@ -1730,8 +2040,8 @@
                             $('<tr>')
                                 .append($('<td style="display:none;" class="IDUsuario">').append(ID_Usuario))
                                 .append($('<td style="display:none;" class="IDTipo">').append(Nom_Tipo_Usuario))
-                                .append($('<td style="font-size:15px;">').append(Nom_Usuario))
-                                .append($('<td style="font-size:15px;">').append(Nom_Tipo_Usuario_val))
+                                .append($('<td style="">').append(Nom_Usuario))
+                                .append($('<td style="">').append(Nom_Tipo_Usuario_val))
                                 .append($('<td style="text-align:center;">').append(Omitir))
                         );
                     }
@@ -1740,8 +2050,8 @@
                         $('<tr>')
                             .append($('<td style="display:none;" class="IDUsuario">').append(ID_Usuario))
                             .append($('<td style="display:none;" class="IDTipo">').append(Nom_Tipo_Usuario))
-                            .append($('<td style="font-size:15px;">').append(Nom_Usuario))
-                            .append($('<td style="font-size:15px;">').append(Nom_Tipo_Usuario_val))
+                            .append($('<td style="">').append(Nom_Usuario))
+                            .append($('<td style="">').append(Nom_Tipo_Usuario_val))
                             .append($('<td style="text-align:center;">').append(Omitir))
                     );
                 }
@@ -1923,8 +2233,10 @@
     }
     function fn_comenzar_Investigacion(param) {
         var folio_template = $("#txtTemplatesRunningN_Folio").val();
+       
         var frmDatos = new FormData();
         frmDatos.append("ID", $("#txtTemplatesRunningN_ID").val());
+        frmDatos.append("Descripcion", $("#txtTemplatesRunningN_description").val());
         frmDatos.append("Folio", $("#txtTemplatesRunningN_Folio").val());
         frmDatos.append("TipoA3", $("#slcTemplatesRunningN_TipoA3 option:selected").text());
         frmDatos.append("Contact", $("#txtTemplatesRunningN_Contact").val());
@@ -1943,7 +2255,7 @@
             success: function (res) {
                 var id_template = res.Id;
                 if (res.Tipo == "success") {
-                    console.log(id_template);
+                    //console.log(id_template);
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                     fn_registrar_evaluadores(id_template);
@@ -1955,8 +2267,6 @@
                     fn_insert_falla_running(res.Id)
                     fn_insert_modofalla_running(res.Id)
                     fn_crear_estructura_investigacion($("#txtTemplatesRunningN_ID").val(), res.Id)
-                    
-                   
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
                 //$.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });                
@@ -1968,10 +2278,12 @@
             }
         });
     }
-    function fn_crear_estructura_investigacion(id_template,id_templateRunning) {
+    function fn_crear_estructura_investigacion(id_template, id_templateRunning) {
+        $("#txtTemplareRunning_band_new_a3").val("1");
         var url = "/Sistema/crear_estructuraInvestigacion";
         var data = { template_id: id_template, templateRunning_id: id_templateRunning };
         $.post(url, data).done(function () {
+            $(".pnlTemplateRunning_Cuadrante_D").hide();
             fn_mostrar_Investigacion(id_templateRunning);
             fn_mostrar_Cuadrantes_btn(id_templateRunning);
             $("#btnTemplatesRunningN_Guardar").removeClass("btn-progress");
@@ -2120,6 +2432,7 @@
     }
     function fn_mostrar_Investigacion(id) {
         $("#pnlTemplatesR_info_failure").hide();
+        $("#btnTemplatesRunningN_AccionesPreventivas").hide();
         var url = "/Sistema/obtenerTemplateRunningID";
         var data = { ID: id };
         $.post(url, data).done(function (datos) {
@@ -2127,12 +2440,14 @@
                 $("#txtTemplateRunngin_Titulo").text("A3 Reloaded - " + item.TipoA3);
                 if (item.TipoA3 == "Problem Statement") {
                     $("#txtBand_pmcard_templateRN").val(1);
+                    
                 }
                 $("#pnlTemplatesRunningM_Folio").val(item.Folio);
                 $("#pnlTemplatesRunningM_Contact").val(item.Responsable);
                 $("#pnlTemplatesRunningM_Problema").val(item.Problema);
                 $("#pnlTemplatesRunningM_Costo").val(item.Costo);
                 $("#txtTemplatesRunningN_ID").val(id);
+                $("#txtTemplatesRunningN_Estatus").val(item.Estatus);
             });
             
             var band_pmcard_Template = $("#txtBand_pmcard_templateRN").val();
@@ -2140,8 +2455,10 @@
                 fn_get_clasificacion_Falla_by_id_template(id)
                 fn_get_modo_falla_by_id_template(id)
                 $("#pnlTemplatesR_info_failure").show();
+                $("#btnTemplatesRunningN_AccionesPreventivas").show();
             } else {
                 $("#pnlTemplatesR_info_failure").hide();
+                $("#btnTemplatesRunningN_AccionesPreventivas").show();
             }
             
             $("#pnlTemplatesRunning_Investigacion").show();
@@ -2152,6 +2469,7 @@
     }
     function fn_mostrar_Cuadrantes_btn(Template_ID) {
         var url = "/Sistema/obtenerCuadrantes_TemplateRunning";
+        var band_new_a3 = $("#txtTemplareRunning_band_new_a3").val();
         var data = { ID: Template_ID };
         $("#pnlTemplatesRunning_Cuadrantes").empty();       
         $.post(url, data).done(function (res) {
@@ -2173,123 +2491,18 @@
                     '<textarea class= "form-control mt-1" disabled style = "height:120px !important; resize:none; overflow:auto; border:0px; outline:none;" > ' + item.Descripcion + '</textarea >' +
                     '</div > ' +
                     '<div class="form-group d-grid gap-2">' +
-                    '<button id="' + item.ID + '" name="' + item.Nombre + '" style="font-size:30px; font-weight:bold; height:100px" class="btn btn-block ' + btnClass + ' btn-lg" > ' + item.Nombre + '</button>' +
+                    '<button id="' + item.ID + '" name="' + item.Nombre + '" style="font-size:30px; font-weight:bold; height:6.6rem !important;" class="btn btn-block ' + btnClass + ' btn-lg" > ' + item.Nombre + '</button>' +
                     '<p>' + EstatusMsg+'</p>'+
                     '</div></div > ');
             });           
+            if (band_new_a3 == "1") {
+                $("#pnlTemplatesRunning_Cuadrantes").find("button[name=A]").click()
+                $("#txtTemplareRunning_band_new_a3").val("0");
+            }
+           
         }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error }); });
     }    
     //Historial A3
-  
-    function fn_validar_Evaluador(ID) {
-        var url = "/Sistema/valida_firma_Evaluador";
-        var data = { ID: ID };
-        var Tipo;
-        $("#ReporteRunning_url").attr("src", "");
-        $("#btnReporteRunning_Firmard").hide();
-        $("#btnReporteRunning_Rechazar").hide();
-        $("#txtTemplateRunning_Reporte_Tipo_Firma").val("N/A");
-        $("#txtTemplateRunning_Reporte_ID").val(ID);
-        $.post(url, data).done(function (info) {
-            if (info != "") {
-                $.each(info, function (i, item) {
-                    if (item.Rol == "1") {
-                        Tipo = $.CargarIdioma.Obtener_Texto('txt_Idioma_Revisor');
-                    } else {
-                        Tipo = $.CargarIdioma.Obtener_Texto('txt_Idioma_Aprovador');
-                    }
-                    $("#txtTemplateRunning_Reporte_Tipo_Firma").val(Tipo);
-                    $("#btnReporteRunning_Firmar").show();
-                    $("#btnReporteRunning_Rechazar").show();
-                    $("#txtTemplatesRunningN_ID").val(ID);
-                });
-            } else {
-                $("#pnl_firma_reporte_template").hide();
-                $("#btnReporteRunning_Firmar").hide();
-            }
-            $("#mdlReporteA3_Panel").modal("show");
-            var url2 = "/Sistema/validar_template_WP_id";
-            var data2 = { ID: ID };
-            $.post(url2, data2).done(function (info) {
-                if (info.Id == "1") {
-                    $("#ReporteRunning_url").attr("src", "/Sistema/reporteA3_WP?ID_Template=" + ID + "");
-                } else {
-                    $("#ReporteRunning_url").attr("src", "/Sistema/reporteA3?ID_Template=" + ID + "");
-                }
-            });
-            let valor = $('#slcTemplateRunning_Reporte_Versiones option:selected').val();
-            if (valor == "value" || valor == "0") {
-                var versionActURL = "/Sistema/obtener_version_actual_documento";
-                var versionActData = { Template: ID };
-                $.post(versionActURL, versionActData).done(function (versionAct) {
-                    fn_obtener_flujo_reporte_A3(ID, versionAct);
-                    $("#btnReporteRunning_Firmar").show();
-                    $("#btnReporteRunning_Rechazar").show();
-                });
-            } else {
-                var versionURL = "/Sistema/obtener_version_documento";
-                var versionData = { Template: ID, Documento: valor };
-                $.post(versionURL, versionData).done(function (version) {
-                    fn_obtener_flujo_reporte_A3(ID, version);
-                    $("#btnReporteRunning_Firmar").hide();
-                    $("#btnReporteRunning_Rechazar").hide();
-                });
-            }
-            fn_obtener_Adjuntos_Template(ID);
-            fn_obtener_versiones(ID);
-        });
-    }
-    function fn_obtener_Adjuntos_Template(ID) {
-        var url = "/Sistema/obtener_Adjuntos_TemplateRunning_ID";
-        var data = { ID: ID };
-        $("#tblAdjuntosTemplate_Running").empty();
-        $.post(url, data).done(function (Data) {
-            var Imprimir = '<button class="btn btn-icon btn-success btnVerAdjunto" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Omitir Registro"><i class="fa fa-print"></i></button>';
-            $.each(Data, function (i, item) {
-                $("#tblAdjuntosTemplate_Running").append(
-                    $('<tr>')
-                        .append($('<td style="display:none;" class="NomAdjunto">').append(item.Nombre))
-                        .append($('<td>').append(item.Nombre))
-                        .append($('<td>').append(item.Tipo))
-                        .append($('<td>').append(item.Item))
-                        .append($('<td>').append(item.Seccion))
-                        .append($('<td>').append(item.Cuadrante))
-                        .append($('<td>').append(Imprimir))
-                );
-            });
-            fn_obtener_Adjuntos_TemplateRunning_Cuadrante_ID(ID);
-        });
-    }
-    function fn_obtener_versiones(ID) {
-        var url = "/Sistema/obtener_versiones_template_id";
-        var data = { ID: ID };
-        $("#slcTemplateRunning_Reporte_Versiones").empty();
-        $.post(url, data).done(function (info) {
-            $("#slcTemplateRunning_Reporte_Versiones").append('<option selected value="0">Version Actual</option>')
-            $.each(info, function (i, item) {
-                $("#slcTemplateRunning_Reporte_Versiones").append('<option value="' + item.Descripcion + '">Version ' + item.Version + '</option>');
-            });
-        })
-    }
-    function fn_obtener_Adjuntos_TemplateRunning_Cuadrante_ID(ID) {
-        var url = "/Sistema/obtener_Adjuntos_TemplateRunning_Cuadrante_ID";
-        var data = { ID: ID };
-        $.post(url, data).done(function (Data) {
-            var Imprimir = '<button class="btn btn-icon btn-success btnVerAdjunto" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Omitir Registro"><i class="fa fa-print"></i></button>';
-            $.each(Data, function (i, item) {
-                $("#tblAdjuntosTemplate_Running").append(
-                    $('<tr>')
-                        .append($('<td style="display:none;" class="NomAdjunto">').append(item.Nombre))
-                        .append($('<td>').append(item.Nombre))
-                        .append($('<td>').append(item.Tipo))
-                        .append($('<td>').append(item.Item))
-                        .append($('<td>').append(item.Seccion))
-                        .append($('<td>').append(item.Cuadrante))
-                        .append($('<td>').append(Imprimir))
-                );
-            });
-        });
-    }
     function fn_obtener_flujo_reporte_A3(Template_ID,Template_Version) {
         var frmDatos = new FormData();
         frmDatos.append("Template_ID", Template_ID);
@@ -2388,7 +2601,6 @@
            
         });
     }
-
     function fn_validar_respuestas_seccion_31(ID_Template) {
         var frmDatos = new FormData();
         frmDatos.append("ID", ID_Template);
@@ -2450,8 +2662,7 @@
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
             }
         });
-    }
-   
+    }  
     function fn_agregarItemsSeccion(id_seccion) {
         var url = "/Sistema/obtener_items_seccionID";
         var data = { ID: id_seccion };
@@ -2613,7 +2824,6 @@
             });
         });
     }
-    
     function fn_obtener_Standard_ID_Cuadrante(ID) {
         var url = "/Sistema/obtener_Standard_ID_Cuadrante";
         var data = { ID: ID };
@@ -2676,12 +2886,14 @@
             $("#tblEvaluadoresTemplate_Running").empty();
             var Tipo = "Revisor";
             var Omitir = '<button class="btn btn-icon btn-danger btnOmitirFirmaRinning" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Omitir Registro"><i class="fa fa-times"></i></button>';
-
             $.each(info, function (i, item) {
-                if (item.Rol == "1") {
-                    Tipo = $.CargarIdioma.Obtener_Texto("txt_Idioma_Revisor");
-                } else {
-                    Tipo = $.CargarIdioma.Obtener_Texto("txt_Idioma_Aprovador");
+                switch (item.Rol) {
+                    case "2":
+                        Tipo = $.CargarIdioma.Obtener_Texto("txt_Idioma_Revisor");
+                        break;
+                    case "3":
+                        Tipo = $.CargarIdioma.Obtener_Texto("txt_Idioma_Aprovador");
+                        break;
                 }
                 $("#tblEvaluadoresTemplate_Running").append(
                     $('<tr>')
@@ -3034,10 +3246,14 @@
             processData: false,
             data: frmDatos,
             success: function (res) {
+   
+                console.log(res);
                 if (res.Tipo == "success") {
                     $("#mdlItemRunning_Panel").modal("hide");
                     $("#txtPreguntaRunning_Comentarios").val(null);
+                   
                 }
+                
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
                 fn_obtener_itemRunning_ID(id_item);
             },
@@ -3683,8 +3899,7 @@
                 fn_obtener_cuadrante_runninID(ID);
                 fn_mostrarSeccionesRunning(ID, Nombre);
                 if (Nombre == "D") {
-                    fn_verify_a3_type(ID, Nombre)
-                   
+                    fn_verify_a3_type(ID, Nombre)                  
                 }
                
             } else {
@@ -3698,10 +3913,11 @@
         url = "/Sistema/getA3_type";
         data = { id_cuadrante: id_cuadrante };
         $.post(url, data).done(function (result) {
+           
             if (result != "Problem Statement" && result != "A3 Lite") {
                 setTimeout(function () {
                     $("#divLoaderCuadranteD").hide()
-                    $("#pnlTemplateRunning_Cuadrante_D").show();
+                    $(".pnlTemplateRunning_Cuadrante_D").show();
                     var url2 = "/Sistema/verifica_tempate_wp";
                     var data2 = { ID: id_cuadrante };
                     $.post(url2, data2).done(function (res) {
@@ -3721,9 +3937,19 @@
                     fn_obtener_Cost(id_cuadrante);
                     obtener_estatus_template();
                 }, 1000);
+            } else {
+                $("#ItemTemplateRunning_SeccionRunning").hide();
             }
             setTimeout(function () {
-                $("#btnTemplateRunning_Finalizar_investigacion").show();
+                var id_template = $("#pnlTemplatesRunningM_Folio").val();
+                var status_template = $("#txtTemplatesRunningN_Estatus").val();
+                $("#btnTemplateRunning_Finalizar_investigacion").hide();
+                if (status_template != "6") {
+                    $("#btnTemplateRunning_Finalizar_investigacion").show();
+                }
+                $("#divLoaderCuadranteD").hide()
+                $("#pnlCuadranteD_5Porque").show();
+                fn_obtener_5w_ID_Cuadrante(id_cuadrante);
             }, 1000);
             
         }).fail(function (error) {
@@ -3856,8 +4082,11 @@
                     $("#mdlItemRunning_Panel").modal("hide");
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    $("#pnlTemplateRunning_Cuadrante_D").hide();
+                    $(".pnlTemplateRunning_Cuadrante_D").hide();
                     $("#tiposA3").hide();
+                    $("#pnlTemplateRunning_signPanel").hide();
+                    $("#txtTemplareRunning_band_new_a3").val("0");
+                    $("#btnTemplateRunning_Finalizar_investigacion").show();
                     //get_configuration_panels(id)
                     fn_mostrar_Investigacion(ID_Template);
                     fn_mostrar_Cuadrantes_btn(ID_Template);
@@ -3902,35 +4131,6 @@
             }
         });
     }
-    function registrar_firma_Revision_A3(param) {
-        var ID_Template = $("#txtTemplatesRunningN_ID").val();
-        var frmDatos = new FormData();
-        frmDatos.append("Template", ID_Template);
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
-        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
-        $.ajax({
-            type: "POST",
-            url: "/Sistema/registrar_firma_revisar_A3",
-            contentType: false,
-            processData: false,
-            data: frmDatos,
-            success: function (res) {
-                if (res.Tipo == "success") {
-                    $("#mdlSistema_FirmaElectronica").modal("hide");
-                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    fn_obtener_flujo_reporte_A3(ID_Template, res.Id);
-                }
-                $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
-                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
-            },
-            error: function (error) {
-                $("#mdlSistema_FirmaElectronica").modal("hide");
-                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
-            }
-        });
-    }
     function registrar_firma_Rechazar_Revision_A3(Param) {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var frmDatos = new FormData();
@@ -3965,13 +4165,13 @@
     function registrar_firma_Aprobacion_A3(param) {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var frmDatos = new FormData();
-        frmDatos.append("Template", ID_Template);
+        frmDatos.append("id_template", ID_Template);
         frmDatos.append("BYTOST", param.BYTOST);
         frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/registrar_firma_aprobar_A3",
+            url: "/Reportes/registrar_firma_aprobar_A3",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -3979,7 +4179,7 @@
                 if (res.Tipo == "success") {
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    fn_obtener_flujo_reporte_A3(ID_Template, res.Id);
+                    window.location.replace("/Home/Index");
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
@@ -3994,14 +4194,14 @@
     function registrar_firma_Rechazar_Aprobacion_A3(Param) {
         var ID_Template = $("#txtTemplatesRunningN_ID").val();
         var frmDatos = new FormData();
-        frmDatos.append("Template", ID_Template);
-        frmDatos.append("Comentarios", $("#txtMdlComments_Comentarios").val());
+        frmDatos.append("id_template", ID_Template);
         frmDatos.append("BYTOST", Param.BYTOST);
         frmDatos.append("ZNACKA", Param.ZNACKA);
+        frmDatos.append("ZMYSEL", Param.ZMYSEL);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
-            url: "/Sistema/registrar_firma_Rechazar_Aprobar_A3",
+            url: "/Reportes/registrar_firma_rechazar_A3",
             contentType: false,
             processData: false,
             data: frmDatos,
@@ -4010,7 +4210,7 @@
                     $("#mdlSistema_FirmaElectronica").modal("hide");
                     $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
                     $("#mdlReporte_RechazoPnl").modal("hide");
-                    fn_obtener_flujo_reporte_A3(ID_Template, res.Id);
+                    window.location.replace("/Home/Index");
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
@@ -4099,7 +4299,8 @@
         frmDatos.append("Why5", $("#txt5wCuadranteD_Why5").val());
         frmDatos.append("Cause", $("#txt5wCuadranteD_Cause").val());
         frmDatos.append("Step", $("#txt5wCuadranteD_Step").val());
-        frmDatos.append("Name", $("#txt5wCuadranteD_Name").val());
+        frmDatos.append("Name", $("#txt5wCuadranteD_NameResponsable option:selected").text());
+        frmDatos.append("Responsable", $("#txt5wCuadranteD_NameResponsable option:selected").val());
         frmDatos.append("Date", $("#txt5wCuadranteD_Date").val());
         frmDatos.append("Status", $("#txt5wCuadranteD_Status").val());
         frmDatos.append("Cuadrante", Cuadrante);
@@ -4128,7 +4329,8 @@
     function fn_guardar_5w() {
         $("#btnInvestigation5Why_CuadranteD_Guardar").addClass("btn-progress");
         var Cuadrante_ID = $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val();
-        var Template_ID = $("#txtTemplatesRunningN_ID").val();
+        var ID_Template = $("#txtTemplatesRunningN_ID").val();
+
         var frmDatos = new FormData();
         frmDatos.append("What", $("#txt5wCuadranteD_What").val());
         frmDatos.append("Why1", $("#txt5wCuadranteD_Why1").val());
@@ -4137,12 +4339,18 @@
         frmDatos.append("Why4", $("#txt5wCuadranteD_Why4").val());
         frmDatos.append("Why5", $("#txt5wCuadranteD_Why5").val());
         frmDatos.append("Cause", $("#txt5wCuadranteD_Cause").val());
-        frmDatos.append("Step", $("#txt5wCuadranteD_Step").val());
-        frmDatos.append("Name", $("#txt5wCuadranteD_Name").val());
+        frmDatos.append("Step", $("#txt5wCuadranteD_Step").val()); // Esta es la acción
+
+        // --- AQUÍ ESTABA EL ERROR: Faltaba enviar el ID del responsable ---
+        frmDatos.append("Name", $("#txt5wCuadranteD_NameResponsable option:selected").text()); // Nombre texto
+        frmDatos.append("Responsable", $("#txt5wCuadranteD_NameResponsable option:selected").val()); // ID Numérico
+        // ------------------------------------------------------------------
+
         frmDatos.append("Date", $("#txt5wCuadranteD_Date").val());
         frmDatos.append("Status", $("#txt5wCuadranteD_Status").val());
         frmDatos.append("Cuadrante", Cuadrante_ID);
-        frmDatos.append("ID_Template", Template_ID);
+        frmDatos.append("ID_Template", ID_Template);
+
         $.ajax({
             type: "POST",
             url: "/Sistema/registrar_5w",
@@ -4163,6 +4371,45 @@
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
             }
         });
+    }
+    function fn_agregar_acciones_preventivas_5W() {
+        var id_template = $("#txtTemplatesRunningN_ID").val();
+        var accion = $("#txt5wCuadranteD_Step").val();
+        var fecha = $("#txt5wCuadranteD_Date").val();
+        var responsable = $("#txt5wCuadranteD_NameResponsable option:selected").val();
+        var usuario_text = $("#txt5wCuadranteD_NameResponsable option:selected").text();
+        var elaborador = $("#pnlTemplatesRunningM_Contact").val();
+        if (usuario_text != elaborador) {
+            var frmDatos = new FormData();
+            frmDatos.append("id_template", id_template);
+            frmDatos.append("accion_text", accion);
+            frmDatos.append("fecha", fecha);
+            frmDatos.append("resposable", responsable);
+            $.ajax({
+                type: "POST",
+                url: "/Acciones/insert_accion_preventiva",
+                contentType: false,
+                processData: false,
+                data: frmDatos,
+                success: function (res) {
+                    if (res.Tipo == "success") {
+
+
+                    }
+                    $.auxFormulario.limpiarCampos({
+                        Seccion: $("#frmAccionPreventivaN")
+                    });
+                    fn_obtener_acciones_preventivas_running(id_template)
+                    $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+                },
+                error: function (error) {
+                    $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+                }
+            });
+        } else {
+            $.notiMsj.Notificacion({ Mensaje: "No se puede asignar una acción preventiva a un Evaluador", Tipo: "info", Error: null });
+        }
+
     }
     function eliminar_5Why(ID) {
         var Cuadrante = $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val();
@@ -4245,6 +4492,10 @@
                 $("#txt5wCuadranteD_Date").val(item.Date);
                 $("#txt5wCuadranteD_Status").val(item.Status);
                 $("#txt5wCuadranteD_ID").val(item.ID);
+            });
+            $("#txt5wCuadranteD_NameResponsable").generarLista({ URL: "/Usuarios/Lista_Usuarios" });
+            $("#txt5wCuadranteD_NameResponsable").select2({
+                dropdownParent: $('#mdlInvestigtion5why_CuadranteD .modal-content')
             });
             $("#mdlInvestigtion5why_CuadranteD").modal("show");
         });

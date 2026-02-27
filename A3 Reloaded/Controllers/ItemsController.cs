@@ -33,30 +33,20 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
+                string BYTOST = HttpContext.User.Identity.Name;
+                //string ZNACKA = Request["ZNACKA"];
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(BYTOST, ZNACKA);
-                if (firma)
+                string id = PR.registrar_Pregunta(Texto, Descripcion, Convert.ToInt32(Tipo));
+                string datos = IT.registrar_Item("Pregunta", Convert.ToInt32(id), 0, "TabPreguntas", Convert.ToInt32(Seccion), Texto, Convert.ToInt32(Firma));
+                if (datos == "guardado")
                 {
-                    string id = PR.registrar_Pregunta(Texto,Descripcion,Convert.ToInt32(Tipo));
-                    string datos = IT.registrar_Item("Pregunta", Convert.ToInt32(id), 0, "TabPreguntas",Convert.ToInt32(Seccion),Texto,Convert.ToInt32(Firma));
-                    if (datos == "guardado")
-                    {
-                        noti.Mensaje = Mensajes.Item_guardado;
-                        noti.Tipo = "success";
-                        AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Item: " + Texto + "", "N/A");
-                    }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.Item_guardado_error;
-                        noti.Tipo = "warning";
-                    }
+                    noti.Mensaje = Mensajes.Item_guardado;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Item: " + Texto + "", "N/A");
                 }
                 else
                 {
-                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Item_guardado_error;
                     noti.Tipo = "warning";
                 }
             }
@@ -72,57 +62,47 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
-                string Justificacion = Request["ZMYSEL"];
+                string BYTOST = HttpContext.User.Identity.Name;
+                //string ZNACKA = Request["ZNACKA"];
+                //string Justificacion = Request["ZMYSEL"];
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(BYTOST, ZNACKA);
-                if (firma)
+                DataTable datosAnterior = IT.obtener_pregunta_ID(Convert.ToInt32(ID));
+                PR.Modificar_Pregunta(Convert.ToInt32(ID), Texto, Descripcion, Convert.ToInt32(Tipo));
+                string datos = IT.modificar_Item(Convert.ToInt32(IDItem), "Pregunta", Convert.ToInt32(ID), 0, "TabPreguntas", Convert.ToInt32(Seccion), Texto, Convert.ToInt32(Firma));
+                if (datos == "guardado")
                 {
-                    DataTable datosAnterior = IT.obtener_pregunta_ID(Convert.ToInt32(ID));
-                    PR.Modificar_Pregunta(Convert.ToInt32(ID),Texto, Descripcion, Convert.ToInt32(Tipo));
-                    string datos = IT.modificar_Item(Convert.ToInt32(IDItem),"Pregunta", Convert.ToInt32(ID), 0, "TabPreguntas", Convert.ToInt32(Seccion), Texto, Convert.ToInt32(Firma));
-                    if (datos == "guardado")
+                    DataTable datosActual = IT.obtener_pregunta_ID(Convert.ToInt32(ID));
+                    noti.Mensaje = Mensajes.Item_guardado;
+                    noti.Tipo = "success";
+                    string Actual = string.Empty;
+                    string Anterior = string.Empty;
+                    for (int i = 0; i < datosAnterior.Rows.Count; i++)
                     {
-                        DataTable datosActual = IT.obtener_pregunta_ID(Convert.ToInt32(ID));
-                        noti.Mensaje = Mensajes.Item_guardado;
-                        noti.Tipo = "success";
-                        string Actual = string.Empty;
-                        string Anterior = string.Empty;
-                        for (int i = 0; i < datosAnterior.Rows.Count; i++)
+                        foreach (DataColumn dc_acterior in datosAnterior.Columns)
                         {
-                            foreach (DataColumn dc_acterior in datosAnterior.Columns)
+                            string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                            string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
+                            string Columna = dc_acterior.ColumnName.ToString();
+                            if (dato_anterior != dato_actual)
                             {
-                                string dato_anterior = datosAnterior.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
-                                string dato_actual = datosActual.Rows[i][dc_acterior.ColumnName.ToString()].ToString();
-                                string Columna = dc_acterior.ColumnName.ToString();
-                                if (dato_anterior != dato_actual)
+                                if (string.IsNullOrEmpty(Anterior))
                                 {
-                                    if (string.IsNullOrEmpty(Anterior))
-                                    {
-                                        Anterior = dato_anterior;
-                                        Actual = dato_actual;
-                                    }
-                                    else
-                                    {
-                                        Anterior = Anterior + ", " + dato_anterior;
-                                        Actual = Actual + ", " + dato_actual;
-                                    }
+                                    Anterior = dato_anterior;
+                                    Actual = dato_actual;
+                                }
+                                else
+                                {
+                                    Anterior = Anterior + ", " + dato_anterior;
+                                    Actual = Actual + ", " + dato_actual;
                                 }
                             }
                         }
-                        AT.registrarAuditTrail(Registro, BYTOST, "M", Anterior, Actual, Justificacion);
                     }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.Item_guardado_error;
-                        noti.Tipo = "warning";
-                    }
+                    AT.registrarAuditTrail(Registro, BYTOST, "M", Anterior, Actual, "Update");
                 }
                 else
                 {
-                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Item_guardado_error;
                     noti.Tipo = "warning";
                 }
             }
@@ -1283,30 +1263,20 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                string BYTOST = Request["BYTOST"];
-                string ZNACKA = Request["ZNACKA"];
-                string Justificacion = Request["ZMYSEL"];
+                string BYTOST = HttpContext.User.Identity.Name;
+                //string ZNACKA = Request["ZNACKA"];
+                //string Justificacion = Request["ZMYSEL"];
                 DateTime Registro = DateTime.Now;
-                bool firma = US.autenticacion(BYTOST, ZNACKA);
-                if (firma)
+                string datos = PR.remover_pregunta(ID, ID_Item);
+                if (datos == "guardado")
                 {
-                    string datos = PR.remover_pregunta(ID, ID_Item);
-                    if (datos == "guardado")
-                    {
-                        noti.Mensaje = Mensajes.Item_omitido;
-                        noti.Tipo = "success";
-                        AT.registrarAuditTrail(Registro, BYTOST, "E", "N/A", "Item omitido", Justificacion);
-                    }
-                    else
-                    {
-                        noti.Mensaje = Mensajes.Item_omitido_error;
-                        noti.Tipo = "warning";
-                    }
+                    noti.Mensaje = Mensajes.Item_omitido;
+                    noti.Tipo = "success";
+                    AT.registrarAuditTrail(Registro, BYTOST, "E", "N/A", "Item omitido", "Deleted");
                 }
                 else
                 {
-                    AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Firma electrónica fallida", "Contraseña Incorrecta");
-                    noti.Mensaje = Mensajes.contrasena_incorrecta;
+                    noti.Mensaje = Mensajes.Item_omitido_error;
                     noti.Tipo = "warning";
                 }
             }

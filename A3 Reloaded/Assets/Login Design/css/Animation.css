@@ -1,0 +1,11 @@
+﻿.div-animation {
+    background-size: 100% 100%;
+    animation: slider 10s linear infinite;
+}
+
+@keyframes slider{
+    0% {background-image: url('../../img/industrial-robot.png')}
+    30% {background-image: url('../../img/mission_officeview.jpg')}
+    60% {background-image: url('../../img/industrial-robot.png')}
+    100% {background-image: url('../../img/mission_officeview.jpg')}
+}

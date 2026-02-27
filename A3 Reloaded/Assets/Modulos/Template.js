@@ -175,64 +175,9 @@
        
         //Items
         
-        $(".btnCerrarPanelItems").click(function () {
-            fn_SetItem_PnlDefault();
-        });
-        $("#slcItems_Elemento").change(function () {
-            var item = $("#slcItems_Elemento option:selected").text();
-            var idioma_pregunta = $.CargarIdioma.Obtener_Texto("txt_Idioma_Pregunta");
-            var idioma_nota = $.CargarIdioma.Obtener_Texto("txt_Idioma_Notas");
-            var idioma_ishikawua = $.CargarIdioma.Obtener_Texto("txt_Idioma_ishikawa");
-            var idioma_instrucciones = $.CargarIdioma.Obtener_Texto("txt_Idioma_Instrucciones");
-            var idioma_hipotesis = $.CargarIdioma.Obtener_Texto("txt_Idioma_Hipotesis");
-            var idioma_factor = $.CargarIdioma.Obtener_Texto("txt_Idioma_Factor_causal");
-            var idioma_seleccione = $.CargarIdioma.Obtener_Texto("txt_Idioma_Seleccione");
-            var idioma_acciones = $.CargarIdioma.Obtener_Texto("txt_Idioma_Acciones_Preventivas");
-            var idioma_analisis = $.CargarIdioma.Obtener_Texto("txt_Idioma_Analisis_porque");
-            fn_SetItem_PnlDefault();
-            if (item != idioma_seleccione) {
-                $("#pnlItem_Default").hide();
-                if (item == "0" || item == idioma_pregunta) {
-                    $("#pnlItem_Pregunta").show();
-                } else if (item == "2" || item == idioma_nota) {
-                    $("#pnlItem_Nota").show();
-                } else if (item == "3" || item == idioma_instrucciones) {
-                    $("#pnlItem_Instrucciones").show();
-                } else if (item == "1" || item == idioma_ishikawua) {
-                    $("#pnlItem_Ishikawua").show();
-                    $("#pnlItem_Ishikawua_Item").show();
-                    $("#pnlItem_Ishikawua_Rama").hide();
-                } else if (item == "4" || item == idioma_hipotesis) {
-                    $("#pnlItem_Hipotesis").show();
-                } else if (item == "5" || item == idioma_factor) {
-                    $("#pnlItem_Factor").show();
-                } else if (item == "6" || item == "Missing Base Condition") {
-                    $("#pnlItem_Missing").show();
-                } else if (item == "7" || item == idioma_acciones) {
-                    $("#pnlItem_Acciones").show();
-                }
-                else if (item == "8" || item == idioma_analisis) {
-                    $("#pnlItem_Analisis").show();
-                }
-            }
-        });
-        $("#btnItem_Guardar").click(function () {
-            var item = $("#slcItems_Elemento").val();
-            var idItem = $("#txtSeccionItem_ID").val();
-            //$("#slcItems_Elemento").val(text_idioma);
-            var idPR = $("#txtPregunta_ID").val();
-            if (idPR != "" && idItem != "") {
-                $.firmaElectronica.MostrarFirma({
-                    Justificacion: true,
-                    Funcion: fn_modificarPregunta
-                });
-            } else {
-                $.firmaElectronica.MostrarFirma({
-                    Justificacion: false,
-                    Funcion: fn_guardarPregunta
-                });
-            }
-        });
+        
+       //Evento para guardar o modificar item tipo pregunta
+       
         $("#btnItemIshikawua_Ramas").click(function () {
             var id = $("#txtIshikawua_ID").val();
             if (id != "") {
@@ -383,132 +328,8 @@
             }
         });
         //eliminar Item
-        $("#tblItems").on("click", ".btnOmitir", function () {
-            var id = $(this).parents("tr").find("[data-registro=ID]").html();
-            var urlItem = "/Items/obtener_item_id";
-            var dataItem = { ID: id };
-            $.post(urlItem, dataItem).done(function (resItem) {
-                $.each(resItem, function (i, Tabitem) {
-                    var Id_Item = Tabitem.TabId;
-                    $("#txtItems_ItemOmitirID").val(Tabitem.ID)
-                    if (Tabitem.Tabla == "TabPreguntas") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_pregunta
-                        });
-                    } else if (Tabitem.Tabla == "TabNotas") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_Nota
-                        });
-                    } else if (Tabitem.Tabla == "TabInstrucciones") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_instruccion
-                        });
-                    } else if (Tabitem.Tabla == "TabHipotesis") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_hipotesis
-                        });
-                    } else if (Tabitem.Tabla == "TabFactor") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_factor
-                        });
-                    } else if (Tabitem.Tabla == "TabAcciones") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_Accion
-                        });
-                    } else if (Tabitem.Tabla == "TabAnalisis_Porque") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_Analisis
-                        });
-                    } else if (Tabitem.Tabla == "TabMissingBaseCondition") {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_Missing
-                        });
-                    } else {
-                        $("#txtItems_OmitirID").val(Id_Item);
-                        $.firmaElectronica.MostrarFirma({
-                            Justificacion: true,
-                            Funcion: fn_eliminar_ishkawua
-                        });
-                    }
-                });
-            }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
-        });
+       
         //modificar Item
-        $("#tblItems").on("click", ".btnEditar", function () {
-            var id = $(this).parents("tr").find("[data-registro=ID]").html();
-            var urlItem = "/Items/obtener_item_id";
-            var dataItem = { ID: id };
-            fn_SetItem_PnlDefault();
-            var idioma_pregunta = $.CargarIdioma.Obtener_Texto("txt_Idioma_Pregunta");
-            var idioma_nota = $.CargarIdioma.Obtener_Texto("txt_Idioma_Notas");
-            var idioma_ishikawua = $.CargarIdioma.Obtener_Texto("txt_Idioma_ishikawa");
-            var idioma_hipotesis = $.CargarIdioma.Obtener_Texto("txt_Idioma_Hipotesis");
-            var idioma_factor = $.CargarIdioma.Obtener_Texto("txt_Idioma_Factor_causal");
-            var idioma_instrucciones = $.CargarIdioma.Obtener_Texto("txt_Idioma_Instrucciones");
-            var idioma_seleccione = $.CargarIdioma.Obtener_Texto("txt_Idioma_Seleccione");
-            var idioma_acciones = $.CargarIdioma.Obtener_Texto("txt_Idioma_Acciones_Preventivas");
-            var idioma_analisis = $.CargarIdioma.Obtener_Texto("txt_Idioma_Analisis_porque");
-            $.post(urlItem, dataItem).done(function (resItem) {
-                $.each(resItem, function (i, Tabitem) {
-                    $("#pnlItem_Default").hide();
-                    $("#slcItems_Elemento").val(idioma_seleccione);
-                    if (Tabitem.Tabla == "TabPreguntas") {
-                        $("#slcItems_Elemento").val(idioma_pregunta);
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_pregunta_id(Tabitem.TabId, Tabitem.Firma);
-                    } else if (Tabitem.Tabla == "TabNotas") {
-                        $("#slcItems_Elemento").val(idioma_nota);
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_nota_id(Tabitem.TabId);
-                    } else if (Tabitem.Tabla == "TabInstrucciones") {
-                        $("#slcItems_Elemento").val(idioma_instrucciones);
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_instruccion_id(Tabitem.TabId);
-                    } else if (Tabitem.Tabla == "TabHipotesis") {
-                        $("#slcItems_Elemento").val(idioma_hipotesis);
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_hipotesis_id(Tabitem.TabId);
-                    } else if (Tabitem.Tabla == "TabFactor") {
-                        $("#slcItems_Elemento").val(idioma_factor);
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_factor_id(Tabitem.TabId);
-                    } else if (Tabitem.Tabla == "TabMissingBaseCondition") {
-                        $("#slcItems_Elemento").val("Missing Base Conditions");
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_Missing_id(Tabitem.TabId);
-                    } else if (Tabitem.Tabla == "TabAnalisis_Porque") {
-                        $("#slcItems_Elemento").val(idioma_analisis);
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_analisis_id(Tabitem.TabId);
-                    } else if (Tabitem.Tabla == "TabAcciones") {
-                            $("#slcItems_Elemento").val(idioma_acciones);
-                            $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_accioness_id(Tabitem.TabId);
-                    } else {
-                        $("#slcItems_Elemento").val(idioma_ishikawua);
-                        $("#txtSeccionItem_ID").val(Tabitem.ID);
-                        fn_obtener_Ishikawua_Info(Tabitem.TabId);
-                    }
-                });
-            }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
-        });
-
         //FUNCIONES PARA ACCESO EN TEMPLATES
         $("#tblTemplates table tbody").on("click", "a[data-registro=Acceso]", function () {
             var ID = $(this).parents("tr").find("[data-registro=ID]").html();
@@ -640,48 +461,7 @@
                 });
             }).catch(err => console.error(err));
     }
-    //function fn_Secciones(Pagina) {
-    //    var nombre = null;
-    //    var descripcion = null;
-    //    var posicion = null;
-    //    var cuadrante = $("#slcSecciones_Cuadrante option:selected").val();
-    //    var template = $("#txtTemplatesM_ID").val();
-    //    var Activo = null;
-    //    if (cuadrante == -1) { cuadrante = null; }
-    //    if ($("#cbxSecciones_Activo").prop("checked")) {
-    //        Activo = 1;
-    //    }
 
-    //    var Datos = { Nombre: nombre, Descripcion: descripcion, Posicion: posicion, Cuadrante: cuadrante == -1 ? null : cuadrante, Template: template, Activo: Activo == -1 ? null : Activo, Index: Pagina };
-    //    $.mostrarInfo({
-    //        URLindex: "/Secciones/obtenerTotalPagSeccion",
-    //        URLdatos: "/Secciones/mostrarSecciones",
-    //        Datos: Datos,
-    //        Version: 2,
-    //        Tabla: $("#tblSecciones"),
-    //        Paginado: $("#pgdSecciones"),
-    //        Mostrar: function (i, item) {
-
-    //            var Activo = '<span class="tag tag-green">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Activo') + '</span>';
-    //            if (item.Activo == 0) {
-    //                Activo = '<span class="tag tag-red">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Inactivo') + '</span>';
-    //            }
-
-    //            var Botones = '<button class="btn btn-icon btn-primary btnEditar" data-toggle="tooltip"  data-registro="Editar" data-placement="bottom" title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '"><i class="far fa-edit"></i></button>';
-    //            var Preguntas = '<button class="btn btn-icon btn-success btnPreguntas_Panel" data-toggle="tooltip" data-placement="bottom" title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Agregar_Items') + '" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Agregar_Items') + '"><i class="fa fa-list"></i></button>';
-    //            $("#tblSecciones").find("tbody").append(
-    //                $('<tr>')
-    //                    .append($('<td data-registro="ID" style="display:none">').append(item.ID))
-    //                    .append($('<td>').append(item.RowNumber))
-    //                    .append($('<td class="NombreSeccion">').append(item.Nombre))
-    //                    .append($('<td>').append(item.Cuadrante))
-    //                    .append($('<td>').append(Activo))
-    //                    .append($('<td>').append(Botones))
-    //                    .append($('<td>').append(Preguntas))
-    //            );
-    //        }
-    //    });
-    //}
     function fn_obtener_folio_template() {
         var url = "/Templates/obtener_folio_template";
         $.get(url).done(function (folio) {
@@ -919,135 +699,8 @@
         }
     }
     //items funciones
-    function fn_modificarPregunta(param) {
-        var frmDatos = new FormData();
-        var Tipo = $("#slcPregunta_Respuesta option:selected").text();
-        var Tipo_val;
-        if (Tipo == "Open" || Tipo == "Abierta") { Tipo_val = 1 }
-        if (Tipo == "Yes/no" || Tipo == "Si/no") { Tipo_val = 0 }
-        frmDatos.append("IDItem", $("#txtSeccionItem_ID").val());
-        frmDatos.append("ID", $("#txtPregunta_ID").val());
-        frmDatos.append("Texto", $("#txtPregunta_Texto").val());
-        frmDatos.append("Descripcion", $("#txtPregunta_Descripcion").val());
-        frmDatos.append("Tipo", Tipo_val);
-        frmDatos.append("Seccion", $("#txtItems_SeccionID").val());
-        var firma = 0;
-        if ($("#txtPregunta_firma").prop("checked")) {
-            firma = 1;
-        }
-        frmDatos.append("Firma", firma);
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
-        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
-        $.ajax({
-            type: "POST",
-            url: "/Items/Modificar_Pregunta",
-            contentType: false,
-            processData: false,
-            data: frmDatos,
-            success: function (res) {
-                if (res.Tipo == "success") {
-                    $("#mdlSistema_FirmaElectronica").modal("hide");
-                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    var idioma_seleccione = $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione');
-                    fn_Items();
-                    $("#txtPregunta_Texto").val(null);
-                    $("#txtPregunta_Descripcion").val(null);
-                    $("#slcPregunta_Respuesta").val(idioma_seleccione);
-                    $("#slcItems_Elemento").val(idioma_seleccione);
-                    $("#txtPregunta_ID").val(null);
-                    $("#txtSeccionItem_ID").val(null);
-                    fn_SetItem_PnlDefault();
-                }
-                $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
-                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
-            },
-            error: function (error) {
-                $("#mdlSistema_FirmaElectronica").modal("hide");
-                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
-            }
-        });
-    }
-    function fn_guardarPregunta(param) {
-        var frmDatos = new FormData();
-        var Tipo = $("#slcPregunta_Respuesta option:selected").text();
-        var Tipo_val;
-        if (Tipo == "Open" || Tipo == "Abierta") { Tipo_val = 1 }
-        if (Tipo == "Yes/no" || Tipo == "Si/no") { Tipo_val = 0 }
-        frmDatos.append("Texto", $("#txtPregunta_Texto").val());
-        frmDatos.append("Descripcion", $("#txtPregunta_Descripcion").val());
-        frmDatos.append("Tipo", Tipo_val);
-        frmDatos.append("Seccion", $("#txtItems_SeccionID").val());
-        var firma = 0;
-        if ($("#txtPregunta_firma").prop("checked")) {
-            firma = 1;
-        }
-        frmDatos.append("Firma", firma);
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
-        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
-        $.ajax({
-            type: "POST",
-            url: "/Items/registrar_Pregunta",
-            contentType: false,
-            processData: false,
-            data: frmDatos,
-            success: function (res) {
-                if (res.Tipo == "success") {
-                    $("#mdlSistema_FirmaElectronica").modal("hide");
-                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    fn_SetItem_PnlDefault();
-                    fn_Items();
-                    var idioma_seleccione = $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione');
-                    $("#txtPregunta_Texto").val(null);
-                    $("#txtPregunta_Descripcion").val(null);
-                    $("#slcPregunta_Respuesta").val(idioma_seleccione);
-                    $("#slcItems_Elemento").val(idioma_seleccione);
-                }
-                $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
-                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
-            },
-            error: function (error) {
-                $("#mdlSistema_FirmaElectronica").modal("hide");
-                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
-            }
-        });
-    }
-    function fn_eliminar_pregunta(param) {
-        var frmDatos = new FormData();
-        frmDatos.append("ID", $("#txtItems_OmitirID").val());
-        frmDatos.append("ID_Item", $("#txtItems_ItemOmitirID").val());
-        frmDatos.append("BYTOST", param.BYTOST);
-        frmDatos.append("ZNACKA", param.ZNACKA);
-        frmDatos.append("ZMYSEL", param.ZMYSEL);
-        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
-        $.ajax({
-            type: "POST",
-            url: "/Items/eliminar_pregunta",
-            contentType: false,
-            processData: false,
-            data: frmDatos,
-            success: function (res) {
-                if (res.Tipo == "success") {
-                    $("#mdlSistema_FirmaElectronica").modal("hide");
-                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                    fn_Items();
-                    $("#txtItems_OmitirID").val(null);
-                    $("#txtItems_ItemOmitirID").val(null);
-                    fn_SetItem_PnlDefault();
-                }
-                $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
-                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
-            },
-            error: function (error) {
-                $("#mdlSistema_FirmaElectronica").modal("hide");
-                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
-                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Registro_omitir_error'), Tipo: "danger", Error: error });
-            }
-        });
-    }
+    
+    
     function fn_eliminar_Nota(param) {
         var frmDatos = new FormData();
         frmDatos.append("ID", $("#txtItems_OmitirID").val());
@@ -1276,42 +929,8 @@
             }
         });
     }
-    function fn_obtener_pregunta_id(id, firma) {
-        var urlPr = "/Items/obtener_Pregnta_id";
-        var dataPr = { ID: id };
-        var Tipo_val_open = $.CargarIdioma.Obtener_Texto("txt_Idioma_Tipo_de_Abiera");
-        var Tipo_val_SI = $.CargarIdioma.Obtener_Texto("txt_Idioma_SiNo");
-        var Tipo_val;
-        
-        $.post(urlPr, dataPr).done(function (resPr) {
-            $("#pnlItem_Pregunta").show();
-            $.each(resPr, function (i, TabPregunta) {
-                if (TabPregunta.Tipo == "1") { Tipo_val = Tipo_val_open }
-                if (TabPregunta.Tipo == "0") { Tipo_val = Tipo_val_SI }
-                
-                $("#txtPregunta_ID").val(TabPregunta.ID);
-                $("#txtPregunta_Texto").val(TabPregunta.Texto);
-                $("#txtPregunta_Descripcion").val(TabPregunta.Descripcion);
-                $("#slcPregunta_Respuesta option:contains(" + Tipo_val + ")").attr('selected', true);
-                $("#txtPregunta_firma").prop("checked", false);
-                if (firma == "1") {
-                    $("#txtPregunta_firma").prop("checked", true);
-                }
-            });
-        }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
-    }
-    function fn_obtener_nota_id(id) {
-        var urlPr = "/Items/obtener_Nota_id";
-        var dataPr = { ID: id };
-        $.post(urlPr, dataPr).done(function (resPr) {
-            $("#pnlItem_Nota").show();
-            $.each(resPr, function (i, TabNota) {
-                $("#txtNota_ID").val(TabNota.ID);
-                $("#txtNota_titulo").val(TabNota.Titulo);
-                $("#txtNota_Descripcion").val(TabNota.Descripcion);
-            });
-        }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
-    }
+    
+   
     function fn_guardarHipotesis(param) {
         var frmDatos = new FormData();
         frmDatos.append("Titulo", $("#txtHipotesis_titulo").val());
@@ -2088,6 +1707,7 @@
             }
         });
     }
+
 });
 
 

@@ -23,7 +23,7 @@ require.config({
         'VisorExcel': ['jquery', 'xlsx', 'NotificacionesMensajes'],
         'MatrizAccesos': ['jquery'],
         'AuditTrail': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos','Idioma'],
-        'Usuario': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos'],
+        'Usuario': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos', 'select2'],
         'Departamento': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'MatrizAccesos'],
         'InicioA3': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos', 'Idioma', 'select2'],
         'Items': ['jquery', 'FirmaElectronica', 'AuxiliarFormularios', 'Paginado', 'VisualizacionDatos'],

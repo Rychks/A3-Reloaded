@@ -6,8 +6,16 @@
  */
 
 /*# sourceMappingURL=custom.css.map */
+html {
+    font-size: 0.7vw !important;
+}
+
+body {
+    font-size: 0.7vw !important;
+}
 select, input {
     padding: 5px !important;
+    font-size: 0.7vw !important;
 }
 .loader {
     position: fixed;
@@ -21,7 +29,7 @@ select, input {
 }
 
 .tabla-md {
-    height: 20rem !important;
+    height: 25rem;
     /*height: calc(100vh - 385px);*/
     max-width: 100% !important;
     max-height: 100% !important;

@@ -15,6 +15,36 @@ namespace A3_Reloaded.Clases
 {
     public class Templates
     {
+        public DataTable get_status_list_acciones_preventivas(string id_language)
+        {
+            var msg = "";
+            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+            DataTable dt = new DataTable();
+            try
+            {
+                using (var conn = new SqlConnection(constr))
+                {
+                    SqlCommand cmd = new SqlCommand("get_status_list_acciones_preventivas", conn);
+                    cmd.Parameters.Add("@Idioma", SqlDbType.Int).Value = id_language;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                }
+                if (dt.Columns[0].ToString() == "ErrorNumber")
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        msg = "Error Number: " + row[0].ToString() + ", Severity: " + row[1].ToString() + ", State: " + row[2].ToString() +
+                                ", Procedure: " + row[3].ToString() + " Line: " + row[4].ToString() + " Message: " + row[5].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorLogger.Registrar(this, e.ToString(), "SQL: " + msg);
+            }
+            return dt;
+        }
         public DataTable get_list_status(string id_language)
         {
             var msg = "";

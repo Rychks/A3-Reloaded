@@ -65,13 +65,13 @@
 </style>
 <div class="loader"></div>
 <div class="section-body" id="pnlTemplates_Admin">
-    <h2 class="section-title txt_Idioma_Administracion_de_templares">Administración de Templates A3</h2>
+    <!--<h2 class="section-title txt_Idioma_Administracion_de_templares">Administración de Templates A3</h2>-->
     <div class="row">
         <div class="col-lg-12">
             <div class="card card-primary">
                 <div class="card-body">
                     <div class="row" id="frmTemplates">
-                        
+
                         <div class="form-group col-lg-2">
                             <span data-text="Thanks for hovering! I'm a tooltip"
                                   class="tooltip1 top">Hover over me!</span>
@@ -90,17 +90,17 @@
                                 <option value="-1" selected disabled>Seleccione</option>
                             </select>
                         </div>
-                        <div class="form-group col-lg-1" style="margin-top:1.8rem">
+                        <div class="form-group col-lg-2" style="margin-top:1.8rem">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="cbxTemplates_Activo" checked>
                                 <label class="form-check-label txt_Idioma_Solo_ver_activos" for="cbxTemplates_Activo">Solo ver activos</label>
                             </div>
                             @*<div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="cbxTemplates_Activo">
-                <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxTemplates_Activo">Solo ver activos</label>
-            </div>*@
+                                    <input type="checkbox" class="custom-control-input" id="cbxTemplates_Activo">
+                                    <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxTemplates_Activo">Solo ver activos</label>
+                                </div>*@
                         </div>
-                        <div class="form-group col-lg-4" style="margin-top:1.3rem">
+                        <div class="form-group col-lg-4 d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top:1.3rem">
                             <button type="button" class="btn btn-sm btn-icon btn-info btn-left txt_Idioma_Buscar tooltip1" data-text="Thanks for hovering! I'm a tooltip" id="btnTemplates_Buscar">
                                 <i class="fa fa-search" aria-hidden="true"></i> Buscar
                             </button>
@@ -124,15 +124,15 @@
                                 <table class="table table-hover text-center">
                                     <thead>
                                         <tr>
-                                            <th scope="col" style="width:15px;">#</th>
-                                            <th scope="col" style="width:25px;" class="txt_Idioma_Folio">Folio</th>
+                                            <th scope="col" style="width:5%">#</th>
+                                            <th scope="col"style="width:15%" class="txt_Idioma_Folio">Folio</th>
                                             <th scope="col" class="txt_Idioma_Descripcion">Descripción</th>
                                             <th scope="col" class="txt_Idioma_Imagen">Imagen</th>
                                             <th scope="col" class="txt_Idioma_Tipo_de_A3">Tipo de A3</th>
-                                            <th scope="col" class="txt_Idioma_Version">Version</th>
-                                            <th scope="col" class="txt_Idioma_Idioma">Idioma</th>
-                                            <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
-                                            <th scope="col" class="txt_Idioma_Opciones">Opciones</th>
+                                            <th scope="col" style="width:5%" class="txt_Idioma_Version">Version</th>
+                                            <th scope="col" style="width:6%" class="txt_Idioma_Idioma">Idioma</th>
+                                            <th scope="col" style="width:6%" class="txt_Idioma_Estatus">Estatus</th>
+                                            <th scope="col" style="width:8%" class="txt_Idioma_Opciones">Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 <div class="card-footer text-right">
-                    <div id="pgdTemplates">
+                    <div id="pgdTemplates" class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <div class="btn-group">
                             <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
                             <div class="btn-group">
@@ -456,6 +456,221 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" role="dialog" id="mdlPreguntas_Panel" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info" data-type="info">
+                <h4 class="modal-title txt_Idioma_Agregar_Items">Agregar elementos a Sección</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text" id="basic-addon1">Id section</span>
+                                <input type="text" class="form-control" disabled readonly id="txtItems_SeccionID" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="slcImtes_Elemento" class="txt_Idioma_Elemento">Elemento</label>
+                            <select class="form-control" id="slcItems_Elemento">
+                                <option value="-1" selected disabled><span class="txt_Idioma_Seleccione">Seleccione</span></option>
+                                <option value="0"><span class="txt_Idioma_Pregunta">Pregunta</span> </option>
+                                <option value="1"><span class="txt_Idioma_ishikawa">Ishikawa</span> </option>
+                                <option value="2"><span class="txt_Idioma_Notas">Notas</span></option>
+                                <option value="3"><span class="txt_Idioma_Instrucciones">Instrucciones</span></option>
+                                <option value="4"><span class="txt_Idioma_Hipotesis">Hipotesis</span></option>
+                                <option value="5"><span class="txt_Idioma_Factor_causal">Causa Raiz</span></option>
+                                <option value="6" class="">Missing Base Condition</option>
+                                <option value="7"><span class="txt_Idioma_Acciones_Preventivas">Acciones preventivas</span></option>
+                                <option value="8"><span class="txt_Idioma_Analisis_porque"></span></option>
+                            </select>
+                        </div>
+                        <div id="pnlItem_Default">
+                            <div class="form-group">
+                                <center><h3 class="txt_Idioma_seleccione_elemento"></h3></center>
+                                <input type="text" class="form-control-plaintext" readonly id="txtSeccionItem_ID">
+                            </div>
+                        </div>
+                        <div id="pnlItem_Pregunta">
+                            <div class="form-group">
+                                <label class="txt_Idioma_Titulo">Texto</label>
+                                <input type="text" id="txtPregunta_Texto" class="form-control" value="" />
+                                <input type="text" id="txtPregunta_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="txt_Idioma_Descripcion">Descripción</label>
+                                <textarea id="txtPregunta_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="slcPregunta_Respuesta" class="txt_Idioma_Tipo_de_pregunta">Tipo de Pregunta</label>
+                                <select class="form-control" id="slcPregunta_Respuesta">
+                                    <option value="1"><span class="txt_Idioma_Tipo_de_Abiera">Abierta</span></option>
+                                    <option value="0"><span class="txt_Idioma_SiNo">Si / No</span></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="txt_Idioma_firma_electronica"> Firma Electronica </label>
+                                <input type="checkbox" id="txtPregunta_firma" name="name" value="" />
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItem_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Nota">
+                            <div class="form-group">
+                                <label class="txt_Idioma_Titulo_de_nota">Titulo de Nota</label>
+                                <input type="text" id="txtNota_titulo" class="form-control" value="" />
+                                <input type="text" id="txtNota_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="txt_Idioma_Descipcion_nota">Descripción de Nota</label>
+                                <textarea id="txtNota_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemNota_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Instrucciones">
+                            <div class="form-group">
+                                <label class="txt_Idioma_Titulo">Titulo</label>
+                                <input type="text" id="txtInstrucciones_titulo" class="form-control" value="" />
+                                <input type="text" id="txtInstrucciones_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="txt_Idioma_Instrucciones">Instrucciones</label>
+                                <textarea id="txtInstrucciones_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemInstruccion_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Ishikawua">
+                            <div id="pnlItem_Ishikawua_Item">
+                                <div class="form-group" style="margin-top:-20px">
+                                    <label class="txt_Idioma_Titulo">Titulo</label>
+                                    <input type="text" id="txtIshikawua_titulo" class="form-control" value="" />
+                                    <input type="text" id="txtIshikawua_ID" style="display:none" class="form-control" value="" />
+                                </div>
+                                <div class="form-group" style="margin-top:-20px">
+                                    <label class="txt_Idioma_Descipcion">Descripción</label>
+                                    <textarea id="txtIshikawua_Descripcion" style="resize:none; height:200px !important;" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group text-right" style="margin-top:-20px">
+                                    <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                    <button type="button" class="btn btn-info txt_Idioma_Ramas" id="btnItemIshikawua_Ramas">Ramas</button>
+                                    <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemIshikawua_Guardar">Guardar</button>
+                                </div>
+                            </div>
+                            <div id="pnlItem_Ishikawua_Rama">
+                                <div class="form-group" style="margin-top:-20px">
+                                    <label class="txt_Idioma_Rama">Rama</label>
+                                    <select class="form-control" id="slcIshikawua_Rama">
+                                        <option class="txt_Idioma_Seleccione" value="-1" selected disabled>Seleccione</option>
+                                        <option value="0">Enviroment</option>
+                                        <option value="1">Equipment</option>
+                                        <option value="2">Material</option>
+                                        <option value="3">Method</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-top:-20px">
+                                    <label class="txt_Idioma_Preguntas">Preguntas</label>
+                                    <textarea id="txtIshikawua_Descripcion_Rama" style="resize:none; height:200px !important;" class="form-control"></textarea>
+                                    <input type="text" id="txtIshikawua_Rama_ID" style="display:none" class="form-control" value="" />
+                                </div>
+                                <div class="form-group text-right" style="margin-top:-20px">
+                                    <button type="button" class="btn btn-danger txt_Idioma_Regresar" id="btnItemIshikawua_Regresar_Rama">Regresar</button>
+                                    <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemIshikawua_Guardar_Rama">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Hipotesis">
+                            <div class="form-group">
+                                <label class="txt_Idioma_Titulo_de_Hipotesis">Titulo de Nota</label>
+                                <input type="text" id="txtHipotesis_titulo" class="form-control" value="" />
+                                <input type="text" id="txtHipotesis_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="txt_Idioma_Descipcion_Hipotesis">Descripción de Nota</label>
+                                <textarea id="txtHipotesis_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemHipotesis_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Factor">
+                            <div class="form-group">
+                                <label class="txt_Idioma_Titulo_de_Factor">Titulo de Nota</label>
+                                <input type="text" id="txtFactor_titulo" class="form-control" value="" />
+                                <input type="text" id="txtFactor_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="txt_Idioma_Descipcion_Factor">Descripción de Nota</label>
+                                <textarea id="txtFactor_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemFactor_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Missing">
+                            <div class="form-group">
+                                <label class="">Titulo de Bloque</label>
+                                <input type="text" id="txtMissing_titulo" class="form-control" value="Missing Base Conditions" />
+                                <input type="text" id="txtMissing_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="">Descripción de Bloque</label>
+                                <textarea id="txtMissing_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemMissing_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Acciones">
+                            <div class="form-group">
+                                <label class="">Titulo de Bloque</label>
+                                <input type="text" id="txtAcciones_titulo" class="form-control" value="" />
+                                <input type="text" id="txtAcciones_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="">Descripción de Bloque</label>
+                                <textarea id="txtAcciones_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemAcciones_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                        <div id="pnlItem_Analisis">
+                            <div class="form-group">
+                                <label class="">Titulo de Bloque</label>
+                                <input type="text" id="txtAnalisis_titulo" class="form-control" value="" />
+                                <input type="text" id="txtAnalisis_ID" style="display:none" class="form-control" value="" />
+                            </div>
+                            <div class="form-group">
+                                <label class="">Descripción de Bloque</label>
+                                <textarea id="txtAnalisis_Descripcion" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" class="btn btn-danger txt_Idioma_Cancelar btnCerrarPanelItems">Cerrar</button>
+                                <button type="button" class="btn btn-success txt_Idioma_Guardar" id="btnItemAnalisis_Guardar">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <button type="button" class="btn btn-danger txt_Idioma_Cerrar" tabindex="4" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>

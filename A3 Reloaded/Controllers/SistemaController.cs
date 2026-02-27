@@ -28,6 +28,7 @@ namespace A3_Reloaded.Controllers
         AuditTrail AT = new AuditTrail();
         Reponses responses = new Reponses();
         OEE oee= new OEE();
+        Acciones acciones = new Acciones();
         public ActionResult Index()
         {
             return View();
@@ -117,12 +118,12 @@ namespace A3_Reloaded.Controllers
             }
             return Json(list, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult comenzar_investigacion(string ID,string Folio, string TipoA3, string Contact, string Problem,string Cost)
+        public JsonResult comenzar_investigacion(string ID,string Descripcion,string Folio, string TipoA3, string Contact, string Problem,string Cost)
         {
             try
             {
                 DateTime Registro = DateTime.Now;
-                string id = TER.registrar_Template_Running(Folio, TipoA3, 1, Contact, Problem, Cost, 1);
+                string id = TER.registrar_Template_Running(Folio, TipoA3, 1, Contact, Problem, Cost, 1,Descripcion);
                 noti.Mensaje = Mensajes.Investigacion_guardar;
                 noti.Tipo = "success";
                 noti.Id = id;
@@ -196,10 +197,14 @@ namespace A3_Reloaded.Controllers
                 string table = dr["autofill_table"].ToString();
                 string column = dr["autofill_column"].ToString();
                 string identifier = dr["autofill_identifier"].ToString();
+                string flow = dr["flow"].ToString();
+                if (string.IsNullOrEmpty(flow)) { flow = "0"; }
                 string response = string.Empty;
+                int status_item = 0;
                 if(autofill == "1")
                 {
-                    if(table == "function")
+                    status_item = 1;
+                    if (table == "function")
                     {
                         response = responses.getResponse_function(column, identifier, id_template);
                     }
@@ -210,7 +215,7 @@ namespace A3_Reloaded.Controllers
                 }
                 if (dr["Elemento"].ToString() == "Pregunta")
                 {                    
-                    ObtenerPregunta(SeccionID, SeccionRID, ID_ELEMENTO, response);
+                    ObtenerPregunta(SeccionID, SeccionRID, ID_ELEMENTO, response, status_item,flow);
 
                 }else if (dr["Elemento"].ToString() == "Nota")
                 {
@@ -233,7 +238,7 @@ namespace A3_Reloaded.Controllers
             }
             
         }
-        private void ObtenerPregunta(string SeccionID,string SeccionRID, string ID_ELEMENTO, string response)
+        private void ObtenerPregunta(string SeccionID,string SeccionRID, string ID_ELEMENTO, string response, int status,string flow)
         {
             DataTable TabPreguntas = TER.obtener_items_pregunta_seccionsID(Convert.ToInt32(SeccionID), Convert.ToInt32(ID_ELEMENTO));
             foreach(DataRow dr in TabPreguntas.Rows)
@@ -243,7 +248,7 @@ namespace A3_Reloaded.Controllers
                 string tipo = dr["Pr_tipo"].ToString();
                 string firma = dr["It_firma"].ToString();
 
-                TER.registrar_Preguntas_Running(Nombre, Descripcion, Convert.ToInt32(tipo), response, 0, Convert.ToInt32(SeccionRID),Convert.ToInt32(firma));
+                TER.registrar_Preguntas_Running(Nombre, Descripcion, Convert.ToInt32(tipo), response, status, Convert.ToInt32(SeccionRID),Convert.ToInt32(firma),Convert.ToInt32(flow));
                 //TER.registrar_Item_Running("Pregunta", "TabPreguntas_Running", Convert.ToInt32(idPreguntaRunning), 0, Convert.ToInt32(SeccionRID), Nombre);
             }
         }
@@ -738,12 +743,14 @@ namespace A3_Reloaded.Controllers
                 {
                     Res = Respuesta;
                 }
+                DataTable datos = TER.get_detail_item_running(Convert.ToInt32(IDItem));
+                
                 DateTime Registro = DateTime.Now;
                 string id = TER.Update_preguntaRunning(Convert.ToInt32(ID), Respuesta, 1, Comentarios);
                 TER.Update_Item_estatus(Convert.ToInt32(IDItem), 1, Res);
                 noti.Mensaje = Mensajes.respuesta_guardada;
                 noti.Tipo = "success";
-                noti.Id = id;
+                noti.Id = datos.Rows[0]["flow"].ToString();
                 //AT.registrarAuditTrail(Registro, "Usuario", "I", "N/A", "Nueva Investigación Folio: ", "N/A");
             }
             catch (Exception e)
@@ -1295,16 +1302,41 @@ namespace A3_Reloaded.Controllers
             return Json(datos, JsonRequestBehavior.AllowGet);
         }
         //
-        public JsonResult registrar_5w(string What, string Why1, string Why2, string Why3, string Why4,string Why5, string Cause, string Date, string Step, string Name, string Status, string Cuadrante)
+        public JsonResult registrar_5w(string What, string Why1, string Why2, string Why3, string Why4, string Why5, string Cause, string Date, string Step, string Name, string Status, string Cuadrante, int ID_Template, int Responsable)
         {
             try
             {
+                // 1. Registramos el 5 Porqués
                 string datos = TER.registrar_5w(What, Why1, Why2, Why3, Why4, Why5, Cause, Date, Step, Name, Status, Cuadrante);
+
                 if (datos == "guardado")
                 {
-                    noti.Mensaje = Mensajes.Informacion_guardar;
-                    noti.Tipo = "success";
-                    //AT.registrarAuditTrail(Registro, BYTOST, "I", "N/A", "Nuevo Archivo Adjunto: " + filename + "", "N/A");
+                    // 2. Sincronizamos insertando en la tabla general de Acciones Preventivas
+                    // Step = Descripción de la acción
+                    // Date = Fecha compromiso
+                    // Responsable = ID del usuario responsable
+                    // Name = Nombre del responsable (lo usamos como 'asignado_por' o referencia, aunque idealmente 'asignado_por' debería ser el usuario logueado)
+
+                    // Nota: Aquí uso HttpContext.User.Identity.Name para saber quién creó el registro (el CWID del usuario logueado)
+                    string cwid_creador = HttpContext.User.Identity.Name;
+
+                    datos = acciones.insert_accion_preventiva(ID_Template, Step, Date, Responsable, Name, cwid_creador);
+
+                    if (datos == "guardado")
+                    {
+                        noti.Mensaje = Mensajes.Informacion_guardar;
+                        noti.Tipo = "success";
+
+                        // Opcional: Registrar en AuditTrail (He corregido el mensaje ya que 'filename' no existe aquí)
+                        DateTime Registro = DateTime.Now;
+                        AT.registrarAuditTrail(Registro, cwid_creador, "I", "N/A", "Nueva Acción 5W registrada y vinculada: " + Step, "N/A");
+                    }
+                    else
+                    {
+                        // Se guardó el 5W pero falló la acción preventiva
+                        noti.Mensaje = "El 5W se guardó, pero hubo un error al sincronizar la acción preventiva.";
+                        noti.Tipo = "warning";
+                    }
                 }
                 else
                 {
@@ -1320,11 +1352,11 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult actualizar_5w(string ID,string What, string Why1, string Why2, string Why3, string Why4, string Cause, string Date, string Step, string Name, string Status, string Cuadrante)
+        public JsonResult actualizar_5w(string ID,string What, string Why1, string Why2, string Why3, string Why4, string Why5, string Cause, string Date, string Step, string Name, string Status, string Cuadrante)
         {
             try
             {
-                string datos = TER.actualizar_5w(ID, What, Why1, Why2, Why3, Why4, Cause, Date, Step, Name, Status, Cuadrante);
+                string datos = TER.actualizar_5w(ID, What, Why1, Why2, Why3, Why4, Why5, Cause, Date, Step, Name, Status, Cuadrante);
                 if (datos == "guardado")
                 {
                     noti.Mensaje = Mensajes.Informacion_guardar;
@@ -1361,6 +1393,7 @@ namespace A3_Reloaded.Controllers
                         Why2 = data["Why2"].ToString(),
                         Why3 = data["Why3"].ToString(),
                         Why4 = data["Why4"].ToString(),
+                        Why5 = data["Why5"].ToString(),
                         Cause = data["Cause"].ToString(),
                         Step = data["Step"].ToString(),
                         Name = data["Name"].ToString(),
@@ -1391,6 +1424,7 @@ namespace A3_Reloaded.Controllers
                         Why2 = data["Why2"].ToString(),
                         Why3 = data["Why3"].ToString(),
                         Why4 = data["Why4"].ToString(),
+                        Why5 = data["Why5"].ToString(),
                         Cause = data["Cause"].ToString(),
                         Step = data["Step"].ToString(),
                         Name = data["Name"].ToString(),
@@ -1549,7 +1583,7 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult omitir_evluador(string ID)
+        public JsonResult omitir_evluador(string ID,string ID_Investigacion)
         {
             try
             {
@@ -2867,17 +2901,27 @@ namespace A3_Reloaded.Controllers
             try
             {
                 //noti.Mensaje = "Se produjo un error al tratar de guardar la información";
-                string rol = US.obtener_Rol_Usuario(HttpContext.User.Identity.Name);
-                string nombre = US.obtener_Nombre_Usuario(HttpContext.User.Identity.Name, "R");
+                string cwid_user = HttpContext.User.Identity.Name;
+                string rol = US.obtener_Rol_Usuario(cwid_user);
+                string nombre = US.obtener_Nombre_Usuario(cwid_user, "R");
                 string Res = string.Empty;
-                if(rol == "1")
+                DataTable datos = templateR.valida_usuario_evaluador(ID, cwid_user);
+                if(datos.Rows.Count > 0)
                 {
-                    Res = "1";
+                    Res = "2";
                 }
                 else
                 {
-                    Res = TER.validar_responsable_template_running(ID, nombre);
+                    if (rol == "1")
+                    {
+                        Res = "1";
+                    }
+                    else
+                    {
+                        Res = TER.validar_responsable_template_running(ID, nombre);
+                    }
                 }
+                
                 //noti.Error = datos;
                 noti.Id = Res;
             }

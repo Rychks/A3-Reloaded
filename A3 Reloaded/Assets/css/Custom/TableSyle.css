@@ -1,61 +1,108 @@
 ﻿body {
-    font-size: 12px !important;
-    font-family: Arial !important;
+    font-family: "Arial", Helvetica, sans-serif !important;
 }
 
-/*input {
+.tablaCss {
+    width: 100%;
+    font-family: "Arial", Helvetica, sans-serif !important;
+    font-size: 0.7vw;
+    vertical-align: middle;
+}
+
+a {
+    font-size: 0.7vw !important;
+}
+textarea {
+    font-size: 0.7vw !important;
+}
+
+label {
+    font-size: 0.7vw !important;
+}
+
+input {
+    font-size: 0.7vw !important;
+}
+select {
+    font-size: 0.7vw !important;
+}
+
+.tablaCss thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     height: 2rem !important;
-}*/
-
-.form-check-input{
-
+    background-color: #E7E6E6;
 }
 
-.validate-div {
-    border:solid;
-    border-color: red;
-}
-
-.text-right {
-    margin-left:auto !important; 
-    margin-right: 0 !important;
-}
-.form-control {
-    font-size: 14px !important;
-    font-family: Arial;
-}
-
-.table {
-    font-size:12px !important;
-    font-family: Arial;
-}
-
-.table tbody td {
-    height: 2rem !important;
-}
-
-    .table thead th {
-        height: 2rem !important;
-        position: sticky;
-        top: 0;
-        z-index: 1 !important;
-        box-shadow: 0px 1px 0px 0px #000;
-        background-color: #E3EAEF !important;
+    .tablaCss thead th {
+        color: black;
+        font-size: 0.7vw !important;
     }
 
-.badge {
-    font-family: Arial !important;
-    font-size: 10px !important
+    .tablaCss thead td {
+        color: black;
+        vertical-align: middle !important;
+       
+    }
+    thead tr{
+        height: 3rem !important;
+        font-size:0.75vw
+    }
+tbody {
+    font-size: 0.7vw!important;
+}
+.tablaCss tr:hover {
+    background-color: #E7E6E6;
 }
 
+.tablaCss td {
+    padding: 5px !important;
+}
+
+.tablaCss tbody td {
+    vertical-align: middle !important;
+    font-size: 0.7vw !important;
+}
+
+.badgeEstatus {
+    margin-bottom: -0rem;
+    background-color: red;
+    color: white;
+    padding: 2px 10px;
+    text-align: center;
+    font-size: 0.6rem !important;
+    font-family: Arial !important;
+    border-radius: 10px;
+}
+
+.bgHeaderModal-dark-blue {
+    background-color: white;
+    color: #264653;
+}
+
+.bgHeaderModal-mid-blue {
+    background-color: #00607E;
+    color: #FFF;
+}
+
+.bgHeaderModal-blue {
+    background-color: #007CBF;
+    color: #FFF;
+}
+
+.bgHeaderModal-raspberry {
+    background-color: #D30F4B;
+    color: #FFF;
+}
+
+.bgHeaderModal-bright-blue {
+    background-color: #00BCFF;
+    color: #000000;
+}
 tbody tr.selected {
     background-color: lightgray !important;
 }
-
-td {
-    padding: 5px;
-}
-
 .table-widget .table-row.selected, .table-widget .table-row:hover * {
     background-color: deepskyblue !important;
 }

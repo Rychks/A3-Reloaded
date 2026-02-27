@@ -59,10 +59,6 @@
                 Seccion: $("#frmSeccionesN"),
                 NoVacio: function () {
                     fn_registrar_Seccion(id_cuadrante)
-                    //$.firmaElectronica.MostrarFirma({
-                    //    Justificacion: false,
-                    //    Funcion: fn_registrar_Seccion
-                    //});
                 }
             });
         });
@@ -72,6 +68,7 @@
             var activado = $.CargarIdioma.Obtener_Texto('txt_Idioma_Activado');
             var desactivado = $.CargarIdioma.Obtener_Texto('txt_Idioma_Desactivado');
             $.post(url, data = { ID: ID }).done(function (res) {
+                console.log(res);
                 if (res != "") {
                     $.each(res, function (i, item) {
                         $("#txtSeccionesM_ID").val(item.ID);
@@ -125,19 +122,362 @@
             });
         });
         $("#ItemTemplate_edition_section").on("click", ".btnAdd_Item", function () {
-            var ID = $(this).parents("tr").find("[data-registro=ID]").html();
-            var nom = $(this).parents("tr").find(".NombreSeccion").html();
+            var id_seccion = $(this).parents("div").parents("div.col-md-6").find("input[data-registro=ID]").val();
+            $("#slcItems_Elemento").val(-1);
+            var name_seccion = $(this).parents("div").parents("div.col-md-6").find("input[data-registro=name_seccion]").val();
             var idioma_seleccione = $.CargarIdioma.Obtener_Texto("txt_Idioma_Seleccione");
-            $("#txtItems_SeccionID").val(ID);
-            $("#txtItems_SeccionNom").val(nom);
+            $("#txtItems_SeccionID").val(id_seccion);
+            $("#txtItems_SeccionNom").val(name_seccion);
             fn_SetItem_PnlDefault();
+            $("#slcItems_Elemento").show();
             $("#mdlPreguntas_Panel").modal("show");
-            fn_Items();
-            $("#slcPregunta_Respuesta").val(idioma_seleccione);
+            $("#slcPregunta_Respuesta").val("1");
+            $("#txtPregunta_Texto").val("");
+            $("#txtPregunta_Descripcion").val("");
+        });
+        $("#ItemTemplate_edition_section").on("click", "button[data-registro=Editar_item]", function () {
+            var id_item = $(this).parents("tr").find("[data-registro=id_item]").html();
+            var id_seccion = $(this).parents("tr").find("[data-registro=id_seccion]").html();
+            var urlItem = "/Items/obtener_item_id";
+            var dataItem = { ID: id_item };
+            fn_SetItem_PnlDefault();
+            $.post(urlItem, dataItem).done(function (resItem) {
+                $.each(resItem, function (i, Tabitem) {
+                    $("#pnlItem_Default").hide();
+                    $("#slcItems_Elemento").val(-1);
+                    //$("#slcItems_Elemento").hide();
+                    var table_item = Tabitem.Tabla;
+                    switch (table_item) {
+                        case "TabPreguntas":
+                            $('#slcItems_Elemento').val(0);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_pregunta_id(Tabitem.TabId, Tabitem.Firma);
+                            break;
+                        case "TabNotas":
+                            $("#slcItems_Elemento").val(2);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_nota_id(Tabitem.TabId);
+                            break;
+                        case "TabInstrucciones":
+                            $("#slcItems_Elemento").val(3);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_instruccion_id(Tabitem.TabId);
+                            break;
+                        case "TabHipotesis":
+                            $("#slcItems_Elemento").val(4);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_hipotesis_id(Tabitem.TabId);
+                            break;
+                        case "TabFactor":
+                            $("#slcItems_Elemento").val(5);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_factor_id(Tabitem.TabId);
+                            break;
+                        case "TabMissingBaseCondition":
+                            $("#slcItems_Elemento").val(6);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_Missing_id(Tabitem.TabId);
+                            break;
+                        case "TabAnalisis_Porque":
+                            $("#slcItems_Elemento").val(7);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_analisis_id(Tabitem.TabId);
+                            break;
+                        case "TabAcciones":
+                            $("#slcItems_Elemento").val(8);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_accioness_id(Tabitem.TabId);
+                            break;
+                        case "TabIshikawua":
+                            $("#slcItems_Elemento").val(1);
+                            $("#txtSeccionItem_ID").val(Tabitem.ID);
+                            fn_obtener_Ishikawua_Info(Tabitem.TabId);
+                            break;
+                        default :
+                         fn_SetItem_PnlDefault();
+                    }
+                    $("#txtItems_SeccionID").val(id_seccion);
+                    $("#mdlPreguntas_Panel").modal("show");
+                });
+            }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
+        });
+        $("#ItemTemplate_edition_section").on("click", "button[data-registro=Omitir_item]", function () {
+            var id_item = $(this).parents("tr").find("[data-registro=id_item]").html();
+            var id_seccion = $(this).parents("tr").find("[data-registro=id_seccion]").html();
+            var urlItem = "/Items/obtener_item_id";
+            var dataItem = { ID: id_item };
+            $.post(urlItem, dataItem).done(function (resItem) {
+                $.each(resItem, function (i, Tabitem) {
+                    var id_dynamic_item = Tabitem.TabId;
+                    var id_registro = Tabitem.ID;
+                    var type_item = Tabitem.Tabla;
+                    $("#txtItems_ItemOmitirID").val(Tabitem.ID)
+
+                    switch (type_item) {
+                        case "TabPreguntas":
+                            $("#txtItems_OmitirID").val(id_dynamic_item);
+                            fn_eliminar_pregunta(id_registro, id_dynamic_item, id_seccion);
+                            break;
+                    }
+
+                    //if (Tabitem.Tabla == "") {
+                        
+                    //} else if (Tabitem.Tabla == "TabNotas") {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_Nota
+                    //    });
+                    //} else if (Tabitem.Tabla == "TabInstrucciones") {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_instruccion
+                    //    });
+                    //} else if (Tabitem.Tabla == "TabHipotesis") {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_hipotesis
+                    //    });
+                    //} else if (Tabitem.Tabla == "TabFactor") {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_factor
+                    //    });
+                    //} else if (Tabitem.Tabla == "TabAcciones") {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_Accion
+                    //    });
+                    //} else if (Tabitem.Tabla == "TabAnalisis_Porque") {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_Analisis
+                    //    });
+                    //} else if (Tabitem.Tabla == "TabMissingBaseCondition") {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_Missing
+                    //    });
+                    //} else {
+                    //    $("#txtItems_OmitirID").val(Id_Item);
+                    //    $.firmaElectronica.MostrarFirma({
+                    //        Justificacion: true,
+                    //        Funcion: fn_eliminar_ishkawua
+                    //    });
+                    //}
+                });
+            }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
         });
     });
+    $("#slcItems_Elemento").change(function () {
+        var selected_option = $(this).val();
+        fn_SetItem_PnlDefault();
+        $("#pnlItem_Default").hide();
+        switch (selected_option) {
+            case "0":
+                $("#pnlItem_Pregunta").show();
+                break;
+            case "1":
+                $("#pnlItem_Ishikawua").show();
+                $("#pnlItem_Ishikawua_Item").show();
+                $("#pnlItem_Ishikawua_Rama").hide();
+                break;
+            case "2":
+                $("#pnlItem_Nota").show();
+                break;
+            case "3":
+                $("#pnlItem_Instrucciones").show();
+                break;
+            case "4":
+                $("#pnlItem_Hipotesis").show();
+                break;
+            case "5":
+                $("#pnlItem_Factor").show();
+                break;
+            case "6":
+                $("#pnlItem_Missing").show();
+                break;
+            case "7":
+                $("#pnlItem_Acciones").show();
+                break;
+            case "8":
+                $("#pnlItem_Analisis").show();
+                break;
+            default:
+                $("#pnlItem_Default").show();
+        }
+    });
+    $(".btnCerrarPanelItems").click(function () {
+        fn_SetItem_PnlDefault();
+    });
+    $("#btnItem_Guardar").click(function () {
+        var item = $("#slcItems_Elemento").val();
+        var idItem = $("#txtSeccionItem_ID").val();
+        //$("#slcItems_Elemento").val(text_idioma);
+        var idPR = $("#txtPregunta_ID").val();
+        if (idPR != "" && idItem != "") {
+            fn_modificarPregunta();
+        } else {
+            fn_guardarPregunta();
+        }
+    });
+    function fn_obtener_pregunta_id(id, firma) {
+        var urlPr = "/Items/obtener_Pregnta_id";
+        var dataPr = { ID: id };
+        $.post(urlPr, dataPr).done(function (resPr) {
+            $("#pnlItem_Pregunta").show();
+            $.each(resPr, function (i, TabPregunta) {
+                $("#txtPregunta_ID").val(TabPregunta.ID);
+                $("#txtPregunta_Texto").val(TabPregunta.Texto);
+                $("#txtPregunta_Descripcion").val(TabPregunta.Descripcion);
+                $("#slcPregunta_Respuesta").val(TabPregunta.Tipo);
+                $("#txtPregunta_firma").prop("checked", false);
+                if (firma == "1") {
+                    $("#txtPregunta_firma").prop("checked", true);
+                }
+            });
+        }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
+    }
+    function fn_modificarPregunta() {
+        var id_seccion = $("#txtItems_SeccionID").val();
+        var frmDatos = new FormData();
+        var Tipo = $("#slcPregunta_Respuesta option:selected").val();
+        var Tipo_val;
+        frmDatos.append("IDItem", $("#txtSeccionItem_ID").val());
+        frmDatos.append("ID", $("#txtPregunta_ID").val());
+        frmDatos.append("Texto", $("#txtPregunta_Texto").val());
+        frmDatos.append("Descripcion", $("#txtPregunta_Descripcion").val());
+        frmDatos.append("Tipo", Tipo);
+        frmDatos.append("Seccion", id_seccion);
+        var firma = 0;
+        if ($("#txtPregunta_firma").prop("checked")) {
+            firma = 1;
+        }
+        frmDatos.append("Firma", firma);
+        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        $.ajax({
+            type: "POST",
+            url: "/Items/Modificar_Pregunta",
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (res) {
+                if (res.Tipo == "success") {
+                    $("#mdlSistema_FirmaElectronica").modal("hide");
+                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                    var idioma_seleccione = $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione');
+                    $("#txtPregunta_Texto").val(null);
+                    $("#txtPregunta_Descripcion").val(null);
+                    $("#slcPregunta_Respuesta").val(idioma_seleccione);
+                    $("#slcItems_Elemento").val(idioma_seleccione);
+                    $("#txtPregunta_ID").val(null);
+                    $("#txtSeccionItem_ID").val(null);
+                    fn_SetItem_PnlDefault();
+                }
+                $("#mdlPreguntas_Panel").modal("hide");
+                fn_Items(1, id_seccion);
+                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+            },
+            error: function (error) {
+                $("#mdlSistema_FirmaElectronica").modal("hide");
+                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+    function fn_guardarPregunta() {
+        var id_seccion = $("#txtItems_SeccionID").val();
+        var frmDatos = new FormData();
+        var Tipo = $("#slcPregunta_Respuesta option:selected").val();
+        frmDatos.append("Texto", $("#txtPregunta_Texto").val());
+        frmDatos.append("Descripcion", $("#txtPregunta_Descripcion").val());
+        frmDatos.append("Tipo", Tipo);
+        frmDatos.append("Seccion", id_seccion);
+        var firma = 0;
+        if ($("#txtPregunta_firma").prop("checked")) {
+            firma = 1;
+        }
+        frmDatos.append("Firma", firma);
+        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        $.ajax({
+            type: "POST",
+            url: "/Items/registrar_Pregunta",
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (res) {
+                if (res.Tipo == "success") {
+                    $("#mdlSistema_FirmaElectronica").modal("hide");
+                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                    fn_SetItem_PnlDefault();
+                    var idioma_seleccione = $.CargarIdioma.Obtener_Texto('txt_Idioma_Seleccione');
+                    
+                    $("#slcPregunta_Respuesta").val(idioma_seleccione);
+                    $("#slcItems_Elemento").val(idioma_seleccione);
+                }
+                $("#mdlPreguntas_Panel").modal("hide");
+                fn_Items(1, id_seccion);
+                $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
+                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+            },
+            error: function (error) {
+                $("#mdlSistema_FirmaElectronica").modal("hide");
+                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Informacion_guardar_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+    function fn_eliminar_pregunta(id_registro,id_item,id_seccion) {
+        var frmDatos = new FormData();
+        frmDatos.append("ID", id_item);
+        frmDatos.append("ID_Item", id_registro);
+        $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
+        $.ajax({
+            type: "POST",
+            url: "/Items/eliminar_pregunta",
+            contentType: false,
+            processData: false,
+            data: frmDatos,
+            success: function (res) {
+                if (res.Tipo == "success") {
+                    $("#mdlSistema_FirmaElectronica").modal("hide");
+                    $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                    $("#txtItems_OmitirID").val(null);
+                    $("#txtItems_ItemOmitirID").val(null);
+                    fn_SetItem_PnlDefault();
+                }
+                fn_Items(1, id_seccion);
+                $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
+                $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });
+            },
+            error: function (error) {
+                $("#mdlSistema_FirmaElectronica").modal("hide");
+                $("#scnFirmaElectronica_Justificacion").prop("hidden", true);
+                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Registro_omitir_error'), Tipo: "danger", Error: error });
+            }
+        });
+    }
+    function fn_obtener_nota_id(id) {
+        var urlPr = "/Items/obtener_Nota_id";
+        var dataPr = { ID: id };
+        $.post(urlPr, dataPr).done(function (resPr) {
+            $("#pnlItem_Nota").show();
+            $.each(resPr, function (i, TabNota) {
+                $("#txtNota_ID").val(TabNota.ID);
+                $("#txtNota_titulo").val(TabNota.Titulo);
+                $("#txtNota_Descripcion").val(TabNota.Descripcion);
+            });
+        }).fail(function (error) { $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_error_mostrar_info'), Tipo: "danger", Error: error }); });
+    }
     function fn_Items(Pagina, id_seccion) {
         //var seccion = $("#txtItems_SeccionID").val();
+        $("#tblSeccion" + id_seccion + "").empty();
         var seccion = id_seccion;
         var Datos = { Seccion: id_seccion, Index: Pagina };
         $.mostrarInfo({
@@ -154,11 +494,12 @@
                     Activo = '<span class="tag tag-red">' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Inactivo') + '</span>';
                 }
 
-                var Botones = '<button class="btn btn-icon btn-primary btnEditar" data-toggle="tooltip"  data-registro="Editar" data-placement="bottom" title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '"><i class="far fa-edit"></i></button>';
-                var Omitir = '<button class="btn btn-icon btn-danger btnOmitir" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Omitir') + '"><i class="fa fa-trash"></i></button>';
+                var Botones = '<button class="btn btn-icon btn-primary" data-toggle="tooltip"  data-registro="Editar_item" data-placement="bottom" title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Editar') + '"><i class="far fa-edit"></i></button>';
+                var Omitir = '<button class="btn btn-icon btn-danger" data-toggle="tooltip" data-registro="Omitir_item" data-placement="bottom" title="" data-original-title="' + $.CargarIdioma.Obtener_Texto('txt_Idioma_Omitir') + '"><i class="fa fa-trash"></i></button>';
                 $("#tblSeccion" + id_seccion + "").append(
                     $('<tr>')
-                        .append($('<td data-registro="ID" style="display:none; text-align:center">').append(item.ID))
+                        .append($('<td data-registro="id_item" style="display:none; text-align:center">').append(item.ID))
+                        .append($('<td data-registro="id_seccion" style="display:none; text-align:center">').append(id_seccion))
                         .append($('<td style="text-align:center">').append(item.RowNumber))
                         .append($('<td>').append(item.Elemento))
                         .append($('<td>').append(item.Texto))
@@ -213,11 +554,7 @@
         frmDatos.append("Descripcion", $("#txtSeccionesM_Descripcion").val());
         frmDatos.append("Cuadrante", $("#slcSeccionesM_Cuadrante option:selected").val());
         frmDatos.append("Template", $("#txtTemplatesM_ID").val());
-        if ($("#cbxSeccionesM_Activo").prop("checked")) {
-            frmDatos.append("Activo", 1);
-        } else {
-            frmDatos.append("Activo", 0);
-        }
+        frmDatos.append("Activo", 1);
         $("#btnFirmaElectronica_Firmar").addClass("btn-progress");
         $.ajax({
             type: "POST",
@@ -332,6 +669,7 @@
                         '<div class="col-md-6">' +
                         '<div class="d-grid gap-2 d-md-flex justify-content-md-end">' +
                         '<input style="display:none;" type="text" value="' + item.id_seccion + '"  data-registro="ID" />' +
+                        '<input style="display:none;" type="text" value="' + item.Nombre + '"  data-registro="name_seccion" />' +
                         '<button type="button" class="btn btn-sm btn-icon btn-light tooltip1 btnAdd_Item" data-text="Permite agregar elementos a la sección ejem. Preguntas, Notas Etc.." style="border-radius: 13px !important;"><i class="fa fa-plus"></i> Agregar Item</button>' +
                         '<button type="button" class="btn btn-sm btn-icon btn-primary tooltip1 btnEditar" data-text="Permite editar nombre y descripción de la sección" style="border-radius: 13px !important;"><i class="fa fa-edit"></i> Editar Sección</button>' +
                         '<button type="button" class="btn btn-sm btn-icon btn-danger tooltip1 btnOmitir" data-text="Permite omitir la sección" style="border-radius: 13px !important;"><i class="fa fa-trash"></i> Omitir Sección</button>' +

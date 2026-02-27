@@ -37,11 +37,11 @@ namespace A3_Reloaded.Controllers
             }
             return Json(list, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult obtenerTotalPagDepartamentos(string Nombre, string Activo, int NumRegistros = 5)
+        public JsonResult obtenerTotalPagDepartamentos(string Nombre, string Activo, int NumRegistros = 50)
         {
             return Json(DE.obtener_TotalPag_Departamentos(Nombre,Activo, NumRegistros), JsonRequestBehavior.AllowGet);
         }
-        public JsonResult mostrarDepartamentos(string Nombre, string Activo, int Index = 0, int NumRegistros = 5)
+        public JsonResult mostrarDepartamentos(string Nombre, string Activo, int Index = 0, int NumRegistros = 50)
         {
             List<DepartamentoModel> list = new List<DepartamentoModel>();
             try

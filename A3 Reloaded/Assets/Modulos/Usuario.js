@@ -186,6 +186,8 @@
     function fn_obtener_listas() {
         $("#slcUsuarios_Departamento").generarLista({ URL: "/Departamento/Lista_Departamentos" });
         $("#slcUsuarios_Rol").generarLista({ URL: "/Usuarios/obtener_Lista_Roles" });
+        $("#slcUsuarios_Rol").select2();
+        $("#slcUsuarios_Departamento").select2();
     }
     function fn_registrar_usuario(Param) {
         var frmDatos = new FormData();

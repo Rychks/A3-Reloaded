@@ -6,32 +6,74 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <link rel="shortcut icon" href="~/Assets/Bayer_Brand/Bayer-Logo2.png" />
-    <title>@ViewBag.Title</title>
-    <link href="~/Content/bootstrap.css" rel="stylesheet" />
-    <link href="~/Assets/modules/fontawesome-free-5.12.1-web/css/all.css" rel="stylesheet" />
-    <link href="~/Assets/css/style.css" rel="stylesheet" />
-    <link href="~/Assets/css/components.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="~/Assets/Bayer_Brand/Bayer-Logo.png" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/Assets/Login Design/fonts/icomoon/style.css">
+
+    <link rel="stylesheet" href="~/Assets/Login Design/css/owl.carousel.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/Assets/Login Design/css/bootstrap.min.css">
+
+    <style>
+        html {
+            font-size: 0.8vw;
+        }
+        body {
+            font-size: 0.8vw;
+        }
+    </style>
+    <!-- Style -->
+    <link rel="stylesheet" href="~/Assets/Login Design/css/style.css">
     <link href="~/Assets/modules/izitoast/css/iziToast.min.css" rel="stylesheet" />
-    <link href="~/Assets/css/custom.css" rel="stylesheet" />
+    
+   
+    <title>Login | A3 Problem Solving</title>
+    @*<link href="~/Content/bootstrap.css" rel="stylesheet" />
+        <link href="~/Assets/modules/fontawesome-free-5.12.1-web/css/all.css" rel="stylesheet" />
+        <link href="~/Assets/css/style.css" rel="stylesheet" />
+        <link href="~/Assets/css/components.css" rel="stylesheet" />
+
+    *@
+
 </head>
-<body style="background-color:#00324e;">
+<!--<body style="background-color:#00324e;">
+<body style="background-image: url('../../Assets/Bayer_Brand/dynamic_gradients_2_color_16x9_v2 (2).jpg'); background-repeat: no-repeat; background-position: center; background-size: cover ">-->
+<body>
     <div class="loader"></div>
-    <div id="app">
-        <section class="section">
-            <div class="container mt-5">
-                <div class="row">
-                    <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
-                        @RenderBody()
+    <div class="container mt-5">
+        <div class="row">
+            @RenderBody()
+
+        </div>
+       
+    </div>
+    @if (ViewBag.Llave != null)
+    {
+        <input type="password" id="txtSistema_Grifo" hidden disabled value=@ViewBag.Llave />
+    }
+<div class="text-center mt-5" style="font-weight:lighter">
+    Powered by CH PS Enterprise Americas Engineering & Lerma Site Engineering v2.0.3
+    <br />
+    <div class="align-content-end">
+        Contact Support:  Jesus Martinez(EJBOM) & Ricardo Hernandez(EUENY)
+    </div>
+</div>
+    @*<div id="app">
+            <section class="section">
+                <div class="container mt-5">
+                    <div class="row">
+                        <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
+
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        @if (ViewBag.Llave != null)
-        {
-            <input type="password" id="txtSistema_Grifo" hidden disabled value=@ViewBag.Llave />
-        }
-    </div>
+            </section>
+
+        </div>*@
 
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
     <script src="~/Scripts/bootstrap.js"></script>
@@ -44,6 +86,7 @@
     <script src="~/Assets/js/page/modules-toastr.js"></script>
     <script src="~/Assets/modules/sweetalert/sweetalert.min.js"></script>
     <script src="~/Assets/Modulos/Lenguage.js"></script>
+    <script src="~/Assets/Login Design/js/main.js"></script>
     @Scripts.Render("~/Assets/RSA")
     <script>
         "use strict";
@@ -82,7 +125,7 @@
                     //Reanuda el envio de los datos
                     $(this).unbind('submit').submit();
                 } else {
-                    fn_Notificaciones({ Mensaje: "Campos vacios, por favor llene los campos", Tipo: "info" });
+                    fn_Notificaciones({ Mensaje: "Por favor, ingrese la información requerida", Tipo: "info" });
                 }
             });
         });

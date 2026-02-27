@@ -1,4 +1,5 @@
-﻿using System;
+﻿using A3_Reloaded.Models;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -200,9 +201,9 @@ namespace A3_Reloaded.Clases
         }
         public DataTable obtener_UsuarioID(int ID)
         {
-            var msg = "";
-            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
             DataTable dt = new DataTable();
+            var msg = "";
+            var constr = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;         
             try
             {
                 using (var conn = new SqlConnection(constr))

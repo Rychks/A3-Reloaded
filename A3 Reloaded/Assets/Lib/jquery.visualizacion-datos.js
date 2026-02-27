@@ -3,7 +3,9 @@
         var Param = jQuery.extend({}, jQuery.mostrarInfo.default, Parametros);
         var PaginaActual = (isNaN(Param.Datos.Index) || (Param.Datos.Index == null)) ? 1 : Param.Datos.Index;
         jQuery.extend(Param.Datos, { Index: (PaginaActual - 1) });
-
+        $(Param.Tabla.find("tbody")).empty();
+        $(Param.Tabla.find("tbody")).append(' <tr><td style="text-align:center" colspan="100%"><div class="spinner-border m-5" style="height:10rem; width:10rem;" role="status">' +
+            '<span class= "visually-hidden" > Loading...</span ></div></td></tr>')
         $.post(Param.URLdatos, Param.Datos).done(function (data) {
             if (Param.Version == 1) {
                 $(Param.Tabla).empty();

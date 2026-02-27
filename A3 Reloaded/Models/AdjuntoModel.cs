@@ -14,5 +14,10 @@ namespace A3_Reloaded.Models
         public string Item { get; set; }
         public string Seccion { get; set; }
         public string Cuadrante { get; set; }
+        public int id_actividad { get; set; }
+        public string stream_archivo { get; set; }
+        public string nombre_archivo { get; set; }
+        public string fecha_creacion { get; set; }
+        public int id_adjunto { get; set; }
     }
 }

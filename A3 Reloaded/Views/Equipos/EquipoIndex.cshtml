@@ -7,24 +7,20 @@
 
 <div class="loader"></div>
 <div class="section-body">
-    <h2 class="section-title txt_Idioma_Administracion_Equipos">Administración de Equipos</h2>
+    <!--<h2 class="section-title txt_Idioma_Administracion_Equipos">Administración de Equipos</h2>-->
     <div class="section-lead">
         <div class="row" id="frmEquipos">
             <div class="form-group col-md-6">
                 <label for="txtEquipos_Nombre" class="txt_Idioma_Equipo">Sub-área</label>
                 <input type="text" class="form-control txt_Idioma_Ingrese_Nombre_Equipo" id="txtEquipos_Nombre" placeholder="Ingrese el Nombre de la Linea">
             </div>
-            <div class="form-group col-md-1" style="margin-top:1.8rem">
+            <div class="form-group col-md-2" style="margin-top:1.8rem">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="cbxEquipos_Activo" checked>
                     <label class="form-check-label txt_Idioma_Solo_ver_activos" for="cbxEquipos_Activo">Solo ver activos</label>
                 </div>
-                @*<div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="cbxEquipos_Activo">
-            <label class="custom-control-label txt_Idioma_Solo_ver_activos" for="cbxEquipos_Activo">Solo ver activos</label>
-        </div>*@
             </div>
-            <div class="form-group col-md-4" style="margin-top:1.3rem">
+            <div class="form-group col-md-4 d-grid gap-2 d-md-flex justify-content-md-end" style="margin-top:1.3rem">
                 <button type="button" class="btn btn-sm btn-icon btn-info btn-left mb-4 txt_Idioma_Buscar" id="btnEquipos_Buscar"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
                 <button type="button" class="btn btn-sm btn-icon btn-outline-secondary btn-left  ml-3 mb-4 txt_Idioma_Limpiar_filtros" id="btnEquipos_Limpiar"><i class="fa fa-eraser" aria-hidden="true"></i> Limpiar Filtros</button>
                 <button type="button" class="btn btn-sm btn-icon btn-success  btn-left  ml-3 mb-4 txt_Idioma_Agregar" id="btnEquipos_Agregar" data-toggle="modal" data-target="#mdlEquipos_Agregar">
@@ -44,10 +40,10 @@
                                 <table class="table table-hover text-center">
                                     <thead>
                                         <tr>
-                                            <th scope="col" style="width:15px;">#</th>
+                                            <th scope="col" style="width:10%">#</th>
                                             <th scope="col" class="txt_Idioma_Nombre">Nombre</th>
-                                            <th scope="col" class="txt_Idioma_Estatus">Estatus</th>
-                                            <th scope="col" class="txt_Idioma_Opciones">Opciones</th>
+                                            <th scope="col" style="width:10%" class="txt_Idioma_Estatus">Estatus</th>
+                                            <th scope="col" style="width:10%" class="txt_Idioma_Opciones">Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -59,15 +55,15 @@
                     </div>
                 </div>
                 <div class="card-footer text-right">
-                    <div id="pgdEquipos">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
-                            <div class="btn-group">
-                                <select class="form-control text-center" style="width:80px !important" data-paginado="Paginas">
+                    <div id="pgdEquipos" class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn  btn-info" data-paginado="Anterior"><i class="fa fa-caret-left" aria-hidden="true"></i></button>
+                            <div class="btn-group btn-group-sm">
+                                <select class="form-control form-control-sm text-center" style="width:80px !important" data-paginado="Paginas">
                                     <option selected disabled value="-1">Página</option>
                                 </select>
                             </div>
-                            <button type="button" class="btn btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
+                            <button type="button" class="btn btn-sm btn-info" data-paginado="Siguiente"><i class="fa fa-caret-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 </div>
@@ -75,7 +71,7 @@
         </div>
     </div>
     <div class="modal fade" tabindex="-1" role="dialog" id="mdlEquipos_Agregar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-dialog  modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header modal-header-info" data-type="warning">
                     <h4 class="modal-title txt_Idioma_Registrar_Equipo">Agregar Nueva Sub-área</h4>
@@ -91,13 +87,17 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
-                            <div class="form-check">
-                                <label class="switch">
-                                    <input type="checkbox" for="cbxEquiposN_Activo" id="cbxEquiposN_Activo">
-                                    <span class="slider"></span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="cbxEquiposN_Activo" checked>
+                                <label class="form-check-label txt_Idioma_Activado" for="cbxEquiposN_Activo">Activado</label>
+                            </div>
+                            @*<div class="form-check">
+                                <label class="switch" style="font-size:8px !important;">
+                                    <input type="checkbox" style="font-size:8px !important;" for="cbxEquiposN_Activo" id="cbxEquiposN_Activo">
+                                    <span class="slider" style="font-size:8px !important;"></span>
                                 </label>
                                 <label for="cbxEquiposN_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
-                            </div>
+                            </div>*@
                         </div>
                     </div>
                 </div>
@@ -109,7 +109,7 @@
         </div>
     </div>
     <div class="modal fade" tabindex="-1" role="dialog" id="mdlEquipos_Modificar" style="display: none;" aria-hidden="true" data-backdrop="false" data-keyboard="false">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header modal-header-info" data-type="warning">
                     <h4 class="modal-title txt_Idioma_Modificar_Equipo">Modificar Sub-área</h4>
@@ -125,12 +125,9 @@
                     <div class="row">
                         <div class="form-group col-md-4">
                             <label class="txt_Idioma_Estatus">Estatus:</label>
-                            <div class="form-check">
-                                <label class="switch">
-                                    <input type="checkbox" for="cbxEquiposM_Activo" id="cbxEquiposM_Activo">
-                                    <span class="slider"></span>
-                                </label>
-                                <label for="cbxEquiposM_Activo" class="txt_Idioma_Desactivado">Desactivado</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="cbxEquiposM_Activo" checked>
+                                <label class="form-check-label txt_Idioma_Activado" for="cbxEquiposM_Activo">Activado</label>
                             </div>
                         </div>
                     </div>

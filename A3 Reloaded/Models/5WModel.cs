@@ -13,6 +13,7 @@ namespace A3_Reloaded.Models
         public string Why2 { get; set; }
         public string Why3 { get; set; }
         public string Why4 { get; set; }
+        public string Why5 { get; set; }
         public string Cause { get; set; }
         public string Date { get; set; }
         public string Step { get; set; }
