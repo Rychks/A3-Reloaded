@@ -118,12 +118,12 @@ namespace A3_Reloaded.Controllers
             }
             return Json(list, JsonRequestBehavior.AllowGet);
         }
-        public JsonResult comenzar_investigacion(string ID,string Descripcion,string Folio, string TipoA3, string Contact, string Problem,string Cost)
+        public JsonResult comenzar_investigacion(string ID,string Descripcion,string Folio, string TipoA3, string Contact)
         {
             try
             {
                 DateTime Registro = DateTime.Now;
-                string id = TER.registrar_Template_Running(Folio, TipoA3, 1, Contact, Problem, Cost, 1,Descripcion);
+                string id = TER.registrar_Template_Running(Folio, TipoA3, 1, Contact, "Sin Definir", "Sin Definir", 1,Descripcion);
                 noti.Mensaje = Mensajes.Investigacion_guardar;
                 noti.Tipo = "success";
                 noti.Id = id;

@@ -136,9 +136,10 @@
                         $("#txtTemplatesRunningN_description").val(description);
                         $("#slcTemplatesRunningN_TipoA3").generarLista({ URL: "/Templates/Lista_Formatos_A3", Seleccion: item.TipoA3 });
                         $("#slcTemplatesRunningN_Usuarios").generarLista({ URL: "/Usuarios/Lista_Usuarios" });
-                        $("#slcTemplatesRunningN_Usuarios").select2({
-                            dropdownParent: $('#mdlTemplate_info_template .modal-content')
-                        });
+                        $("#slcTemplatesRunningN_Usuarios").select2();
+                        //$("#slcTemplatesRunningN_Usuarios").select2({
+                        //    dropdownParent: $('#mdlTemplate_info_template .modal-content')
+                        //});
                         $("#slcTemplatesRunningN_Departamento").generarLista({ URL: "/Departamento/Lista_Departamentos" });
                         $("#slcTemplatesRunningN_Subarea").generarLista({ URL: "/Subareas/Lista_Subareas" });
                         $("#slcTemplatesRunningN_Linea").generarLista({ URL: "/Lineas/Lista_Lineas" });
@@ -348,6 +349,7 @@
         //Funciones Lineas Running
         $("#btnTemplatesRunningN_Lineas").click(function () {
             $("#slcTemplatesRunningN_Lineas_Linea").generarLista({ URL: "/Lineas/Lista_Lineas" });
+
             fn_obtener_Lineas_running();
             $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
             $("#mdlLinea_Panel").modal("show");
@@ -2240,8 +2242,8 @@
         frmDatos.append("Folio", $("#txtTemplatesRunningN_Folio").val());
         frmDatos.append("TipoA3", $("#slcTemplatesRunningN_TipoA3 option:selected").text());
         frmDatos.append("Contact", $("#txtTemplatesRunningN_Contact").val());
-        frmDatos.append("Problem", $("#txtTemplatesRunningN_Problem").val());
-        frmDatos.append("Cost", $("#txtTemplatesRunningN_Cost").val());
+        //frmDatos.append("Problem", $("#txtTemplatesRunningN_Problem").val());
+        //frmDatos.append("Cost", $("#txtTemplatesRunningN_Cost").val());
         //frmDatos.append("BYTOST", param.BYTOST);
         //frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnTemplatesRunningN_Guardar").addClass("btn-progress");

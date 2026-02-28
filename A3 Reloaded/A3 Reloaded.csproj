@@ -133,7 +133,7 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.2.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -253,6 +253,7 @@
     <Compile Include="Clases\Usuarios.cs" />
     <Compile Include="Controllers\AccionesController.cs" />
     <Compile Include="Controllers\AuditTrailController.cs" />
+    <Compile Include="Controllers\ChatController.cs" />
     <Compile Include="Controllers\DepartamentoController.cs" />
     <Compile Include="Controllers\EquiposController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -3310,6 +3311,7 @@
     <Folder Include="Assets\Veriones_A3\" />
     <Folder Include="Logs\" />
     <Folder Include="Views\Acciones\" />
+    <Folder Include="Views\Chat\" />
     <Folder Include="Views\Items\" />
     <Folder Include="Views\Lenguaje\" />
     <Folder Include="Views\OEE\" />
