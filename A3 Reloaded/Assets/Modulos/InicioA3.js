@@ -2247,6 +2247,7 @@
         //frmDatos.append("BYTOST", param.BYTOST);
         //frmDatos.append("ZNACKA", param.ZNACKA);
         $("#btnTemplatesRunningN_Guardar").addClass("btn-progress");
+        $("#btnTemplatesRunningN_Guardar").attr("disabled", true);
         
         $.ajax({
             type: "POST",
@@ -2289,6 +2290,7 @@
             fn_mostrar_Investigacion(id_templateRunning);
             fn_mostrar_Cuadrantes_btn(id_templateRunning);
             $("#btnTemplatesRunningN_Guardar").removeClass("btn-progress");
+            $("#btnTemplatesRunningN_Guardar").removeAttr("disabled");
         });
     }
     function fn_insert_modofalla_running(id_template) {
@@ -2550,6 +2552,20 @@
     }
 
     //Pendientes Aplicar Idioma
+
+    function fn_mostrarAsistenteAI(ID, Nombre){
+        $("#pnlTemplatesRunning_Investigacion").slideUp();
+        setTimeout(function () {
+            $("#pnlTemplatesRunning_secciones").show();
+        }, 500);
+        $("#ItemTemplateRunning_SeccionRunning").empty();
+        var Idioma_Cuadrante = $.CargarIdioma.Obtener_Texto("txt_Idioma_Cuadrante");
+        $("#txtTemplateRunning_Cuadrante_Titulo").text(Idioma_Cuadrante + " - " + Nombre);
+
+        fn_obtener_cuadrante_runninID(ID, Nombre);
+        $("#divLoaderSecciones").css("display", "none");
+        $("#divLoaderSecciones").hide();
+    }
 
     //*****MUESTRA SECCIONES -> APLICA VALIDACIÓN POR ROL */
     async function fn_mostrarSeccionesRunning(ID, Nombre) {       
@@ -3900,6 +3916,9 @@
                 $("#btnTemplateRunning_Finalizar_investigacion").hide();
                 fn_obtener_cuadrante_runninID(ID);
                 fn_mostrarSeccionesRunning(ID, Nombre);
+                if (Nombre == "A") {
+                    alert("Cuadrante A")
+                }
                 if (Nombre == "D") {
                     fn_verify_a3_type(ID, Nombre)                  
                 }
