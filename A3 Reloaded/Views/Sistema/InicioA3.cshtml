@@ -604,6 +604,17 @@
                 <div class="spinner-border" id="divLoaderCuadranteD" style="font-size:32px; height:300px; width:300px;">
                 </div>
             </div>
+            <div id="ItemTemplateRunning_AssistenteAI">
+                <div class="chat-container">
+                    <div id="chatHistory" class="chat-history">
+                        <div class="message bot">Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="txtMessage" class="form-control" placeholder="Escribe tu pregunta..." />
+                        <button id="btnSend" class="btn btn-primary">Enviar</button>
+                    </div>
+                </div>
+            </div>
             <div id="pnlTemplateRunning_Cuadrante_D">
                 <div class="card card-primary pnlTemplateRunning_Cuadrante_D" id="pnlCuadranteD_5Porque">
                     <div class="card-body">
@@ -853,17 +864,7 @@
                 <div class="spinner-border" id="divLoaderSecciones" style="font-size:32px; height:300px; width:300px;">
                 </div>
             </div>
-            <div id="ItemTemplateRunning_AssistenteAI">
-                <div class="chat-container">
-                    <div id="chatHistory" class="chat-history">
-                        <div class="message bot">Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="txtMessage" class="form-control" placeholder="Escribe tu pregunta..." />
-                        <button id="btnSend" class="btn btn-primary">Enviar</button>
-                    </div>
-                </div>
-            </div>
+
             <div id="ItemTemplateRunning_SeccionRunning">
 
             </div>
@@ -871,6 +872,7 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <div class="form-group">
+                        <button id="btnFinalizarInvestigacion" class="btn btn-info btn-lg">Reporte de Investigación</button>
                         <button type="button" class="btn btn-primary btn-lg txt_Idioma_Finalizar_Investigacion" id="btnTemplateRunning_Finalizar_investigacion">Finalizar Investigación</button>
                         <button type="button" class="btn btn-info btn-lg  txt_Idioma_Finalizar_Modificacion" style="display:none;" id="btnTemplateRunning_Finalizar_investigacion_Modificacion">Finalizar Modificación</button>
                     </div>

@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -376,7 +377,24 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                // 1. Crear el PDF en memoria
+                string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+
+                // 1. OBTENER LAS ACCIONES PREVENTIVAS DE LA BD
+                DataTable dtAcciones = new DataTable();
+                using (SqlConnection conn = new SqlConnection(connString))
+                {
+                    string queryAcciones = "SELECT accion, fecha_entrega FROM TabAcciones_Preventivas WHERE id_template = @id";
+                    using (SqlCommand cmd = new SqlCommand(queryAcciones, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", investigacionId);
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(dtAcciones);
+                        }
+                    }
+                }
+
+                // 2. CREAR EL PDF EN MEMORIA
                 byte[] pdfBytes;
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -384,40 +402,80 @@ namespace A3_Reloaded.Controllers
                     PdfWriter writer = PdfWriter.GetInstance(pdfDoc, ms);
                     pdfDoc.Open();
 
+                    // Definición de Fuentes
                     Font tituloFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.DARK_GRAY);
+                    Font subtituloFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY);
                     Font textoFont = FontFactory.GetFont(FontFactory.HELVETICA, 11, BaseColor.BLACK);
+                    Font tablaHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
+                    Font tablaCellFont = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
 
+                    // Título Principal
                     pdfDoc.Add(new Paragraph($"Reporte de Análisis Asistido por IA - Folio #{investigacionId}", tituloFont) { Alignment = Element.ALIGN_CENTER, SpacingAfter = 20f });
 
-                    Paragraph cuerpo = new Paragraph(textoResumen, textoFont) { Alignment = Element.ALIGN_JUSTIFIED, SpacingBefore = 10f };
+                    // Cuerpo (El resumen generado por el Bot)
+                    Paragraph cuerpo = new Paragraph(textoResumen, textoFont) { Alignment = Element.ALIGN_JUSTIFIED, SpacingBefore = 10f, SpacingAfter = 20f };
                     pdfDoc.Add(cuerpo);
 
+                    // -------------------------------------------------------------
+                    // AGREGAR TABLA DE ACCIONES PREVENTIVAS SI EXISTEN
+                    // -------------------------------------------------------------
+                    if (dtAcciones.Rows.Count > 0)
+                    {
+                        pdfDoc.Add(new Paragraph("Acciones Preventivas Generadas:", subtituloFont) { SpacingAfter = 10f });
+
+                        // Crear tabla con 2 columnas (70% para acción, 30% para fecha)
+                        PdfPTable table = new PdfPTable(2);
+                        table.WidthPercentage = 100;
+                        table.SetWidths(new float[] { 75f, 25f });
+
+                        // Encabezados de tabla
+                        PdfPCell cellAccion = new PdfPCell(new Phrase("Acción Preventiva", tablaHeaderFont)) { BackgroundColor = new BaseColor(0, 153, 204), Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER };
+                        PdfPCell cellFecha = new PdfPCell(new Phrase("Fecha de Entrega", tablaHeaderFont)) { BackgroundColor = new BaseColor(0, 153, 204), Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER };
+
+                        table.AddCell(cellAccion);
+                        table.AddCell(cellFecha);
+
+                        // Llenar filas con los datos de SQL
+                        foreach (DataRow row in dtAcciones.Rows)
+                        {
+                            table.AddCell(new PdfPCell(new Phrase(row["accion"].ToString(), tablaCellFont)) { Padding = 5f });
+
+                            // Formatear la fecha para que se vea limpia
+                            string fechaStr = "";
+                            if (row["fecha_entrega"] != DBNull.Value)
+                            {
+                                fechaStr = Convert.ToDateTime(row["fecha_entrega"]).ToString("dd/MM/yyyy");
+                            }
+
+                            table.AddCell(new PdfPCell(new Phrase(fechaStr, tablaCellFont)) { Padding = 5f, HorizontalAlignment = Element.ALIGN_CENTER });
+                        }
+
+                        pdfDoc.Add(table);
+                    }
+                    // -------------------------------------------------------------
+
+                    // Pie de página
                     pdfDoc.Add(new Paragraph($"\nGenerado automáticamente el: {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}", FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, BaseColor.GRAY)));
 
                     pdfDoc.Close();
                     writer.Close();
 
-                    pdfBytes = ms.ToArray(); // Obtenemos el arreglo de bytes del PDF
+                    pdfBytes = ms.ToArray();
                 }
 
-                // 2. Guardar físicamente en el servidor (Como en tu función SaveReporte_A3)
+                // 3. GUARDAR FÍSICAMENTE EN EL SERVIDOR
                 string filename = "Chatbot_Folio_" + investigacionId + "_" + Guid.NewGuid().ToString().Substring(0, 8) + ".pdf";
                 string serverPath = Server.MapPath(@"/Assets/Veriones_A3/" + filename);
 
-                // Opcional: Asegurarse de que el directorio exista
                 string directoryPath = Path.GetDirectoryName(serverPath);
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
+                if (!Directory.Exists(directoryPath)) Directory.CreateDirectory(directoryPath);
 
                 using (FileStream stream = new FileStream(serverPath, FileMode.Create))
                 {
                     stream.Write(pdfBytes, 0, pdfBytes.Length);
                 }
 
-                // 3. Registrar el nombre del archivo en la base de datos
-                string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+                // 4. REGISTRAR EL NOMBRE DEL ARCHIVO EN LA BD (TABLA CHATBOT)
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
                     string updateQuery = @"
@@ -426,21 +484,20 @@ namespace A3_Reloaded.Controllers
                     FechaActualizacion = GETDATE()
                 WHERE Investigacion_Id = @id";
 
-                    SqlCommand cmd = new SqlCommand(updateQuery, conn);
-                    cmd.Parameters.AddWithValue("@filename", filename);
-                    cmd.Parameters.AddWithValue("@id", investigacionId);
-
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@filename", filename);
+                        cmd.Parameters.AddWithValue("@id", investigacionId);
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
                 }
 
-                // 4. Devolver el archivo al usuario para que se descargue en su navegador
+                // 5. DEVOLVER PDF AL NAVEGADOR
                 return File(pdfBytes, "application/pdf", filename);
             }
             catch (Exception ex)
             {
-                // En caso de error, puedes usar tu ErrorLogger
-                // Clases.ErrorLogger.Registrar(this, ex.ToString());
                 return new HttpStatusCodeResult(500, "Error generando PDF del Chatbot: " + ex.Message);
             }
         }

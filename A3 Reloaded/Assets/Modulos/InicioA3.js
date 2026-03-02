@@ -5,6 +5,60 @@
         $('#txtMessage').keypress(function (e) {
             if (e.which == 13) { sendMessage(); return false; }
         })
+        $('#btnFinalizarInvestigacion').click(function (e) {
+            e.preventDefault();
+            var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
+            // Buscar el último mensaje del bot que contiene el resumen
+            var ultimoMensajeBot = [...localHistory].reverse().find(m => m.role === 'assistant');
+
+            if (!ultimoMensajeBot) {
+                alert("Aún no hay un resumen para generar el reporte.");
+                return;
+            }
+
+            // Formulamos la petición para descargar el archivo y a la vez ejecutar el guardado en backend
+            var form = $('<form></form>')
+                .attr('action', '/Chat/FinalizarYGuardarReporteBot')
+                .attr('method', 'post')
+                .attr('target', '_blank'); // Se abre/descarga en otra pestaña
+
+            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'investigacionId').attr('value', investigacionId));
+            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'textoResumen').attr('value', ultimoMensajeBot.content));
+
+            form.appendTo('body').submit().remove();
+
+            // Opcional: Podrías deshabilitar el botón de enviar mensajes del chat aquí
+            // para indicar que la sesión ha finalizado.
+            $('#txtMessage, #btnSend').prop('disabled', true);
+            $('#txtMessage').attr('placeholder', 'Investigación finalizada y guardada.');
+        });
+        $("#btnTemplateRunning_Finalizar_investigacion").click(function (e) {
+            e.preventDefault();
+            var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
+            // Buscar el último mensaje del bot que contiene el resumen
+            var ultimoMensajeBot = [...localHistory].reverse().find(m => m.role === 'assistant');
+
+            if (!ultimoMensajeBot) {
+                alert("Aún no hay un resumen para generar el reporte.");
+                return;
+            }
+
+            // Formulamos la petición para descargar el archivo y a la vez ejecutar el guardado en backend
+            var form = $('<form></form>')
+                .attr('action', '/Chat/FinalizarYGuardarReporteBot')
+                .attr('method', 'post')
+                .attr('target', '_blank'); // Se abre/descarga en otra pestaña
+
+            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'investigacionId').attr('value', investigacionId));
+            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'textoResumen').attr('value', ultimoMensajeBot.content));
+
+            form.appendTo('body').submit().remove();
+
+            // Opcional: Podrías deshabilitar el botón de enviar mensajes del chat aquí
+            // para indicar que la sesión ha finalizado.
+            $('#txtMessage, #btnSend').prop('disabled', true);
+            $('#txtMessage').attr('placeholder', 'Investigación finalizada y guardada.');
+        });
         //FUN FUNCIONES AI
         $("#tblTemplateRunningN_acciones_prevetivas_Datos").on('click', ".btnRemoverRegistro", function () {
             var id_accion = $(this).parents("tr").find("[data-registro=id_accion]").html();
@@ -1269,6 +1323,7 @@
         history.scrollTop(history[0].scrollHeight);
     }
     function cargarHistorial(investigacionId) {
+        $('#chatHistory').empty();
         $.ajax({
             url: '/Chat/LoadChatHistory',
             type: 'GET',
@@ -4043,12 +4098,18 @@
                 fn_obtener_cuadrante_runninID(ID);              
                 if (Nombre == "A") {
                     fn_mostrarAsistenteAI(ID, Nombre);
+                    $("#ItemTemplateRunning_AssistenteAI").show();
+                    $("#btnFinalizarInvestigacion").hide();
+
                     cargarHistorial(ID_Template);
                 } else {
                     fn_mostrarSeccionesRunning(ID, Nombre);
                 }
                 if (Nombre == "D") {
-                    fn_verify_a3_type(ID, Nombre)                  
+                    fn_verify_a3_type(ID, Nombre);
+                    $("#ItemTemplateRunning_AssistenteAI").hide();
+                    $("#btnFinalizarInvestigacion").show();
+                    cargarHistorial(ID_Template);
                 }
                
             } else {
