@@ -1,5 +1,11 @@
-﻿define(["jquery"], function ($) {
+﻿define(["jquery"], function ($) {   
     $(document).ready(function () {
+        //FUNCIONA AI
+        $('#btnSend').click(sendMessage);
+        $('#txtMessage').keypress(function (e) {
+            if (e.which == 13) { sendMessage(); return false; }
+        })
+        //FUN FUNCIONES AI
         $("#tblTemplateRunningN_acciones_prevetivas_Datos").on('click', ".btnRemoverRegistro", function () {
             var id_accion = $(this).parents("tr").find("[data-registro=id_accion]").html();
             $.notiMsj.Confirmacion({
@@ -210,9 +216,6 @@
         });
         /* **************************  */
         /* FUNCTION TO GET DATA FROM IRIS*/
-
-
-
         /******************************** */
         $("#btnTemplatesRunningN_Guardar").click(function () {           
             var num_failure_pm_card = $('#tbl_PmCardRunning tbody').find('input[type="checkbox"]:checked').length;
@@ -1184,6 +1187,127 @@
             }
         })
     });
+    //FUNCIONES ASISTENTE AI
+    var localHistory = [];
+    var currentConversationId = "";
+    var currentParentMessageId = "";
+    function sendMessage() {
+        var userText = $('#txtMessage').val().trim();
+        var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
+        if (userText === "") return;
+
+        // 1. Agregamos y mostramos el mensaje del usuario
+        localHistory.push({ role: "user", content: userText });
+        $('#chatHistory').append('<div class="message user">' + $('<div>').text(userText).html() + '</div>');
+
+        // Limpiar input y deshabilitar controles
+        $('#txtMessage').val('');
+        $('#txtMessage, #btnSend').prop('disabled', true);
+        scrollToBottom();
+
+        // ---------------------------------------------------------
+        // 2. MOSTRAR INDICADOR DE CARGA ("Escribiendo...")
+        // ---------------------------------------------------------
+        var loadingHtml = `
+            <div id="loading-bubble" class="message bot">
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>`;
+        $('#chatHistory').append(loadingHtml);
+        scrollToBottom(); // Hacemos scroll para que el usuario vea que está cargando
+
+        // 3. Llamada al Servidor
+        $.ajax({
+            url: '/Chat/SendMessage',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                history: localHistory,
+                conversationId: currentConversationId,
+                parentMessageId: currentParentMessageId,
+                investigacionId: investigacionId
+            }),
+            success: function (response) {
+                // ---------------------------------------------------------
+                // 4. QUITAR INDICADOR DE CARGA
+                // ---------------------------------------------------------
+                $('#loading-bubble').remove();
+
+                if (response.success) {
+                    // Actualizar IDs
+                    if (response.conversationId) currentConversationId = response.conversationId;
+                    if (response.newParentId) currentParentMessageId = response.newParentId;
+
+                    // Guardar y mostrar respuesta
+                    localHistory.push({ role: "assistant", content: response.reply });
+                    var htmlContent = marked.parse(response.reply);
+                    $('#chatHistory').append('<div class="message bot">' + htmlContent + '</div>');
+                } else {
+                    localHistory.pop(); // Revertir si hay error
+                    $('#chatHistory').append('<div class="message error">Error: ' + response.error + '</div>');
+                }
+            },
+            error: function () {
+                // QUITAR INDICADOR DE CARGA EN CASO DE ERROR TAMBIÉN
+                $('#loading-bubble').remove();
+                localHistory.pop();
+                $('#chatHistory').append('<div class="message error">Error de conexión con el servidor.</div>');
+            },
+            complete: function () {
+                // 5. Reactivar controles
+                $('#txtMessage, #btnSend').prop('disabled', false);
+                $('#txtMessage').focus();
+                scrollToBottom();
+            }
+        });
+    }
+
+    // ... resto de tu código (enter key, scroll) ...
+    function scrollToBottom() {
+        var history = $('#chatHistory');
+        history.scrollTop(history[0].scrollHeight);
+    }
+    function cargarHistorial(investigacionId) {
+        $.ajax({
+            url: '/Chat/LoadChatHistory',
+            type: 'GET',
+            data: { investigacionId: investigacionId },
+            success: function (response) {
+                if (response.success && response.history) {
+                    // --- ESCENARIO A: YA HAY CHARLA GUARDADA ---
+                    currentConversationId = response.conversationId || "";
+                    currentParentMessageId = response.parentId || "";
+
+                    localHistory = JSON.parse(response.history);
+
+                    localHistory.forEach(function (msg) {
+                        if (msg.role === "user") {
+                            $('#chatHistory').append('<div class="message user">' + $('<div>').text(msg.content).html() + '</div>');
+                        } else if (msg.role === "assistant") {
+                            var htmlContent = marked.parse(msg.content);
+                            $('#chatHistory').append('<div class="message bot">' + htmlContent + '</div>');
+                        }
+                    });
+                    scrollToBottom();
+                } else {
+                    // --- ESCENARIO B: ES UN CHAT NUEVO ---
+                    // No hay historial, disparamos el mensaje automático
+                    iniciarChatAutomatico();
+                }
+            }
+        });
+    }
+    function iniciarChatAutomatico() {
+        var mensajeInicial = "Quiero plantear mi problema, ¿Podrías ayudarme?";
+
+        // Ponemos el texto en el input (opcional, pero se ve bien)
+        $('#txtMessage').val(mensajeInicial);
+
+        // Reutilizamos tu función sendMessage() que ya maneja UI, Loading y BD!
+        sendMessage();
+    }
+    //FIN FUNCIONES
     function getIrisEvents_dataAll(line) {
         let tipoParo = $("#slc_PmCardRunning_tipoParo").val();
         const tbody = $("#tbl_PmCardRunning tbody");
@@ -1544,6 +1668,7 @@
         }
     }
     /* *********************************************** */
+    //CONTINUAR A3
     function fn_continue_a3() {
         let ID = $("#txt_id_a3_running").val()
         $("#txtTemplatesRunningN_ID").val(ID);
@@ -2563,6 +2688,7 @@
         $("#txtTemplateRunning_Cuadrante_Titulo").text(Idioma_Cuadrante + " - " + Nombre);
 
         fn_obtener_cuadrante_runninID(ID, Nombre);
+
         $("#divLoaderSecciones").css("display", "none");
         $("#divLoaderSecciones").hide();
     }
@@ -3914,10 +4040,12 @@
                 $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID);
                 $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
                 $("#btnTemplateRunning_Finalizar_investigacion").hide();
-                fn_obtener_cuadrante_runninID(ID);
-                fn_mostrarSeccionesRunning(ID, Nombre);
+                fn_obtener_cuadrante_runninID(ID);              
                 if (Nombre == "A") {
-                    alert("Cuadrante A")
+                    fn_mostrarAsistenteAI(ID, Nombre);
+                    cargarHistorial(ID_Template);
+                } else {
+                    fn_mostrarSeccionesRunning(ID, Nombre);
                 }
                 if (Nombre == "D") {
                     fn_verify_a3_type(ID, Nombre)                  
