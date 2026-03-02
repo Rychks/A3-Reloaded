@@ -6,58 +6,7 @@
             if (e.which == 13) { sendMessage(); return false; }
         })
         $('#btnFinalizarInvestigacion').click(function (e) {
-            e.preventDefault();
-            var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
-            // Buscar el último mensaje del bot que contiene el resumen
-            var ultimoMensajeBot = [...localHistory].reverse().find(m => m.role === 'assistant');
-
-            if (!ultimoMensajeBot) {
-                alert("Aún no hay un resumen para generar el reporte.");
-                return;
-            }
-
-            // Formulamos la petición para descargar el archivo y a la vez ejecutar el guardado en backend
-            var form = $('<form></form>')
-                .attr('action', '/Chat/FinalizarYGuardarReporteBot')
-                .attr('method', 'post')
-                .attr('target', '_blank'); // Se abre/descarga en otra pestaña
-
-            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'investigacionId').attr('value', investigacionId));
-            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'textoResumen').attr('value', ultimoMensajeBot.content));
-
-            form.appendTo('body').submit().remove();
-
-            // Opcional: Podrías deshabilitar el botón de enviar mensajes del chat aquí
-            // para indicar que la sesión ha finalizado.
-            $('#txtMessage, #btnSend').prop('disabled', true);
-            $('#txtMessage').attr('placeholder', 'Investigación finalizada y guardada.');
-        });
-        $("#btnTemplateRunning_Finalizar_investigacion").click(function (e) {
-            e.preventDefault();
-            var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
-            // Buscar el último mensaje del bot que contiene el resumen
-            var ultimoMensajeBot = [...localHistory].reverse().find(m => m.role === 'assistant');
-
-            if (!ultimoMensajeBot) {
-                alert("Aún no hay un resumen para generar el reporte.");
-                return;
-            }
-
-            // Formulamos la petición para descargar el archivo y a la vez ejecutar el guardado en backend
-            var form = $('<form></form>')
-                .attr('action', '/Chat/FinalizarYGuardarReporteBot')
-                .attr('method', 'post')
-                .attr('target', '_blank'); // Se abre/descarga en otra pestaña
-
-            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'investigacionId').attr('value', investigacionId));
-            form.append($('<input></input>').attr('type', 'hidden').attr('name', 'textoResumen').attr('value', ultimoMensajeBot.content));
-
-            form.appendTo('body').submit().remove();
-
-            // Opcional: Podrías deshabilitar el botón de enviar mensajes del chat aquí
-            // para indicar que la sesión ha finalizado.
-            $('#txtMessage, #btnSend').prop('disabled', true);
-            $('#txtMessage').attr('placeholder', 'Investigación finalizada y guardada.');
+            generarReporteAI();
         });
         //FUN FUNCIONES AI
         $("#tblTemplateRunningN_acciones_prevetivas_Datos").on('click', ".btnRemoverRegistro", function () {
@@ -1361,6 +1310,32 @@
 
         // Reutilizamos tu función sendMessage() que ya maneja UI, Loading y BD!
         sendMessage();
+    }
+    function generarReporteAI() {
+        var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
+        // Buscar el último mensaje del bot que contiene el resumen
+        var ultimoMensajeBot = [...localHistory].reverse().find(m => m.role === 'assistant');
+
+        if (!ultimoMensajeBot) {
+            alert("Aún no hay un resumen para generar el reporte.");
+            return;
+        }
+
+        // Formulamos la petición para descargar el archivo y a la vez ejecutar el guardado en backend
+        var form = $('<form></form>')
+            .attr('action', '/Chat/FinalizarYGuardarReporteBot')
+            .attr('method', 'post')
+            .attr('target', '_blank'); // Se abre/descarga en otra pestaña
+
+        form.append($('<input></input>').attr('type', 'hidden').attr('name', 'investigacionId').attr('value', investigacionId));
+        form.append($('<input></input>').attr('type', 'hidden').attr('name', 'textoResumen').attr('value', ultimoMensajeBot.content));
+
+        form.appendTo('body').submit().remove();
+
+        // Opcional: Podrías deshabilitar el botón de enviar mensajes del chat aquí
+        // para indicar que la sesión ha finalizado.
+        $('#txtMessage, #btnSend').prop('disabled', true);
+        $('#txtMessage').attr('placeholder', 'Investigación finalizada y guardada.');
     }
     //FIN FUNCIONES
     function getIrisEvents_dataAll(line) {
@@ -4265,6 +4240,7 @@
                     window.location.replace("/Home/Index");
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
+                generarReporteAI();
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });               
             },
             error: function (error) {

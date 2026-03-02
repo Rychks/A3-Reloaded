@@ -330,16 +330,29 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
-                // Expresiones regulares para buscar el formato específico del bot
-                // Busca "1. QUÉ:" y captura todo hasta encontrar un salto de línea seguido de "2."
-                var matchQue = Regex.Match(textoBot, @"1\.\s*QUÉ[?:]*\s*(.*?)(?=\r?\n2\.)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                // 1. LIMPIEZA DE MARKDOWN
+                // Quitamos todos los asteriscos que mete la IA para que el texto sea plano y fácil de leer
+                string textoLimpio = Regex.Replace(textoBot, @"\*", "");
 
-                // Busca "6. CUÁNTO:" y captura todo hasta "Revisión", un doble salto de línea, o el final del texto
-                var matchCuanto = Regex.Match(textoBot, @"6\.\s*CUÁNTO[?:]*\s*(.*?)(?=\r?\nRevisión|\r?\n\r?\n|$)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                // 2. EXPRESIONES REGULARES MEJORADAS
+                // Explicación:
+                // - QU[EÉ]: Tolera si la IA lo escribe con o sin acento.
+                // - \s+: Significa "uno o más espacios O saltos de línea". Es mucho más seguro que \r?\n.
+                // - (?=\s+2\.\s*D[OÓ]NDE): Obliga a detenerse justo antes de encontrar "2. DÓNDE".
 
+                var matchQue = Regex.Match(textoLimpio,
+                    @"1\.\s*QU[EÉ][?:]*\s*(.*?)(?=\s+2\.\s*D[OÓ]NDE)",
+                    RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+                var matchCuanto = Regex.Match(textoLimpio,
+                    @"6\.\s*CU[AÁ]NTO[?:]*\s*(.*?)(?=\s+Revisi[oó]n|\s+###|$)",
+                    RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+                // 3. ACTUALIZACIÓN EN BASE DE DATOS
                 // Si encontró al menos el QUÉ o el CUÁNTO, significa que es el resumen final
                 if (matchQue.Success || matchCuanto.Success)
                 {
+                    // Usamos Trim() para limpiar cualquier espacio sobrante al inicio o al final
                     string textoQue = matchQue.Success ? matchQue.Groups[1].Value.Trim() : null;
                     string textoCuanto = matchCuanto.Success ? matchCuanto.Groups[1].Value.Trim() : null;
 
