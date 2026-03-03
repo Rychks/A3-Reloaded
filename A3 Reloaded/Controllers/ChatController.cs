@@ -199,7 +199,7 @@ namespace A3_Reloaded.Controllers
             if (palabrasClave.Count == 0) return "";
 
             // 3. Cadena de conexión (Asegúrate de que coincida con tu Web.config)
-            string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"]?.ConnectionString;
+            string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["BD_Base"]?.ConnectionString;
 
             if (string.IsNullOrEmpty(connectionString)) return "";
 
@@ -341,35 +341,30 @@ namespace A3_Reloaded.Controllers
             try
             {
                 // 1. LIMPIEZA DE MARKDOWN
-                // Quitamos todos los asteriscos que mete la IA para que el texto sea plano y fácil de leer
+                // Quitamos los asteriscos por si la IA usa negritas
                 string textoLimpio = Regex.Replace(textoBot, @"\*", "");
 
-                // 2. EXPRESIONES REGULARES MEJORADAS
-                // Explicación:
-                // - QU[EÉ]: Tolera si la IA lo escribe con o sin acento.
-                // - \s+: Significa "uno o más espacios O saltos de línea". Es mucho más seguro que \r?\n.
-                // - (?=\s+2\.\s*D[OÓ]NDE): Obliga a detenerse justo antes de encontrar "2. DÓNDE".
+                // 2. EXPRESIONES REGULARES CORREGIDAS
+                // Agregamos "¿?" opcional para capturar "¿QUÉ?" y "¿DÓNDE?"
+                string patronQue = @"1\.\s*¿?QU[EÉ][?:]*\s*(.*?)(?=\s+2\.\s*¿?D[OÓ]NDE)";
 
-                var matchQue = Regex.Match(textoLimpio,
-                    @"1\.\s*QU[EÉ][?:]*\s*(.*?)(?=\s+2\.\s*D[OÓ]NDE)",
-                    RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                // Agregamos "Listado" como palabra de corte para que no se traiga las acciones
+                string patronCuanto = @"6\.\s*¿?CU[AÁ]NTO[?:]*\s*(.*?)(?=\s+(?:Listado|Revisi[oó]n|###|$))";
 
-                var matchCuanto = Regex.Match(textoLimpio,
-                    @"6\.\s*CU[AÁ]NTO[?:]*\s*(.*?)(?=\s+Revisi[oó]n|\s+###|$)",
-                    RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                var matchQue = Regex.Match(textoLimpio, patronQue, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                var matchCuanto = Regex.Match(textoLimpio, patronCuanto, RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
                 // 3. ACTUALIZACIÓN EN BASE DE DATOS
-                // Si encontró al menos el QUÉ o el CUÁNTO, significa que es el resumen final
                 if (matchQue.Success || matchCuanto.Success)
                 {
-                    // Usamos Trim() para limpiar cualquier espacio sobrante al inicio o al final
+                    // Usamos Trim() para limpiar cualquier espacio sobrante
                     string textoQue = matchQue.Success ? matchQue.Groups[1].Value.Trim() : null;
                     string textoCuanto = matchCuanto.Success ? matchCuanto.Groups[1].Value.Trim() : null;
 
                     string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
                     using (SqlConnection conn = new SqlConnection(connString))
                     {
-                        // Construimos la query dinámicamente según lo que hayamos encontrado
+                        // Construimos la query dinámicamente usando tus tablas originales
                         string updateQuery = "UPDATE TabTemplates_Running SET ";
                         List<string> setClauses = new List<string>();
 
@@ -384,14 +379,20 @@ namespace A3_Reloaded.Controllers
                         cmd.Parameters.AddWithValue("@id", investigacionId);
 
                         conn.Open();
-                        cmd.ExecuteNonQuery();
+                        int filasAfectadas = cmd.ExecuteNonQuery();
+
+                        // Imprimimos en consola para asegurarnos de que se guardó
+                        System.Diagnostics.Debug.WriteLine($"Datos guardados correctamente. Filas afectadas: {filasAfectadas}");
                     }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("No se encontraron coincidencias con el Regex en la respuesta del bot.");
                 }
             }
             catch (Exception ex)
             {
-                // Loguear error de extracción, pero no detener el chat
-                System.Diagnostics.Debug.WriteLine("Error al extraer QUÉ/CUÁNTO: " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("Error al extraer y actualizar QUÉ/CUÁNTO: " + ex.Message);
             }
         }
 
