@@ -77,21 +77,48 @@ namespace A3_Reloaded.Controllers
                     return Json(new { success = false, error = "Faltan las credenciales del Chatbot en la base de datos." });
                 }
                 // 1. Validar historial
+                // 1. Validar historial
                 if (history == null) history = new List<ChatMessage>();
 
+                // --- A. LÓGICA DE CONTEXTO HISTÓRICO (Solo en el mensaje 3) ---
                 if (history.Count == 3)
                 {
-                    // Tomamos el mensaje que el usuario acaba de escribir
                     var inputProblemaUsuario = history[2];
-
-                    // Buscamos en la BD usando ese planteamiento real del problema
                     string contextoAdicional = ObtenerContextoDeBaseDeDatos(inputProblemaUsuario.content);
 
                     if (!string.IsNullOrEmpty(contextoAdicional))
                     {
-                        // Inyectamos el contexto oculto solo esta vez
                         inputProblemaUsuario.content += "\n\n" + contextoAdicional;
                     }
+                }
+
+                // --- B. LÓGICA DE FORMATO ESTRICTO (Siempre en el último mensaje) ---
+                var ultimoMensaje = history.LastOrDefault(m => m.role == "user");
+                string contenidoOriginalUsuario = ""; // Guardaremos el texto original aquí
+
+                if (ultimoMensaje != null)
+                {
+                    // Guardamos lo que realmente escribió el usuario
+                    contenidoOriginalUsuario = ultimoMensaje.content;
+
+                    string reglaDeFormato = @"
+                    [INSTRUCCIÓN ESTRICTA DE FORMATO PARA EL SISTEMA]
+                    Si en este turno vas a presentar el resumen final del problema, DEBES utilizar EXACTAMENTE las siguientes etiquetas para estructurar tu respuesta. No uses asteriscos (**), ni cambies las palabras de los corchetes. Desarrolla todo el análisis que necesites dentro de cada etiqueta:
+
+                    [QUE]: (tu respuesta)
+                    [DONDE]: (tu respuesta)
+                    [CUANDO]: (tu respuesta)
+                    [CUAL]: (tu respuesta)
+                    [QUIEN]: (tu respuesta)
+                    [CUANTO]: (tu respuesta)
+                    [CONDICIONES_BASICAS]: (Tu resumen de la revisión de DFF, CIL, ajustes, mantenimiento, etc., si aplica)
+                    [ACCIONES]: (El listado de acciones a realizar)
+                    [ANALISIS_FINAL]: (Tus observaciones adicionales, advertencias, sugerencias como revisar ajustes y la nota final sobre realizar análisis MTM/WPA)
+
+                    Si aún estás en la fase de hacer preguntas, simplemente ignora esta instrucción y continúa conversando normalmente.";
+
+                    // Le pegamos la regla de forma oculta
+                    ultimoMensaje.content += "\n\n" + reglaDeFormato;
                 }
 
                 // 2. Construir el payload EXACTO según tu ejemplo
@@ -109,7 +136,7 @@ namespace A3_Reloaded.Controllers
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                 // 3. Enviar a Bayer
-                client.DefaultRequestHeaders.Authorization = null; // Limpiar anteriores
+                client.DefaultRequestHeaders.Authorization = null;
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenDinamico);
 
                 var response = await client.PostAsync(BAYER_API_URL, content);
@@ -122,12 +149,17 @@ namespace A3_Reloaded.Controllers
                 string replyText = jsonResponse.choices?[0]?.message?.content ?? jsonResponse.choices?[0]?.content ?? "";
                 string newConvId = jsonResponse.conversation_id ?? jsonResponse.id ?? conversationId;
                 string newParentId = jsonResponse.choices?[0]?.message?.id ?? jsonResponse.choices?[0]?.id ?? jsonResponse.id;
-                ExtraerYActualizarQueYCuanto(replyText, investigacionId);
-                // ---------------------------------------------------------
-                // 5. GUARDAR EN BASE DE DATOS SQL SERVER
-                // ---------------------------------------------------------
 
-                // Agregamos la respuesta del bot al historial para guardarlo completo
+                ExtraerYActualizarQueYCuanto(replyText, investigacionId);
+
+                // --- C. LIMPIEZA ANTES DE GUARDAR EN BASE DE DATOS ---
+                // Restauramos el mensaje del usuario a su estado original para no guardar la regla repetida
+                if (ultimoMensaje != null)
+                {
+                    ultimoMensaje.content = contenidoOriginalUsuario;
+                }
+
+                // 5. GUARDAR EN BASE DE DATOS SQL SERVER
                 history.Add(new ChatMessage { role = "assistant", content = replyText });
                 string historyJson = JsonConvert.SerializeObject(history);
 
@@ -344,15 +376,16 @@ namespace A3_Reloaded.Controllers
                 // Quitamos los asteriscos por si la IA usa negritas
                 string textoLimpio = Regex.Replace(textoBot, @"\*", "");
 
-                // 2. EXPRESIONES REGULARES CORREGIDAS
-                // Agregamos "¿?" opcional para capturar "¿QUÉ?" y "¿DÓNDE?"
-                string patronQue = @"1\.\s*¿?QU[EÉ][?:]*\s*(.*?)(?=\s+2\.\s*¿?D[OÓ]NDE)";
+                // 2. EXPRESIONES REGULARES EXACTAS BASADAS EN EL PROMPT
+                // Busca exactamente la etiqueta "[QUE]:" y captura todo hasta encontrar "[DONDE]:"
+                // Busca "[QUE]:" y captura hasta "[DONDE]:"
+                string patronQue = @"\[QUE\]:\s*(.*?)(?=\s*\[DONDE\]:|$)";
 
-                // Agregamos "Listado" como palabra de corte para que no se traiga las acciones
-                string patronCuanto = @"6\.\s*¿?CU[AÁ]NTO[?:]*\s*(.*?)(?=\s+(?:Listado|Revisi[oó]n|###|$))";
+                // Busca "[CUANTO]:" y captura hasta "[CONDICIONES_BASICAS]:" o "[ACCIONES]:" (por si acaso la IA se salta una)
+                string patronCuanto = @"\[CUANTO\]:\s*(.*?)(?=\s*(?:\[CONDICIONES_BASICAS\]:|\[ACCIONES\]:)|$)";
 
-                var matchQue = Regex.Match(textoLimpio, patronQue, RegexOptions.Singleline | RegexOptions.IgnoreCase);
-                var matchCuanto = Regex.Match(textoLimpio, patronCuanto, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                var matchQue = Regex.Match(textoBot, patronQue, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                var matchCuanto = Regex.Match(textoBot, patronCuanto, RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
                 // 3. ACTUALIZACIÓN EN BASE DE DATOS
                 if (matchQue.Success || matchCuanto.Success)
@@ -395,25 +428,82 @@ namespace A3_Reloaded.Controllers
                 System.Diagnostics.Debug.WriteLine("Error al extraer y actualizar QUÉ/CUÁNTO: " + ex.Message);
             }
         }
-
         [HttpPost]
-        public ActionResult FinalizarYGuardarReporteBot(int investigacionId, string textoResumen)
+        public ActionResult FinalizarYGuardarReporteBot(int investigacionId)
         {
             try
             {
                 string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
 
-                // 1. OBTENER EL ANÁLISIS DE LOS 5 PORQUÉS DE LA BD
+                // Texto por defecto en caso de que algo falle
+                string textoResumen = "No se encontró el historial del chat en la base de datos.";
+
+                // 1. OBTENER EL ÚLTIMO MENSAJE DE LA IA DESDE EL HISTORIAL (JSON)
+                using (SqlConnection conn = new SqlConnection(connString))
+                {
+                    string queryHistory = "SELECT HistoryJson FROM TabChatbot_History WHERE Investigacion_Id = @id";
+
+                    using (SqlCommand cmd = new SqlCommand(queryHistory, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", investigacionId);
+                        conn.Open();
+                        var result = cmd.ExecuteScalar();
+
+                        if (result != null && result != DBNull.Value)
+                        {
+                            string historyJson = result.ToString();
+                            try
+                            {
+                                // Convertimos el JSON guardado de vuelta a nuestra lista de mensajes
+                                var history = JsonConvert.DeserializeObject<List<ChatMessage>>(historyJson);
+
+                                if (history != null && history.Count > 0)
+                                {
+                                    // Buscamos el último mensaje donde el rol sea "assistant" (la IA)
+                                    var ultimoMensajeIA = history.LastOrDefault(m => m.role == "assistant");
+
+                                    if (ultimoMensajeIA != null && !string.IsNullOrWhiteSpace(ultimoMensajeIA.content))
+                                    {
+                                        string textoPDF = ultimoMensajeIA.content;
+
+                                        // 1. Limpiamos cualquier asterisco de Markdown que la IA haya filtrado
+                                        textoPDF = Regex.Replace(textoPDF, @"\*", "");
+
+                                        // 2. Reemplazamos las etiquetas por títulos limpios y legibles para el PDF
+                                        textoPDF = Regex.Replace(textoPDF, @"\[QUE\]:", "\nQUÉ: ", RegexOptions.IgnoreCase);
+                                        textoPDF = Regex.Replace(textoPDF, @"\[DONDE\]:", "\nDÓNDE: ", RegexOptions.IgnoreCase);
+                                        textoPDF = Regex.Replace(textoPDF, @"\[CUANDO\]:", "\nCUÁNDO: ", RegexOptions.IgnoreCase);
+                                        textoPDF = Regex.Replace(textoPDF, @"\[CUAL\]:", "\nCUÁL: ", RegexOptions.IgnoreCase);
+                                        textoPDF = Regex.Replace(textoPDF, @"\[QUIEN\]:", "\nA QUIÉN: ", RegexOptions.IgnoreCase);
+                                        textoPDF = Regex.Replace(textoPDF, @"\[CUANTO\]:", "\nCUÁNTO: ", RegexOptions.IgnoreCase);
+
+                                        textoPDF = Regex.Replace(textoPDF, @"\[CONDICIONES_BASICAS\]:", "\n\nCONDICIONES BÁSICAS:\n", RegexOptions.IgnoreCase);
+                                        textoPDF = Regex.Replace(textoPDF, @"\[ACCIONES\]:", "\n\nACCIONES A REALIZAR:\n", RegexOptions.IgnoreCase);
+                                        textoPDF = Regex.Replace(textoPDF, @"\[ANALISIS_FINAL\]:", "\n\nANÁLISIS FINAL:\n", RegexOptions.IgnoreCase);
+
+                                        textoResumen = textoPDF.Trim();
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Error leyendo JSON del chat: " + ex.Message);
+                            }
+                        }
+                    }
+                }
+
+                // 2. OBTENER EL ANÁLISIS DE LOS 5 PORQUÉS DE LA BD
                 DataTable dt5Whys = new DataTable();
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
                     string query5Whys = @"
-                SELECT Iw_what as Que, Iw_why1 as Porque, Iw_why2 as Porque2, 
-                       Iw_why3 as Porque3, Iw_why4 as Porque4, Iw_why5 as Porque5, 
-                       Iw_cause as Causa, Iw_step as Accion, Iw_name as Responsable 
-                FROM TabInv5Why 
-                INNER JOIN TabCuadrantes_Running ON Iw_cuadrante = CaR_id
-                WHERE CaR_template = @id";
+                    SELECT Iw_what as Que, Iw_why1 as Porque, Iw_why2 as Porque2, 
+                           Iw_why3 as Porque3, Iw_why4 as Porque4, Iw_why5 as Porque5, 
+                           Iw_cause as Causa, Iw_step as Accion, Iw_name as Responsable 
+                    FROM TabInv5Why 
+                    INNER JOIN TabCuadrantes_Running ON Iw_cuadrante = CaR_id
+                    WHERE CaR_template = @id";
 
                     using (SqlCommand cmd = new SqlCommand(query5Whys, conn))
                     {
@@ -425,7 +515,7 @@ namespace A3_Reloaded.Controllers
                     }
                 }
 
-                // 2. CREAR EL PDF EN MEMORIA
+                // 3. CREAR EL PDF EN MEMORIA
                 byte[] pdfBytes;
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -438,12 +528,12 @@ namespace A3_Reloaded.Controllers
                     Font subtituloFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY);
                     Font textoFont = FontFactory.GetFont(FontFactory.HELVETICA, 11, BaseColor.BLACK);
                     Font tablaHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
-                    Font tablaCellFont = FontFactory.GetFont(FontFactory.HELVETICA, 9, BaseColor.BLACK); // Fuente ligeramente más pequeña para que quepa bien
+                    Font tablaCellFont = FontFactory.GetFont(FontFactory.HELVETICA, 9, BaseColor.BLACK);
 
                     // Título Principal
                     pdfDoc.Add(new Paragraph($"Reporte de Análisis Asistido por IA - Folio #{investigacionId}", tituloFont) { Alignment = Element.ALIGN_CENTER, SpacingAfter = 20f });
 
-                    // Cuerpo (El resumen generado por el Bot)
+                    // Cuerpo (El resumen completo de la IA)
                     Paragraph cuerpo = new Paragraph(textoResumen, textoFont) { Alignment = Element.ALIGN_JUSTIFIED, SpacingBefore = 10f, SpacingAfter = 20f };
                     pdfDoc.Add(cuerpo);
 
@@ -454,26 +544,20 @@ namespace A3_Reloaded.Controllers
                     {
                         pdfDoc.Add(new Paragraph("Análisis de 5 Porqués y Acciones Preventivas:", subtituloFont) { SpacingAfter = 10f });
 
-                        // Crear tabla con 4 columnas agrupadas
                         PdfPTable table = new PdfPTable(4);
                         table.WidthPercentage = 100;
-                        // Anchos: Qué (20%), 5 Porqués (40%), Causa (20%), Acción/Resp (20%)
                         table.SetWidths(new float[] { 20f, 40f, 20f, 20f });
 
-                        // Encabezados de tabla
                         BaseColor colorHeader = new BaseColor(0, 153, 204);
                         table.AddCell(new PdfPCell(new Phrase("Qué", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
                         table.AddCell(new PdfPCell(new Phrase("5 Porqués", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
                         table.AddCell(new PdfPCell(new Phrase("Causa Raíz", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
                         table.AddCell(new PdfPCell(new Phrase("Acción y Responsable", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
 
-                        // Llenar filas con los datos de SQL
                         foreach (DataRow row in dt5Whys.Rows)
                         {
-                            // 1. Qué
                             table.AddCell(new PdfPCell(new Phrase(row["Que"].ToString(), tablaCellFont)) { Padding = 5f });
 
-                            // 2. Los 5 Porqués (agrupados en un solo string con saltos de línea)
                             System.Text.StringBuilder sbWhys = new System.Text.StringBuilder();
                             if (!string.IsNullOrWhiteSpace(row["Porque"].ToString())) sbWhys.AppendLine("1. " + row["Porque"].ToString());
                             if (!string.IsNullOrWhiteSpace(row["Porque2"].ToString())) sbWhys.AppendLine("2. " + row["Porque2"].ToString());
@@ -482,20 +566,15 @@ namespace A3_Reloaded.Controllers
                             if (!string.IsNullOrWhiteSpace(row["Porque5"].ToString())) sbWhys.AppendLine("5. " + row["Porque5"].ToString());
 
                             table.AddCell(new PdfPCell(new Phrase(sbWhys.ToString().TrimEnd(), tablaCellFont)) { Padding = 5f });
-
-                            // 3. Causa Raíz
                             table.AddCell(new PdfPCell(new Phrase(row["Causa"].ToString(), tablaCellFont)) { Padding = 5f });
 
-                            // 4. Acción y Responsable
                             string accionResp = $"{row["Accion"]}\n\nResp: {row["Responsable"]}";
                             table.AddCell(new PdfPCell(new Phrase(accionResp, tablaCellFont)) { Padding = 5f });
                         }
 
                         pdfDoc.Add(table);
                     }
-                    // -------------------------------------------------------------
 
-                    // Pie de página
                     pdfDoc.Add(new Paragraph($"\nGenerado automáticamente el: {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}", FontFactory.GetFont(FontFactory.HELVETICA_OBLIQUE, 9, BaseColor.GRAY)));
 
                     pdfDoc.Close();
@@ -504,7 +583,7 @@ namespace A3_Reloaded.Controllers
                     pdfBytes = ms.ToArray();
                 }
 
-                // 3. GUARDAR FÍSICAMENTE EN EL SERVIDOR
+                // 4. GUARDAR FÍSICAMENTE EN EL SERVIDOR
                 string filename = "Chatbot_Folio_" + investigacionId + "_" + Guid.NewGuid().ToString().Substring(0, 8) + ".pdf";
                 string serverPath = Server.MapPath(@"/Assets/Veriones_A3/" + filename);
 
@@ -516,7 +595,7 @@ namespace A3_Reloaded.Controllers
                     stream.Write(pdfBytes, 0, pdfBytes.Length);
                 }
 
-                // 4. REGISTRAR EL NOMBRE DEL ARCHIVO EN LA BD (TABLA CHATBOT)
+                // 5. REGISTRAR EL NOMBRE DEL ARCHIVO EN LA BD
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
                     string updateQuery = @"
@@ -534,7 +613,7 @@ namespace A3_Reloaded.Controllers
                     }
                 }
 
-                // 5. DEVOLVER PDF AL NAVEGADOR
+                // 6. DEVOLVER PDF AL NAVEGADOR
                 return File(pdfBytes, "application/pdf", filename);
             }
             catch (Exception ex)
@@ -665,5 +744,7 @@ namespace A3_Reloaded.Controllers
 
             return valorDB;
         }
+
+
     }
 }

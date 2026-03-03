@@ -609,9 +609,17 @@
                     <div id="chatHistory" class="chat-history">
                         <div class="message bot">Hola, soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</div>
                     </div>
+
                     <div class="chat-input-area">
-                        <input type="text" id="txtMessage" class="form-control" placeholder="Escribe tu pregunta..." />
-                        <button id="btnSend" class="btn btn-primary">Enviar</button>
+                        <div class="input-group">
+                            <button id="btnMic" class="btn btn-secondary" type="button" title="Dictar por voz">
+                                <i class="fa fa-microphone"></i>
+                            </button>
+
+                            <input type="text" id="txtMessage" class="form-control" placeholder="Escribe o dicta tu pregunta..." />
+
+                            <button id="btnSend" class="btn btn-primary">Enviar</button>
+                        </div>
                     </div>
                 </div>
             </div>

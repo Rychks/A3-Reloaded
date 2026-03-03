@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
 
 namespace A3_Reloaded.Controllers
 {
@@ -1321,6 +1322,24 @@ namespace A3_Reloaded.Controllers
                     string cwid_creador = HttpContext.User.Identity.Name;
 
                     datos = acciones.insert_accion_preventiva(ID_Template, Step, Date, Responsable, Name, cwid_creador);
+
+                    DataTable user_info = US.obtener_UsuarioID(Responsable);
+
+                    foreach (DataRow data in user_info.Rows)
+                    {
+                        //ID = Convert.ToInt32(data["ID"]),
+                        //    CWID = data["CWID"].ToString(),
+                        string user_name = data["Nombre"].ToString();
+                        string user_email = data["Correo"].ToString();
+                        //    App = data["App"].ToString(),
+                        StringBuilder mailBody = new StringBuilder();
+                        mailBody.AppendFormat("<h1>Tarea asignada - A3 Reloaded</h1>");
+                        mailBody.AppendFormat("Estimado(a) {0},", user_name);
+                        mailBody.AppendFormat("<br />");
+                        mailBody.AppendFormat("<p>Tarea asignada correspondiente a la investigación con folio: <b>" + ID_Template + "</b></p>");
+                        mailBody.AppendFormat("<p>Descripción: " + Step + "</p>");
+                        TE.enviarCorreo(user_email, "Tarea asignada - A3 Reloaded", mailBody.ToString(), null, null, null);
+                    }
 
                     if (datos == "guardado")
                     {

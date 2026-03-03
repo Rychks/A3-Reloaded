@@ -8,6 +8,9 @@
         $('#btnFinalizarInvestigacion').click(function (e) {
             generarReporteAI();
         });
+        $('#btnMic').click(function () {
+            iniciarDictado();
+        })
         //FUN FUNCIONES AI
         $("#tblTemplateRunningN_acciones_prevetivas_Datos").on('click', ".btnRemoverRegistro", function () {
             var id_accion = $(this).parents("tr").find("[data-registro=id_accion]").html();
@@ -1244,8 +1247,12 @@
 
                     // Guardar y mostrar respuesta
                     localHistory.push({ role: "assistant", content: response.reply });
-                    var htmlContent = marked.parse(response.reply);
+                    //var htmlContent = marked.parse(response.reply);
+                    var textoLimpio = formatearTextoBot(response.reply);
+                    var htmlContent = marked.parse(textoLimpio);
                     $('#chatHistory').append('<div class="message bot">' + htmlContent + '</div>');
+
+                    botHabla(response.reply);
                 } else {
                     localHistory.pop(); // Revertir si hay error
                     $('#chatHistory').append('<div class="message error">Error: ' + response.error + '</div>');
@@ -1289,7 +1296,10 @@
                         if (msg.role === "user") {
                             $('#chatHistory').append('<div class="message user">' + $('<div>').text(msg.content).html() + '</div>');
                         } else if (msg.role === "assistant") {
-                            var htmlContent = marked.parse(msg.content);
+                            //var htmlContent = marked.parse(msg.content);
+                            // CÓDIGO LIMPIO:
+                            var textoLimpio = formatearTextoBot(msg.content);
+                            var htmlContent = marked.parse(textoLimpio);
                             $('#chatHistory').append('<div class="message bot">' + htmlContent + '</div>');
                         }
                     });
@@ -1313,11 +1323,9 @@
     }
     function generarReporteAI() {
         var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
-        // Buscar el último mensaje del bot que contiene el resumen
-        var ultimoMensajeBot = [...localHistory].reverse().find(m => m.role === 'assistant');
 
-        if (!ultimoMensajeBot) {
-            alert("Aún no hay un resumen para generar el reporte.");
+        if (!investigacionId || investigacionId === "") {
+            alert("Error: No se encontró el ID de la investigación activa.");
             return;
         }
 
@@ -1325,17 +1333,91 @@
         var form = $('<form></form>')
             .attr('action', '/Chat/FinalizarYGuardarReporteBot')
             .attr('method', 'post')
-            .attr('target', '_blank'); // Se abre/descarga en otra pestaña
+            .attr('target', '_blank'); // Se abre/descarga el PDF en otra pestaña
 
+        // Solo enviamos el investigacionId (El Backend se encargará de buscar el resumen)
         form.append($('<input></input>').attr('type', 'hidden').attr('name', 'investigacionId').attr('value', investigacionId));
-        form.append($('<input></input>').attr('type', 'hidden').attr('name', 'textoResumen').attr('value', ultimoMensajeBot.content));
 
+        // Ejecutamos y limpiamos el DOM
         form.appendTo('body').submit().remove();
 
-        // Opcional: Podrías deshabilitar el botón de enviar mensajes del chat aquí
-        // para indicar que la sesión ha finalizado.
+        // Deshabilitar el chat para indicar que la sesión ha finalizado
         $('#txtMessage, #btnSend').prop('disabled', true);
         $('#txtMessage').attr('placeholder', 'Investigación finalizada y guardada.');
+        $('#loading-bubble').remove(); // Por precaución, limpiamos si había algo cargando
+    }
+    function formatearTextoBot(texto) {
+        if (!texto) return "";
+        // Reemplazamos las etiquetas feas por títulos en negritas de Markdown (**)
+        texto = texto.replace(/\[QUE\]:/gi, "**QUÉ:** ");
+        texto = texto.replace(/\[DONDE\]:/gi, "**DÓNDE:** ");
+        texto = texto.replace(/\[CUANDO\]:/gi, "**CUÁNDO:** ");
+        texto = texto.replace(/\[CUAL\]:/gi, "**CUÁL:** ");
+        texto = texto.replace(/\[QUIEN\]:/gi, "**A QUIÉN:** ");
+        texto = texto.replace(/\[CUANTO\]:/gi, "**CUÁNTO:** ");
+        texto = texto.replace(/\[CONDICIONES_BASICAS\]:/gi, "\n\n**CONDICIONES BÁSICAS:**\n");
+        texto = texto.replace(/\[ACCIONES\]:/gi, "\n\n**ACCIONES A REALIZAR:**\n");
+        texto = texto.replace(/\[ANALISIS_FINAL\]:/gi, "\n\n**ANÁLISIS FINAL:**\n");
+
+        return texto;
+    }
+    function botHabla(texto) {
+        if (!('speechSynthesis' in window)) return; // Validar si el navegador lo soporta
+
+        // Detenemos cualquier audio previo para que no se encimen
+        window.speechSynthesis.cancel();
+
+        // Limpiamos el texto de markdown (asteriscos, corchetes, etc.) para que no los lea literal
+        var textoLimpioParaVoz = texto.replace(/[\*\#\[\]\_]/g, '');
+
+        var mensajeVoz = new SpeechSynthesisUtterance(textoLimpioParaVoz);
+        mensajeVoz.lang = 'es-MX'; // Español de México
+        mensajeVoz.rate = 1.0;     // Velocidad normal
+        mensajeVoz.pitch = 1.0;    // Tono normal
+
+        window.speechSynthesis.speak(mensajeVoz);
+    }
+    function iniciarDictado() {
+        // Validar soporte en el navegador
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Tu navegador no soporta el dictado por voz. Intenta usar Chrome o Edge.");
+            return;
+        }
+
+        var recognition = new SpeechRecognition();
+        recognition.lang = 'es-MX';
+        recognition.interimResults = false; // Solo devuelve el resultado cuando termina de hablar
+        recognition.maxAlternatives = 1;
+
+        // Cambiamos el color del botón para indicar que está escuchando
+        $('#btnMic').removeClass('btn-secondary').addClass('btn-danger');
+        $('#txtMessage').attr('placeholder', 'Escuchando... Habla ahora.');
+
+        recognition.start();
+
+        recognition.onresult = function (event) {
+            var transcripcion = event.results[0][0].transcript;
+            // Ponemos lo que dijo en el input de texto
+            $('#txtMessage').val(transcripcion);
+
+            // Opcional: Si quieres que se envíe automáticamente después de hablar, descomenta la siguiente línea:
+            // sendMessage(); 
+        };
+
+        recognition.onspeechend = function () {
+            recognition.stop();
+        };
+
+        recognition.onerror = function (event) {
+            console.log("Error de reconocimiento de voz: " + event.error);
+        };
+
+        recognition.onend = function () {
+            // Restauramos el botón y el input a la normalidad
+            $('#btnMic').removeClass('btn-danger').addClass('btn-secondary');
+            $('#txtMessage').attr('placeholder', 'Escribe o dicta tu problema...');
+        };
     }
     //FIN FUNCIONES
     function getIrisEvents_dataAll(line) {
