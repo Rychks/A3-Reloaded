@@ -15,6 +15,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace A3_Reloaded.Controllers
@@ -23,8 +24,8 @@ namespace A3_Reloaded.Controllers
     {
         // ⚠️ SEGURIDAD: He ocultado tu token. 
         // Como lo publicaste en el chat anterior, deberías REVOCARLO y generar uno nuevo.
-        private const string API_TOKEN = "mga-2a4f885fd2b62177a9ec11a2b392a5f7fdf75f0b";
-        private const string ASSISTANT_ID = "fc966206-2132-4b75-b585-db329d5447d3";
+        //private const string API_TOKEN = "mga-7ecdcd920fde8d7509788e1ebc8aec79e4a827a0";
+        //private const string ASSISTANT_ID = "fc966206-2132-4b75-b585-db329d5447d3";
         private const string BAYER_API_URL = "https://chat.int.bayer.com/api/v2/chat/agent";
 
         // CONFIGURACIÓN DE SEGURIDAD (SSL/TLS)
@@ -68,6 +69,13 @@ namespace A3_Reloaded.Controllers
         {
             try
             {
+                string tokenDinamico = ObtenerConfiguracion("BAYER_API_TOKEN");
+                string assistantIdDinamico = ObtenerConfiguracion("BAYER_ASSISTANT_ID");
+
+                if (string.IsNullOrEmpty(tokenDinamico) || string.IsNullOrEmpty(assistantIdDinamico))
+                {
+                    return Json(new { success = false, error = "Faltan las credenciales del Chatbot en la base de datos." });
+                }
                 // 1. Validar historial
                 if (history == null) history = new List<ChatMessage>();
 
@@ -90,7 +98,7 @@ namespace A3_Reloaded.Controllers
                 var payloadObj = new Dictionary<string, object>
                 {
                     { "messages", history },
-                    { "assistant_id", ASSISTANT_ID },
+                    { "assistant_id", assistantIdDinamico },
                     { "stream", false }
                 };
 
@@ -101,7 +109,9 @@ namespace A3_Reloaded.Controllers
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                 // 3. Enviar a Bayer
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", API_TOKEN);
+                client.DefaultRequestHeaders.Authorization = null; // Limpiar anteriores
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenDinamico);
+
                 var response = await client.PostAsync(BAYER_API_URL, content);
                 string responseString = await response.Content.ReadAsStringAsync();
 
@@ -392,17 +402,24 @@ namespace A3_Reloaded.Controllers
             {
                 string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
 
-                // 1. OBTENER LAS ACCIONES PREVENTIVAS DE LA BD
-                DataTable dtAcciones = new DataTable();
+                // 1. OBTENER EL ANÁLISIS DE LOS 5 PORQUÉS DE LA BD
+                DataTable dt5Whys = new DataTable();
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
-                    string queryAcciones = "SELECT accion, fecha_entrega FROM TabAcciones_Preventivas WHERE id_template = @id";
-                    using (SqlCommand cmd = new SqlCommand(queryAcciones, conn))
+                    string query5Whys = @"
+                SELECT Iw_what as Que, Iw_why1 as Porque, Iw_why2 as Porque2, 
+                       Iw_why3 as Porque3, Iw_why4 as Porque4, Iw_why5 as Porque5, 
+                       Iw_cause as Causa, Iw_step as Accion, Iw_name as Responsable 
+                FROM TabInv5Why 
+                INNER JOIN TabCuadrantes_Running ON Iw_cuadrante = CaR_id
+                WHERE CaR_template = @id";
+
+                    using (SqlCommand cmd = new SqlCommand(query5Whys, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", investigacionId);
                         using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                         {
-                            da.Fill(dtAcciones);
+                            da.Fill(dt5Whys);
                         }
                     }
                 }
@@ -420,7 +437,7 @@ namespace A3_Reloaded.Controllers
                     Font subtituloFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.DARK_GRAY);
                     Font textoFont = FontFactory.GetFont(FontFactory.HELVETICA, 11, BaseColor.BLACK);
                     Font tablaHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10, BaseColor.WHITE);
-                    Font tablaCellFont = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
+                    Font tablaCellFont = FontFactory.GetFont(FontFactory.HELVETICA, 9, BaseColor.BLACK); // Fuente ligeramente más pequeña para que quepa bien
 
                     // Título Principal
                     pdfDoc.Add(new Paragraph($"Reporte de Análisis Asistido por IA - Folio #{investigacionId}", tituloFont) { Alignment = Element.ALIGN_CENTER, SpacingAfter = 20f });
@@ -430,37 +447,47 @@ namespace A3_Reloaded.Controllers
                     pdfDoc.Add(cuerpo);
 
                     // -------------------------------------------------------------
-                    // AGREGAR TABLA DE ACCIONES PREVENTIVAS SI EXISTEN
+                    // AGREGAR TABLA DE LOS 5 PORQUÉS SI EXISTEN
                     // -------------------------------------------------------------
-                    if (dtAcciones.Rows.Count > 0)
+                    if (dt5Whys.Rows.Count > 0)
                     {
-                        pdfDoc.Add(new Paragraph("Acciones Preventivas Generadas:", subtituloFont) { SpacingAfter = 10f });
+                        pdfDoc.Add(new Paragraph("Análisis de 5 Porqués y Acciones Preventivas:", subtituloFont) { SpacingAfter = 10f });
 
-                        // Crear tabla con 2 columnas (70% para acción, 30% para fecha)
-                        PdfPTable table = new PdfPTable(2);
+                        // Crear tabla con 4 columnas agrupadas
+                        PdfPTable table = new PdfPTable(4);
                         table.WidthPercentage = 100;
-                        table.SetWidths(new float[] { 75f, 25f });
+                        // Anchos: Qué (20%), 5 Porqués (40%), Causa (20%), Acción/Resp (20%)
+                        table.SetWidths(new float[] { 20f, 40f, 20f, 20f });
 
                         // Encabezados de tabla
-                        PdfPCell cellAccion = new PdfPCell(new Phrase("Acción Preventiva", tablaHeaderFont)) { BackgroundColor = new BaseColor(0, 153, 204), Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER };
-                        PdfPCell cellFecha = new PdfPCell(new Phrase("Fecha de Entrega", tablaHeaderFont)) { BackgroundColor = new BaseColor(0, 153, 204), Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER };
-
-                        table.AddCell(cellAccion);
-                        table.AddCell(cellFecha);
+                        BaseColor colorHeader = new BaseColor(0, 153, 204);
+                        table.AddCell(new PdfPCell(new Phrase("Qué", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
+                        table.AddCell(new PdfPCell(new Phrase("5 Porqués", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
+                        table.AddCell(new PdfPCell(new Phrase("Causa Raíz", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
+                        table.AddCell(new PdfPCell(new Phrase("Acción y Responsable", tablaHeaderFont)) { BackgroundColor = colorHeader, Padding = 6f, HorizontalAlignment = Element.ALIGN_CENTER });
 
                         // Llenar filas con los datos de SQL
-                        foreach (DataRow row in dtAcciones.Rows)
+                        foreach (DataRow row in dt5Whys.Rows)
                         {
-                            table.AddCell(new PdfPCell(new Phrase(row["accion"].ToString(), tablaCellFont)) { Padding = 5f });
+                            // 1. Qué
+                            table.AddCell(new PdfPCell(new Phrase(row["Que"].ToString(), tablaCellFont)) { Padding = 5f });
 
-                            // Formatear la fecha para que se vea limpia
-                            string fechaStr = "";
-                            if (row["fecha_entrega"] != DBNull.Value)
-                            {
-                                fechaStr = Convert.ToDateTime(row["fecha_entrega"]).ToString("dd/MM/yyyy");
-                            }
+                            // 2. Los 5 Porqués (agrupados en un solo string con saltos de línea)
+                            System.Text.StringBuilder sbWhys = new System.Text.StringBuilder();
+                            if (!string.IsNullOrWhiteSpace(row["Porque"].ToString())) sbWhys.AppendLine("1. " + row["Porque"].ToString());
+                            if (!string.IsNullOrWhiteSpace(row["Porque2"].ToString())) sbWhys.AppendLine("2. " + row["Porque2"].ToString());
+                            if (!string.IsNullOrWhiteSpace(row["Porque3"].ToString())) sbWhys.AppendLine("3. " + row["Porque3"].ToString());
+                            if (!string.IsNullOrWhiteSpace(row["Porque4"].ToString())) sbWhys.AppendLine("4. " + row["Porque4"].ToString());
+                            if (!string.IsNullOrWhiteSpace(row["Porque5"].ToString())) sbWhys.AppendLine("5. " + row["Porque5"].ToString());
 
-                            table.AddCell(new PdfPCell(new Phrase(fechaStr, tablaCellFont)) { Padding = 5f, HorizontalAlignment = Element.ALIGN_CENTER });
+                            table.AddCell(new PdfPCell(new Phrase(sbWhys.ToString().TrimEnd(), tablaCellFont)) { Padding = 5f });
+
+                            // 3. Causa Raíz
+                            table.AddCell(new PdfPCell(new Phrase(row["Causa"].ToString(), tablaCellFont)) { Padding = 5f });
+
+                            // 4. Acción y Responsable
+                            string accionResp = $"{row["Accion"]}\n\nResp: {row["Responsable"]}";
+                            table.AddCell(new PdfPCell(new Phrase(accionResp, tablaCellFont)) { Padding = 5f });
                         }
 
                         pdfDoc.Add(table);
@@ -492,10 +519,10 @@ namespace A3_Reloaded.Controllers
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
                     string updateQuery = @"
-                UPDATE TabChatbot_History 
-                SET Reporte_Filename = @filename,
-                    FechaActualizacion = GETDATE()
-                WHERE Investigacion_Id = @id";
+                    UPDATE TabChatbot_History 
+                    SET Reporte_Filename = @filename,
+                        FechaActualizacion = GETDATE()
+                    WHERE Investigacion_Id = @id";
 
                     using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
                     {
@@ -514,6 +541,128 @@ namespace A3_Reloaded.Controllers
                 return new HttpStatusCodeResult(500, "Error generando PDF del Chatbot: " + ex.Message);
             }
         }
+        [HttpGet]
+        public ActionResult VerificarReporteChatbot(int investigacionId)
+        {
+            try
+            {
+                string filename = null;
+                string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
 
+                using (SqlConnection conn = new SqlConnection(connString))
+                {
+                    // Buscamos si hay un nombre de archivo guardado para este ID
+                    string query = "SELECT Reporte_Filename FROM TabChatbot_History WHERE Investigacion_Id = @id";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", investigacionId);
+                        conn.Open();
+                        var result = cmd.ExecuteScalar();
+
+                        if (result != null && result != DBNull.Value)
+                        {
+                            filename = result.ToString();
+                        }
+                    }
+                }
+
+                // Devolvemos si existe y el nombre del archivo
+                return Json(new
+                {
+                    existe = !string.IsNullOrEmpty(filename),
+                    filename = filename
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { existe = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        private string ObtenerApiTokenDinamico()
+        {
+            // 1. Intentar obtener el token de la memoria Caché (Rapidísimo)
+            string tokenCache = HttpRuntime.Cache["BayerApiToken"] as string;
+
+            // Si ya lo tenemos en memoria, lo devolvemos inmediatamente
+            if (!string.IsNullOrEmpty(tokenCache))
+                return tokenCache;
+
+            // 2. Si no está en memoria (o ya expiró), vamos a la Base de Datos
+            string tokenDB = "";
+            string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                string query = "SELECT Valor FROM TabConfiguraciones_Chat WHERE Clave = 'BAYER_API_TOKEN'";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    var result = cmd.ExecuteScalar();
+                    if (result != null)
+                    {
+                        tokenDB = result.ToString();
+                    }
+                }
+            }
+
+            // 3. Guardar en Caché para las próximas consultas (ej. por 12 horas)
+            if (!string.IsNullOrEmpty(tokenDB))
+            {
+                HttpRuntime.Cache.Insert(
+                    "BayerApiToken",
+                    tokenDB,
+                    null,
+                    DateTime.Now.AddHours(12), // Tiempo de vida en memoria
+                    System.Web.Caching.Cache.NoSlidingExpiration
+                );
+            }
+
+            return tokenDB;
+        }
+
+        private string ObtenerConfiguracion(string clave)
+        {
+            // 1. Buscamos en memoria caché usando la clave como identificador único
+            string cacheKey = "ChatConfig_" + clave;
+            string valorCache = HttpRuntime.Cache[cacheKey] as string;
+
+            // Si ya lo tenemos en memoria, lo devolvemos rápido
+            if (!string.IsNullOrEmpty(valorCache))
+                return valorCache;
+
+            // 2. Si no está en memoria, vamos a SQL Server
+            string valorDB = "";
+            string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                string query = "SELECT Valor FROM TabConfiguraciones_Chat WHERE Clave = @clave";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@clave", clave);
+                    conn.Open();
+                    var result = cmd.ExecuteScalar();
+                    if (result != null)
+                    {
+                        valorDB = result.ToString();
+                    }
+                }
+            }
+
+            // 3. Guardamos el resultado en la memoria RAM del servidor por 12 horas
+            if (!string.IsNullOrEmpty(valorDB))
+            {
+                HttpRuntime.Cache.Insert(
+                    cacheKey,
+                    valorDB,
+                    null,
+                    DateTime.Now.AddHours(12),
+                    System.Web.Caching.Cache.NoSlidingExpiration
+                );
+            }
+
+            return valorDB;
+        }
     }
 }

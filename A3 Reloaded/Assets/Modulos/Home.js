@@ -643,7 +643,7 @@
         $("#mdlReporteA3_Panel").modal("show");
 
         // Obtener y establecer la URL del reporte
-        obtenerUrlReporte(id_template);
+        
 
         // Obtener versión del documento y flujo
         let valorSeleccionado = $('#slcTemplateRunning_Reporte_Versiones option:selected').val();
@@ -652,7 +652,7 @@
         } else {
             obtenerVersionDocumento(id_template, valorSeleccionado);
         }
-
+        obtenerUrlReporte(id_template);
         // Obtener adjuntos y versiones del template
         fn_obtener_Adjuntos_Template(id_template);
         fn_obtener_versiones(id_template);
@@ -668,23 +668,50 @@
         $("#pnl_firma_reporte_template").hide();
     }
     function obtenerUrlReporte(id_template) {
-        const url = "/Reportes/validar_template_WP_id";
         const $reporteUrl = $("#ReporteRunning_url");
         const $spinner = $("#pdfLoader");
 
         // Mostrar el spinner y limpiar la URL actual
         $spinner.show();
-        $reporteUrl.attr("src", "").off("load"); // Limpia eventos previos en el iframe
+        $reporteUrl.attr("src", "").off("load"); // Limpia eventos previos
+
+        // Configurar el evento para ocultar el spinner cuando el iframe cargue 
+        // (Lo definimos una sola vez aquí arriba)
+        $reporteUrl.on("load", function () {
+            $spinner.hide();
+        });
+
+        // 1. PRIMERO: Consultar si existe un reporte del Chatbot
+        $.ajax({
+            url: '/Chat/VerificarReporteChatbot',
+            type: 'GET',
+            data: { investigacionId: id_template },
+            success: function (chatbotInfo) {
+
+                if (chatbotInfo.existe && chatbotInfo.filename) {
+                    // SI EXISTE REPORTE IA: Apuntamos a la carpeta física donde guardamos el PDF
+                    const urlChatbot = `/Assets/Veriones_A3/${chatbotInfo.filename}`;
+                    $reporteUrl.attr("src", urlChatbot);
+                } else {
+                    // SI NO EXISTE: Ejecutamos tu lógica original (Fallback)
+                    cargarReporteTradicional(id_template, $reporteUrl);
+                }
+            },
+            error: function () {
+                // Si el servidor falla al verificar el chatbot, intentamos cargar el tradicional de todos modos
+                cargarReporteTradicional(id_template, $reporteUrl);
+            }
+        });
+    }
+
+    // Separamos tu lógica original en una función para que quede más limpio
+    function cargarReporteTradicional(id_template, $reporteUrl) {
+        const url = "/Reportes/validar_template_WP_id";
 
         $.post(url, { ID: id_template }).done(function (info) {
             const reporteUrl = info.Id === "1"
                 ? `/Reportes/reporteA3_WP?ID_Template=${id_template}`
                 : `/Reportes/reporteA3?ID_Template=${id_template}`;
-
-            // Cuando el iframe termine de cargar, ocultar el spinner
-            $reporteUrl.on("load", function () {
-                $spinner.hide();
-            });
 
             // Establecer la URL en el iframe
             $reporteUrl.attr("src", reporteUrl);
