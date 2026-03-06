@@ -745,6 +745,66 @@ namespace A3_Reloaded.Controllers
             return valorDB;
         }
 
+        // 1. Método para buscar casos históricos (RAG)
+        [HttpPost]
+        public ActionResult ObtenerContextoBD(string problema)
+        {
+            try
+            {
+                // Llamas a la función que ya tenías creada
+                string contexto = ObtenerContextoDeBaseDeDatos(problema);
+                return Json(new { success = true, contexto = contexto });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
 
+        // 2. Método para Guardar el Chat y extraer QUÉ/CUÁNTO
+        [HttpPost]
+        public ActionResult GuardarChatYExtraer(int investigacionId, List<ChatMessage> history, string ultimaRespuesta, string conversationId, string parentMessageId)
+        {
+            try
+            {
+                // Usamos tu función de limpieza Regex que hicimos antes
+                ExtraerYActualizarQueYCuanto(ultimaRespuesta, investigacionId);
+
+                // Guardamos todo en la tabla TabChatbot_History
+                string historyJson = JsonConvert.SerializeObject(history);
+                string connString = ConfigurationManager.ConnectionStrings["BD_Base"].ConnectionString;
+
+                using (SqlConnection conn = new SqlConnection(connString))
+                {
+                    string upsertQuery = @"
+                IF EXISTS (SELECT 1 FROM TabChatbot_History WHERE Investigacion_Id = @id)
+                BEGIN
+                    UPDATE TabChatbot_History 
+                    SET ConversationId = @convId, ParentMessageId = @parentId, HistoryJson = @history, FechaActualizacion = GETDATE()
+                    WHERE Investigacion_Id = @id
+                END
+                ELSE
+                BEGIN
+                    INSERT INTO TabChatbot_History (Investigacion_Id, ConversationId, ParentMessageId, HistoryJson)
+                    VALUES (@id, @convId, @parentId, @history)
+                END";
+
+                    SqlCommand cmd = new SqlCommand(upsertQuery, conn);
+                    cmd.Parameters.AddWithValue("@id", investigacionId);
+                    cmd.Parameters.AddWithValue("@convId", (object)conversationId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@parentId", (object)parentMessageId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@history", historyJson);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
     }
 }

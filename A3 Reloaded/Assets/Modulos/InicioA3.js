@@ -6,7 +6,7 @@
             if (e.which == 13) { sendMessage(); return false; }
         })
         $('#btnFinalizarInvestigacion').click(function (e) {
-            generarReporteAI();
+            descargarReportePDF();
         });
         $('#btnMic').click(function () {
             iniciarDictado();
@@ -1194,131 +1194,245 @@
         })
     });
     //FUNCIONES ASISTENTE AI
+    const msalConfig = {
+        auth: {
+            clientId: "fdbc25f6-c263-4d93-b5ce-640e8d35aee7",
+            authority: "https://login.microsoftonline.com/fcb2b37b-5da0-466b-9b83-0014b67a7c78"
+        },
+        cache: { cacheLocation: "sessionStorage", storeAuthStateInCookie: false }
+    };
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    const tokenRequest = { scopes: ["https://bayer.com/prod-baychatgpt-api/.default"] };
+    async function obtenerTokenEntraID() {
+        try {
+            const currentAccounts = msalInstance.getAllAccounts();
+            if (currentAccounts.length === 0) {
+                const loginResponse = await msalInstance.loginPopup(tokenRequest);
+                msalInstance.setActiveAccount(loginResponse.account);
+                return loginResponse.accessToken;
+            } else {
+                msalInstance.setActiveAccount(currentAccounts[0]);
+                const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+                return tokenResponse.accessToken;
+            }
+        } catch (error) {
+            console.warn("Fallo silencioso, pidiendo login interactivo...", error);
+            if (error instanceof msal.InteractionRequiredAuthError) {
+                const tokenResponse = await msalInstance.acquireTokenPopup(tokenRequest);
+                return tokenResponse.accessToken;
+            } else throw error;
+        }
+    }
     var localHistory = [];
     var currentConversationId = "";
     var currentParentMessageId = "";
-    function sendMessage() {
-        var userText = $('#txtMessage').val().trim();
-        var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
-        if (userText === "") return;
 
-        // 1. Agregamos y mostramos el mensaje del usuario
+    var getInvestigacionId = () => parseInt($('#txtTemplatesRunningN_ID').val());
+
+    async function sendMessage() {
+        var userText = $('#txtMessage').val().trim();
+        var investigacionId = getInvestigacionId();
+        if (userText === "" || !investigacionId) return;
+
+        // 1. UI: Mostrar mensaje del usuario
         localHistory.push({ role: "user", content: userText });
         $('#chatHistory').append('<div class="message user">' + $('<div>').text(userText).html() + '</div>');
+        $('#txtMessage').val('').prop('disabled', true);
+        $('#btnSend').prop('disabled', true);
 
-        // Limpiar input y deshabilitar controles
-        $('#txtMessage').val('');
-        $('#txtMessage, #btnSend').prop('disabled', true);
+        var loadingHtml = `<div id="loading-bubble" class="message bot"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
+        $('#chatHistory').append(loadingHtml);
         scrollToBottom();
 
-        // ---------------------------------------------------------
-        // 2. MOSTRAR INDICADOR DE CARGA ("Escribiendo...")
-        // ---------------------------------------------------------
-        var loadingHtml = `
-            <div id="loading-bubble" class="message bot">
-                <div class="typing-indicator">
-                    <span></span><span></span><span></span>
-                </div>
-            </div>`;
-        $('#chatHistory').append(loadingHtml);
-        scrollToBottom(); // Hacemos scroll para que el usuario vea que está cargando
+        try {
+            // Clonamos el historial para inyectar datos invisibles
+            let payloadHistory = JSON.parse(JSON.stringify(localHistory));
 
-        // 3. Llamada al Servidor
-        $.ajax({
-            url: '/Chat/SendMessage',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                history: localHistory,
-                conversationId: currentConversationId,
-                parentMessageId: currentParentMessageId,
-                investigacionId: investigacionId
-            }),
-            success: function (response) {
-                // ---------------------------------------------------------
-                // 4. QUITAR INDICADOR DE CARGA
-                // ---------------------------------------------------------
-                $('#loading-bubble').remove();
-
-                if (response.success) {
-                    // Actualizar IDs
-                    if (response.conversationId) currentConversationId = response.conversationId;
-                    if (response.newParentId) currentParentMessageId = response.newParentId;
-
-                    // Guardar y mostrar respuesta
-                    localHistory.push({ role: "assistant", content: response.reply });
-                    //var htmlContent = marked.parse(response.reply);
-                    var textoLimpio = formatearTextoBot(response.reply);
-                    var htmlContent = marked.parse(textoLimpio);
-                    $('#chatHistory').append('<div class="message bot">' + htmlContent + '</div>');
-
-                    botHabla(response.reply);
-                } else {
-                    localHistory.pop(); // Revertir si hay error
-                    $('#chatHistory').append('<div class="message error">Error: ' + response.error + '</div>');
+            // 2. RAG: Buscar contexto SQL (Solo en el 3er mensaje)
+            if (localHistory.length === 3) {
+                const ragResponse = await $.post('/Chat/ObtenerContextoBD', { problema: userText });
+                if (ragResponse.success && ragResponse.contexto) {
+                    payloadHistory[2].content = userText + "\n\n" + ragResponse.contexto;
                 }
-            },
-            error: function () {
-                // QUITAR INDICADOR DE CARGA EN CASO DE ERROR TAMBIÉN
-                $('#loading-bubble').remove();
-                localHistory.pop();
-                $('#chatHistory').append('<div class="message error">Error de conexión con el servidor.</div>');
-            },
-            complete: function () {
-                // 5. Reactivar controles
-                $('#txtMessage, #btnSend').prop('disabled', false);
-                $('#txtMessage').focus();
-                scrollToBottom();
             }
-        });
+
+            // Inyectamos la regla de formato estructurado de forma oculta al último mensaje
+            const reglaFormato = "\n\n[INSTRUCCIÓN ESTRICTA] Si vas a dar el resumen final, usa: [QUE]: [DONDE]: [CUANDO]: [CUAL]: [QUIEN]: [CUANTO]: [CONDICIONES_BASICAS]: [ACCIONES]: [ANALISIS_FINAL]:";
+            payloadHistory[payloadHistory.length - 1].content += reglaFormato;
+
+            // 3. API BAYER: Obtener token y llamar directo desde el navegador
+            const entraIdToken = await obtenerTokenEntraID();
+            const bayerPayload = {
+                messages: payloadHistory,
+                assistant_id: "fc966206-2132-4b75-b585-db329d5447d3", // ID de tu Asistente
+                stream: false
+            };
+            if (currentConversationId) bayerPayload.conversation_id = currentConversationId;
+            if (currentParentMessageId) bayerPayload.parent_message_id = currentParentMessageId;
+
+            const bayerResponse = await $.ajax({
+                url: 'https://chat.int.bayer.com/api/v2/chat/agent',
+                type: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + entraIdToken,
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(bayerPayload)
+            });
+
+            // 4. UI: Mostrar respuesta de la IA
+            let replyText = bayerResponse.choices[0].message ? bayerResponse.choices[0].message.content : bayerResponse.choices[0].content;
+            if (bayerResponse.conversation_id) currentConversationId = bayerResponse.conversation_id;
+            if (bayerResponse.id) currentParentMessageId = bayerResponse.id; // o bayerResponse.choices[0].message.id
+
+            $('#loading-bubble').remove();
+            localHistory.push({ role: "assistant", content: replyText });
+            $('#chatHistory').append('<div class="message bot">' + marked.parse(replyText) + '</div>');
+
+            // 5. C#: Guardar en SQL y extraer QUÉ/CUÁNTO silenciosamente
+            await $.ajax({
+                url: '/Chat/GuardarChatYExtraer',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    investigacionId: investigacionId,
+                    history: localHistory,
+                    ultimaRespuesta: replyText,
+                    conversationId: currentConversationId,
+                    parentMessageId: currentParentMessageId
+                })
+            });
+
+        } catch (error) {
+            console.error(error);
+            $('#loading-bubble').remove();
+            localHistory.pop(); // Revertir en caso de error
+
+            if (error.status === 0) {
+                $('#chatHistory').append('<div class="message error">Error CORS: El navegador no puede conectar a la API. Solicita a IT añadir esta URL a los orígenes permitidos.</div>');
+            } else {
+                $('#chatHistory').append('<div class="message error">Ocurrió un error al comunicarse con el asistente.</div>');
+            }
+        } finally {
+            $('#txtMessage, #btnSend').prop('disabled', false);
+            $('#txtMessage').focus();
+            scrollToBottom();
+        }
     }
+    //function sendMessage() {
+    //    var userText = $('#txtMessage').val().trim();
+    //    var investigacionId = $('#txtTemplatesRunningN_ID').val().trim();
+    //    if (userText === "") return;
+
+    //    // 1. Agregamos y mostramos el mensaje del usuario
+    //    localHistory.push({ role: "user", content: userText });
+    //    $('#chatHistory').append('<div class="message user">' + $('<div>').text(userText).html() + '</div>');
+
+    //    // Limpiar input y deshabilitar controles
+    //    $('#txtMessage').val('');
+    //    $('#txtMessage, #btnSend').prop('disabled', true);
+    //    scrollToBottom();
+
+    //    // ---------------------------------------------------------
+    //    // 2. MOSTRAR INDICADOR DE CARGA ("Escribiendo...")
+    //    // ---------------------------------------------------------
+    //    var loadingHtml = `
+    //        <div id="loading-bubble" class="message bot">
+    //            <div class="typing-indicator">
+    //                <span></span><span></span><span></span>
+    //            </div>
+    //        </div>`;
+    //    $('#chatHistory').append(loadingHtml);
+    //    scrollToBottom(); // Hacemos scroll para que el usuario vea que está cargando
+
+    //    // 3. Llamada al Servidor
+    //    $.ajax({
+    //        url: '/Chat/SendMessage',
+    //        type: 'POST',
+    //        contentType: 'application/json',
+    //        data: JSON.stringify({
+    //            history: localHistory,
+    //            conversationId: currentConversationId,
+    //            parentMessageId: currentParentMessageId,
+    //            investigacionId: investigacionId
+    //        }),
+    //        success: function (response) {
+    //            // ---------------------------------------------------------
+    //            // 4. QUITAR INDICADOR DE CARGA
+    //            // ---------------------------------------------------------
+    //            $('#loading-bubble').remove();
+
+    //            if (response.success) {
+    //                // Actualizar IDs
+    //                if (response.conversationId) currentConversationId = response.conversationId;
+    //                if (response.newParentId) currentParentMessageId = response.newParentId;
+
+    //                // Guardar y mostrar respuesta
+    //                localHistory.push({ role: "assistant", content: response.reply });
+    //                //var htmlContent = marked.parse(response.reply);
+    //                var textoLimpio = formatearTextoBot(response.reply);
+    //                var htmlContent = marked.parse(textoLimpio);
+    //                $('#chatHistory').append('<div class="message bot">' + htmlContent + '</div>');
+
+    //                botHabla(response.reply);
+    //            } else {
+    //                localHistory.pop(); // Revertir si hay error
+    //                $('#chatHistory').append('<div class="message error">Error: ' + response.error + '</div>');
+    //            }
+    //        },
+    //        error: function () {
+    //            // QUITAR INDICADOR DE CARGA EN CASO DE ERROR TAMBIÉN
+    //            $('#loading-bubble').remove();
+    //            localHistory.pop();
+    //            $('#chatHistory').append('<div class="message error">Error de conexión con el servidor.</div>');
+    //        },
+    //        complete: function () {
+    //            // 5. Reactivar controles
+    //            $('#txtMessage, #btnSend').prop('disabled', false);
+    //            $('#txtMessage').focus();
+    //            scrollToBottom();
+    //        }
+    //    });
+    //}
 
     // ... resto de tu código (enter key, scroll) ...
     function scrollToBottom() {
         var history = $('#chatHistory');
         history.scrollTop(history[0].scrollHeight);
     }
-    function cargarHistorial(investigacionId) {
-        $('#chatHistory').empty();
+    function cargarHistorial() {
+        var investigacionId = getInvestigacionId();
+        if (!investigacionId) return;
+
         $.ajax({
             url: '/Chat/LoadChatHistory',
             type: 'GET',
             data: { investigacionId: investigacionId },
             success: function (response) {
+                $('#chatHistory').empty(); // Limpiar chat actual
+
                 if (response.success && response.history) {
-                    // --- ESCENARIO A: YA HAY CHARLA GUARDADA ---
                     currentConversationId = response.conversationId || "";
                     currentParentMessageId = response.parentId || "";
-
                     localHistory = JSON.parse(response.history);
 
                     localHistory.forEach(function (msg) {
                         if (msg.role === "user") {
                             $('#chatHistory').append('<div class="message user">' + $('<div>').text(msg.content).html() + '</div>');
                         } else if (msg.role === "assistant") {
-                            //var htmlContent = marked.parse(msg.content);
-                            // CÓDIGO LIMPIO:
-                            var textoLimpio = formatearTextoBot(msg.content);
-                            var htmlContent = marked.parse(textoLimpio);
-                            $('#chatHistory').append('<div class="message bot">' + htmlContent + '</div>');
+                            $('#chatHistory').append('<div class="message bot">' + marked.parse(msg.content) + '</div>');
                         }
                     });
                     scrollToBottom();
                 } else {
-                    // --- ESCENARIO B: ES UN CHAT NUEVO ---
-                    // No hay historial, disparamos el mensaje automático
+                    // Chat nuevo: Disparar mensaje automático
                     iniciarChatAutomatico();
                 }
             }
         });
     }
     function iniciarChatAutomatico() {
-        var mensajeInicial = "Quiero plantear mi problema, ¿Podrías ayudarme?";
-
-        // Ponemos el texto en el input (opcional, pero se ve bien)
-        $('#txtMessage').val(mensajeInicial);
-
-        // Reutilizamos tu función sendMessage() que ya maneja UI, Loading y BD!
+        $('#txtMessage').val("Quiero plantear mi problema, ¿Podrías ayudarme?");
         sendMessage();
     }
     function generarReporteAI() {
@@ -1418,6 +1532,21 @@
             $('#btnMic').removeClass('btn-danger').addClass('btn-secondary');
             $('#txtMessage').attr('placeholder', 'Escribe o dicta tu problema...');
         };
+    }
+    function descargarReportePDF() {
+        var id = getInvestigacionId();
+        if (!id) { alert("No se ha cargado una investigación válida."); return; }
+
+        // Creamos un formulario dinámico para forzar la descarga en el navegador
+        var form = $('<form></form>')
+            .attr('action', '/Chat/FinalizarYGuardarReporteBot')
+            .attr('method', 'post')
+            .attr('target', '_blank');
+
+        form.append($('<input></input>').attr('type', 'hidden').attr('name', 'investigacionId').attr('value', id));
+        form.appendTo('body').submit().remove();
+
+        alert("La base de datos se ha actualizado y tu reporte se está descargando.");
     }
     //FIN FUNCIONES
     function getIrisEvents_dataAll(line) {
@@ -4146,24 +4275,35 @@
     }
     //Funciones Cuadrantes
     function fn_verifica_cuadrantes(ID_Template, Nombre, ID_Cuadrante) {
-        var esProblemSonvingTemplate = $("#txtBand_pmcard_templateRN").val();
+        // 1. Obtenemos el valor y nos aseguramos de que sea un número. 
+        // Si el campo está vacío, usamos 0 por defecto.
+        var valTemplateRN = $("#txtBand_pmcard_templateRN").val();
+        var esProblemSolvingTemplate = parseInt(valTemplateRN) || 0;
+        var idTemplateNum = parseInt(ID_Template) || 0;
+
         var url = "/Templates/Verifica_Cuadrantes";
         var data = { ID_Template: ID_Template, Nombre: Nombre };
+
         $.post(url, data).done(function (info) {
-            console.log(esProblemSonvingTemplate)
+            console.log("ID_Template actual:", idTemplateNum);
+            console.log("esProblemSolvingTemplate actual:", esProblemSolvingTemplate);
+
             if (info != "0") {
-                if (ID_Template > 19831 && esProblemSonvingTemplate > 1) {
-                    
-                    //carga templates con asistente AI
-                    $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID_Cuadrante);
-                    $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
-                    $("#btnTemplateRunning_Finalizar_investigacion").hide();
-                    fn_obtener_cuadrante_runninID(ID_Cuadrante);
+                // Asignaciones comunes que se hacen en ambos casos
+                $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID_Cuadrante);
+                $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
+                $("#btnTemplateRunning_Finalizar_investigacion").hide();
+                fn_obtener_cuadrante_runninID(ID_Cuadrante);
+
+                // 2. Condición principal ajustada
+                if (idTemplateNum > 19831 && esProblemSolvingTemplate > 0) {
+
+                    // --- Lógica para Templates con Asistente AI ---
                     if (Nombre == "A") {
                         fn_mostrarAsistenteAI(ID_Cuadrante, Nombre);
                         $("#ItemTemplateRunning_AssistenteAI").show();
                         $("#btnFinalizarInvestigacion").hide();
-                        cargarHistorial(ID_Template);
+                        cargarHistorial(idTemplateNum);
                     } else {
                         fn_mostrarSeccionesRunning(ID_Cuadrante, Nombre);
                     }
@@ -4171,26 +4311,33 @@
                         fn_verify_a3_type(ID_Cuadrante, Nombre);
                         $("#ItemTemplateRunning_AssistenteAI").hide();
                         $("#btnFinalizarInvestigacion").show();
-                        cargarHistorial(ID_Template);
+                        cargarHistorial(idTemplateNum);
                     }
                 } else {
+                    // --- Lógica para Templates antiguos (anteriores a AI) ---
                     $("#ItemTemplateRunning_AssistenteAI").hide();
                     $("#btnFinalizarInvestigacion").hide();
-                    //carga A3 anteriores a AI
-                    $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID_Cuadrante);
-                    $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
-                    $("#btnTemplateRunning_Finalizar_investigacion").hide();
-                    fn_obtener_cuadrante_runninID(ID_Cuadrante);
+
                     fn_mostrarSeccionesRunning(ID_Cuadrante, Nombre);
+
                     if (Nombre == "D") {
-                        fn_verify_a3_type(ID_Cuadrante, Nombre)
+                        fn_verify_a3_type(ID_Cuadrante, Nombre);
                     }
                 }
             } else {
-                $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_comenzar_cuadrante_A'), Tipo: "info", Error: null });
+                // Notificación en caso de que el cuadrante no pueda iniciar
+                $.notiMsj.Notificacion({
+                    Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_comenzar_cuadrante_A'),
+                    Tipo: "info",
+                    Error: null
+                });
             }
         }).fail(function (error) {
-            $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'), Tipo: "danger", Error: error });
+            $.notiMsj.Notificacion({
+                Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_Mostrar_informacion_error'),
+                Tipo: "danger",
+                Error: error
+            });
         });
     }
     function fn_verify_a3_type(id_cuadrante, nombre_cuadrante) {
@@ -4339,7 +4486,7 @@
                     window.location.replace("/Home/Index");
                 }
                 $("#btnFirmaElectronica_Firmar").removeClass("btn-progress");
-                generarReporteAI();
+                descargarReportePDF();
                 $.notiMsj.Notificacion({ Mensaje: res.Mensaje, Tipo: res.Tipo, Error: res.Error });               
             },
             error: function (error) {

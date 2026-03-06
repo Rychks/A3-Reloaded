@@ -416,7 +416,6 @@ namespace A3_Reloaded.Controllers
             }
             return Json(noti, JsonRequestBehavior.AllowGet);
         }
-
         public JsonResult get_profile_users(string cwid)
         {
             List<UsuarioModel> list = new List<UsuarioModel>();
@@ -438,5 +437,6 @@ namespace A3_Reloaded.Controllers
             }
             return Json(list, JsonRequestBehavior.AllowGet);
         }
+        //
     }
 }
