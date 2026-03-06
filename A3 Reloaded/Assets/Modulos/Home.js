@@ -641,7 +641,6 @@
         resetearInterfaz(id_template);
 
         $("#mdlReporteA3_Panel").modal("show");
-
         // Obtener y establecer la URL del reporte
         
 
@@ -671,34 +670,44 @@
         const $reporteUrl = $("#ReporteRunning_url");
         const $spinner = $("#pdfLoader");
 
-        // Mostrar el spinner y limpiar la URL actual
+        // 1. Mostrar el spinner y asegurar que el iframe esté oculto mientras carga
         $spinner.show();
-        $reporteUrl.attr("src", "").off("load"); // Limpia eventos previos
+        $reporteUrl.hide();
 
-        // Configurar el evento para ocultar el spinner cuando el iframe cargue 
-        // (Lo definimos una sola vez aquí arriba)
+        // 2. Limpiamos eventos previos para evitar ejecuciones duplicadas
+        $reporteUrl.off("load");
+
+        // 3. Removemos el atributo src en lugar de asignarle "", para evitar "cargas fantasma"
+        $reporteUrl.removeAttr("src");
+
+        // 4. Configuramos el evento de carga para el iframe
         $reporteUrl.on("load", function () {
-            $spinner.hide();
+            // Verificamos que el iframe tenga una URL asignada y no esté vacía
+            const currentSrc = $(this).attr("src");
+            if (currentSrc && currentSrc !== "") {
+                // Cuando la URL real termine de cargar, ocultamos el spinner y mostramos el PDF
+                $spinner.hide();
+                $reporteUrl.show();
+            }
         });
 
-        // 1. PRIMERO: Consultar si existe un reporte del Chatbot
+        // 5. PRIMERO: Consultar si existe un reporte del Chatbot
         $.ajax({
             url: '/Chat/VerificarReporteChatbot',
             type: 'GET',
             data: { investigacionId: id_template },
             success: function (chatbotInfo) {
-
                 if (chatbotInfo.existe && chatbotInfo.filename) {
-                    // SI EXISTE REPORTE IA: Apuntamos a la carpeta física donde guardamos el PDF
+                    // SI EXISTE REPORTE IA: Apuntamos a la carpeta física y asignamos la URL
                     const urlChatbot = `/Assets/Veriones_A3/${chatbotInfo.filename}`;
                     $reporteUrl.attr("src", urlChatbot);
                 } else {
-                    // SI NO EXISTE: Ejecutamos tu lógica original (Fallback)
+                    // SI NO EXISTE: Ejecutamos el flujo tradicional
                     cargarReporteTradicional(id_template, $reporteUrl);
                 }
             },
             error: function () {
-                // Si el servidor falla al verificar el chatbot, intentamos cargar el tradicional de todos modos
+                // En caso de error, intentamos cargar el reporte tradicional
                 cargarReporteTradicional(id_template, $reporteUrl);
             }
         });

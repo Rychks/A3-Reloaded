@@ -1,5 +1,6 @@
 require.config({
     baseUrl: '..',
+    urlArgs: "v=" + (typeof appVersion !== 'undefined' ? appVersion : (new Date()).getTime()),
     shim: {
         'bootstrap': ['jquery'],
         'core': ['bootstrap', 'jquery'],

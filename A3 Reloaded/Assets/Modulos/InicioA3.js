@@ -2681,7 +2681,8 @@
                 $("#txtTemplateRunngin_Titulo").text("A3 Reloaded - " + item.TipoA3);
                 if (item.TipoA3 == "Problem Statement") {
                     $("#txtBand_pmcard_templateRN").val(1);
-                    
+                } else {
+                    $("#txtBand_pmcard_templateRN").val(0);
                 }
                 $("#pnlTemplatesRunningM_Folio").val(item.Folio);
                 $("#pnlTemplatesRunningM_Contact").val(item.Responsable);
@@ -4144,31 +4145,47 @@
         });
     }
     //Funciones Cuadrantes
-    function fn_verifica_cuadrantes(ID_Template, Nombre, ID) {
+    function fn_verifica_cuadrantes(ID_Template, Nombre, ID_Cuadrante) {
+        var esProblemSonvingTemplate = $("#txtBand_pmcard_templateRN").val();
         var url = "/Templates/Verifica_Cuadrantes";
         var data = { ID_Template: ID_Template, Nombre: Nombre };
         $.post(url, data).done(function (info) {
+            console.log(esProblemSonvingTemplate)
             if (info != "0") {
-                $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID);
-                $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
-                $("#btnTemplateRunning_Finalizar_investigacion").hide();
-                fn_obtener_cuadrante_runninID(ID);              
-                if (Nombre == "A") {
-                    fn_mostrarAsistenteAI(ID, Nombre);
-                    $("#ItemTemplateRunning_AssistenteAI").show();
-                    $("#btnFinalizarInvestigacion").hide();
-
-                    cargarHistorial(ID_Template);
+                if (ID_Template > 19831 && esProblemSonvingTemplate > 1) {
+                    
+                    //carga templates con asistente AI
+                    $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID_Cuadrante);
+                    $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
+                    $("#btnTemplateRunning_Finalizar_investigacion").hide();
+                    fn_obtener_cuadrante_runninID(ID_Cuadrante);
+                    if (Nombre == "A") {
+                        fn_mostrarAsistenteAI(ID_Cuadrante, Nombre);
+                        $("#ItemTemplateRunning_AssistenteAI").show();
+                        $("#btnFinalizarInvestigacion").hide();
+                        cargarHistorial(ID_Template);
+                    } else {
+                        fn_mostrarSeccionesRunning(ID_Cuadrante, Nombre);
+                    }
+                    if (Nombre == "D") {
+                        fn_verify_a3_type(ID_Cuadrante, Nombre);
+                        $("#ItemTemplateRunning_AssistenteAI").hide();
+                        $("#btnFinalizarInvestigacion").show();
+                        cargarHistorial(ID_Template);
+                    }
                 } else {
-                    fn_mostrarSeccionesRunning(ID, Nombre);
-                }
-                if (Nombre == "D") {
-                    fn_verify_a3_type(ID, Nombre);
                     $("#ItemTemplateRunning_AssistenteAI").hide();
-                    $("#btnFinalizarInvestigacion").show();
-                    cargarHistorial(ID_Template);
+                    $("#btnFinalizarInvestigacion").hide();
+                    //carga A3 anteriores a AI
+                    $("#pnlTemplateRunning_Cuadrante_ID_Ejecucion").val(ID_Cuadrante);
+                    $("#pnlTemplateRunning_Cuadrante_Nombre_Ejecucion").val(Nombre);
+                    $("#btnTemplateRunning_Finalizar_investigacion").hide();
+                    fn_obtener_cuadrante_runninID(ID_Cuadrante);
+                    fn_mostrarSeccionesRunning(ID_Cuadrante, Nombre);
+                    if (Nombre == "D") {
+                        fn_verify_a3_type(ID_Cuadrante, Nombre)
+                    }
                 }
-               
             } else {
                 $.notiMsj.Notificacion({ Mensaje: $.CargarIdioma.Obtener_Texto('txt_Idioma_comenzar_cuadrante_A'), Tipo: "info", Error: null });
             }

@@ -275,6 +275,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\HtmlHelperExtensions.cs" />
     <Compile Include="Models\5WModel.cs" />
     <Compile Include="Models\AccesosModel.cs" />
     <Compile Include="Models\AccionesModel.cs" />

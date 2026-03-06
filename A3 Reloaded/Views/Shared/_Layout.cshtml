@@ -8,6 +8,7 @@
 
 
 }
+@using A3_Reloaded.Helpers
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,7 +22,7 @@
     <title>A3 Problem Solving</title>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Assets/fontawesome-free-6.6.0-web/css/all.css" rel="stylesheet" />
-    <link href="~/Assets/css/style.css?v=1.0.2" rel="stylesheet" />
+    <link href="@Url.UrlVersionada("~/Assets/css/style.css")" rel="stylesheet" />
     <link href="~/Assets/modules/select2/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="icon" href="~/Assets/Bayer_Brand/Bayer-Logo.png" type="image/x-icon" />
     <link rel="shortcut icon" href="~/Assets/Bayer_Brand/Bayer-Logo.png" />
@@ -44,7 +45,11 @@
         </script>
         <script src="https://chat.int.bayer.com/embed.min.js" defer></script>*@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="~/Assets/V2/js/require.min.js?v=1.0.6"></script>
+    <script>
+    // Ahora sí tomará la versión real de la DLL de tu proyecto
+    var appVersion = '@(typeof(A3_Reloaded.Clases.Usuarios).Assembly.GetName().Version.ToString())';
+    </script>
+    <script src="@Url.UrlVersionada("~/Assets/V2/js/require.min.js")"></script>
 </head>
 <body>
 
@@ -236,13 +241,13 @@
                         <div class="align-content-end">
                             Contact Support:  Jesus Martinez(EJBOM) & Ricardo Hernandez(EUENY)
                         </div>
-                      
+
                     </div>
                 </footer>
             </div>
         </div>
     </div>
-    <script src="~/Assets/V2/js/dashboard.js?v=1.0.4"></script>
+    <script src="@Url.UrlVersionada("~/Assets/V2/js/dashboard.js")"></script>
     <script>
         function openLeftMenu() {
             document.getElementById("leftMenu").style.display = "block";
